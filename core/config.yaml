@@ -1,0 +1,5 @@
+moduleName: 'core'
+requiredModules:
+  api: true
+dwellers:
+  Core: true

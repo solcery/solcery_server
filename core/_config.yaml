@@ -1,5 +1,6 @@
 moduleName: 'core'
 requiredModules:
   api: true
+  game: true
 dwellers:
   Core: true

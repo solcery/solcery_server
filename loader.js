@@ -3,8 +3,10 @@ const fs = require('fs');
 const { Dweller, addMixin } = require('./dweller.js');
 require('./utils');
 
+const loadedModules = {}
 
 function loadModule(moduleName) {
+	if (loadedModules[moduleName]) return; // Do not load modules twice
 	let config = parseConfig(`./${moduleName}/_config.yaml`);
 	let { dwellers, requiredModules, mixins } = config;
 	if (dwellers) {
@@ -27,7 +29,7 @@ function loadModule(moduleName) {
 			}
 		}
 	}
-
+	loadedModules[moduleName] = { config };
 }
 
 
@@ -44,5 +46,6 @@ loadModule('core'); // Loading core module
 const core = Object.create(Core); //Creating core
 core.id = 'main'
 core.core = core;
+core.loadedModules = loadedModules;
 // core.create(Api, { id: 1 })
 core.execAllMixins('onCreate')

@@ -16,7 +16,6 @@ Dweller.execAllMixins = function(event, ...args) {
     let callbacks = objget(proto, 'callbacks', event)
     if (callbacks) {
         for (let callback of callbacks) {
-            console.log('callback: ', callback)
             callback.apply(this, args);
         }
     }
@@ -46,6 +45,7 @@ Dweller.execAllMixins = function(event, ...args) {
 Dweller.create = function(classObject, data) {
     let obj = Object.create(classObject);
     obj.id = data.id;
+    obj.core = this.core;
     objset(this, obj, 'objects', classObject, data.id)
     obj.parent = this
     obj.execAllMixins('onCreate', data);

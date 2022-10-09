@@ -5,7 +5,7 @@ require('./utils');
 
 
 function loadModule(moduleName) {
-	let config = parseConfig(`./${moduleName}/config.yaml`);
+	let config = parseConfig(`./${moduleName}/_config.yaml`);
 	let { dwellers, requiredModules, mixins } = config;
 	if (dwellers) {
 		for (let [ dwellerName, _ ] of Object.entries(dwellers)) {
@@ -43,5 +43,6 @@ loadModule('core'); // Loading core module
 
 const core = Object.create(Core); //Creating core
 core.id = 'main'
+core.core = core;
 // core.create(Api, { id: 1 })
 core.execAllMixins('onCreate')

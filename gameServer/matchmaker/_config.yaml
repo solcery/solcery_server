@@ -1,0 +1,10 @@
+moduleName: 'matchmaker'
+dwellers:
+  Matchmaker: 
+    id: 'string'
+mixins:
+  Matchmaker:
+    matchmaker: true
+  GameServer:
+    gameServer: true
+    

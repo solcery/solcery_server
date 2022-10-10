@@ -1,6 +1,7 @@
 moduleName: 'game'
 requiredModules:
   api: true
+  gameServer/match: true
 dwellers:
   GameServer: true
 mixins:
@@ -26,8 +27,8 @@ api:
             version:
               type: 'string'
               description: 'Game version'
-        createMatch:
-          description: 'Starts new match'
+        findMatch:
+          description: 'Find new match using matchmaker'
           params: 
             nfts:
               type: 'array(string)'

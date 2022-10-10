@@ -1,0 +1,10 @@
+moduleName: 'gameServer/match'
+dwellers:
+  Match: 
+    id: 'string'
+mixins:
+  Match:
+    match: true
+  GameServer:
+    gameServer: true
+    

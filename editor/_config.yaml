@@ -1,6 +1,7 @@
 moduleName: 'editor'
 requiredModules: 
   editor/project: true
+  api: true
 dwellers:
   Editor: 
     id: 'string'

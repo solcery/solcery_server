@@ -1,3 +1,7 @@
+const { 
+  v1: uuidv1,
+} = require('uuid');
+
 global.assert = (value, message = 'Assertion failed') => {
 	if (value) return true;
 	throw new Error(message);
@@ -62,3 +66,4 @@ global.objmerge = (target, source) => {
 	return target;
 }
 
+global.uuid = uuidv1;

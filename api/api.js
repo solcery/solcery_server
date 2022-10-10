@@ -85,6 +85,7 @@ Master.apiCall = async function(query) {
             }
         }
         let arrayCommand = command.split('.');
+        // TODO: Check for responses
         await this.execAllMixins('onApiCommand', arrayCommand, result, params)
     } catch (e) {
         console.error(e)

@@ -1,0 +1,17 @@
+moduleName: 'player'
+dwellers:
+  Player: true
+mixins:
+  Player:
+    player: true
+  GameServer:
+    gameServer: true
+api:
+  commands:
+    login: 
+      params:
+        gameId: 
+          required: true
+        pubkey:
+          required: true
+    

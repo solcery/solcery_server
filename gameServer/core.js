@@ -1,7 +1,7 @@
 const Master = {};
 
 Master.onCreate = function(data) {
-    this.api = this.create(Api, { id: 'main' });
+    this.create(GameServer, { id: 'game_polygon', gameId: 'game_polygon' });
 }
 
 module.exports = Master

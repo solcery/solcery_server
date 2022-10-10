@@ -1,0 +1,11 @@
+moduleName: 'editor'
+requiredModules: 
+  editor/project: true
+dwellers:
+  Editor: 
+    id: 'string'
+mixins:
+  Editor:
+    editor: true
+  Core:
+    core: true

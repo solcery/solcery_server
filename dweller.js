@@ -11,51 +11,38 @@ function addMixin(base, mixin) {
     }
 }
 
-Dweller.execAllMixins = function(event, ...args) {
+Dweller.execAllMixins = async function(event, ...args) {
     let proto = Object.getPrototypeOf(this);
-    let callbacks = objget(proto, 'callbacks', event)
-    if (callbacks) {
-        for (let callback of callbacks) {
-            callback.apply(this, args);
+    let classCallbacks = objget(proto, 'callbacks', event);
+    // Generic dweller mixin
+    // let dweller = Object.getPrototypeOf(proto);
+    // let dwellerCallbacks = objget(dweller, 'callbacks', event);
+    // if (dwellerCallbacks) {
+    //     for (let callback of dwellerCallbacks) {
+    //         await callback.apply(this, args);
+    //     }
+    // }
+    if (classCallbacks) {
+        for (let callback of classCallbacks) {
+
+            await callback.apply(this, args);
         }
     }
-    // TODO: onEvent generic handler
 }
 
-    //TODO
-// Dweller.awaitAllMixins = async function(event, ...args) {
-    // let proto = Object.getPrototypeOf(this);
-    // if (proto.eventHandlers) {
-    //     let handlers = proto.eventHandlers[event];
-    //     if (handlers) {
-    //         for (let handler of handlers) {
-    //             await handler.apply(this, args);
-    //         }
-    //     }
-    //     handlers = proto.eventHandlers['onEvent'];
-    //     if (handlers) {
-    //         for (let handler of handlers) {
-    //             await handler.apply(this, [ event ].concat(args));
-    //         }
-    //     }
-
-    // }
-// }
-
 Dweller.create = function(classObject, data) {
+    assert(data, 'Dweller create error: no data provided!');
     let obj = Object.create(classObject);
     obj.id = data.id;
     obj.core = this.core;
-    objset(this, obj, 'objects', classObject, data.id)
+    objset(this, obj, 'objects', classObject.classname, data.id)
     obj.parent = this
     obj.execAllMixins('onCreate', data);
     return obj;
 }
 
 Dweller.get = function(classObject, id) {
-    if (this.objects && this.objects[classObject.classname]) {
-        return this.objects[classObject.classname][id]
-    }
+    return objget(this, 'objects', classObject.classname, id);
 }
 
 Dweller.getAll = function(classObject) {
@@ -69,4 +56,6 @@ Dweller.getAll = function(classObject) {
     return result
 }
 
-module.exports = { Dweller, addMixin }
+global['Dweller'] = Dweller;
+
+module.exports = { addMixin }

@@ -1,0 +1,56 @@
+moduleName: 'game'
+requiredModules:
+  api: true
+dwellers:
+  GameServer: true
+mixins:
+  GameServer:
+    gameServer: true
+  Core:
+    core: true
+  Api:
+    api: true
+api:
+  paths:
+    game:
+      params: 
+        gameId:
+          type: 'string'
+          required: true
+      paths:
+        getGameInfo:
+          description: 'Returns game info'
+        getContentVersion:
+          description: 'Return content version'
+          params: 
+            version:
+              type: 'string'
+              description: 'Game version'
+        createMatch:
+          description: 'Starts new match'
+          params: 
+            nfts:
+              type: 'array(string)'
+              description: 'List of player nfts'
+            gameVersion:
+              type: 'int'
+              description: 'Version of the game. Latest if not specified'
+        # joinMatch:
+        #   params:
+        #     matchId:
+        #       type: 'string'
+        #       required: true
+        # leaveMatch:
+        #   params:
+        #     matchId:
+        #       type: 'string'
+        #       description: 'matchId'
+        #       required: true
+
+        # bugreport:
+        #   description: 'Send bug report'
+        #   params:
+        #     payload:
+        #       description: 'JSON serialized payload with report'
+        #       type: 'json'
+        #       required: true

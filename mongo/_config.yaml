@@ -1,0 +1,7 @@
+moduleName: 'mongo'
+dwellers: 
+  Mongo: 
+    id: 'string'
+mixins: 
+  Mongo:
+    mongo: true

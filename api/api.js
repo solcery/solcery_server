@@ -1,35 +1,65 @@
 const express = require("express");
 
-const Dweller = {};
+const Master = {};
 
-Dweller.onCreate = function(data) {
+Master.onCreate = function(data) {
     this.commands = {}
-    const PORT = process.env.API_PORT || 5000;
+    const PORT = process.env.API_PORT || 3000;
     const app = express();
     app.get("/api", (request, response) => this.apiGetRequest(request, response));
     app.listen(PORT, function () {
         console.error(`Node ${process.pid}: listening on port ${PORT}`);
     });
+
+    const exportCommands = function(command, data, ctx) {
+        let oldParams = ctx.params;
+        ctx.params = Object.assign({}, ctx.params, data.params);
+        if (data.paths) {
+            ctx.path.push(command);
+            for (let [ command, commandData ] of Object.entries(data.paths)) {
+                exportCommands(command, commandData, ctx);
+            }
+            ctx.path.pop();
+        } else {
+            ctx.result.push({
+                name: ctx.path.concat([command]),
+                description: data.description,
+                params: ctx.params,
+            })
+        }
+        ctx.params = oldParams;
+    }
+
     for (let { config } of Object.values(this.core.loadedModules)) {
-        let commands = objget(config, 'api', 'commands');
-        if (!commands) continue;
-        for (let [ commandName, commandData ] of Object.entries(commands)) {
-            this.commands[commandName] = commandData;
+        let paths = objget(config, 'api', 'paths');
+        if (!paths) continue;
+        for (let [ path, props ] of Object.entries(paths)) {
+            let ctx = {
+                path: [],
+                params: {},
+                result: []
+            }
+            exportCommands(path, props, ctx)
+            for (let cmd of ctx.result) {
+                commandName = cmd.name.join('.');
+                delete cmd.name;
+                this.commands[commandName] = cmd;
+            }
         }
     }
 }
 
-Dweller.sendResult = function(result, response) {
+Master.sendResult = function(result, response) {
     response.header("Access-Control-Allow-Origin", '*');
     response.json(result)
 }
 
-Dweller.apiGetRequest = function(request, response) {
-    let res = this.apiCall(request.query);
+Master.apiGetRequest = async function(request, response) {
+    let res = await this.apiCall(request.query);
     this.sendResult(res, response);
 }
 
-Dweller.apiCall = function(query) {
+Master.apiCall = async function(query) {
     let command = query.command;
     let params = {};
     let result = {};
@@ -46,12 +76,16 @@ Dweller.apiCall = function(query) {
         if (commandConfig.params) {
             for (let [paramName, paramConfig] of Object.entries(commandConfig.params)) {
                 let paramInvalid = paramConfig.required && query[paramName] === undefined;
-                console.log(paramInvalid)
                 assert(!paramInvalid, `API error: Missing param '${paramName}'`);
-                params[paramName] = query[paramName];
+                let value = query[paramName];
+                if (paramConfig.type === 'json' && typeof value === 'string') {
+                    value = JSON.parse(value);
+                }
+                params[paramName] = value;
             }
         }
-        this.execAllMixins('onCommand', command, result, params);
+        let arrayCommand = command.split('.');
+        await this.execAllMixins('onApiCommand', arrayCommand, result, params)
     } catch (e) {
         console.error(e)
         return {
@@ -65,4 +99,4 @@ Dweller.apiCall = function(query) {
     }
 }
 
-module.exports = Dweller
+module.exports = Master

@@ -1,7 +1,7 @@
 const Master = {};
 
 Master.onCreate = function(data) {
-    this.api = this.create(Api, { id: 'main' });
+    this.create(Editor, { id: 'polygon', projectId: 'polygon' });
 }
 
 module.exports = Master

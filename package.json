@@ -6,7 +6,7 @@
     "node": "16.x"
   },
   "scripts": {
-    "start": "node loader.js"
+    "start": "node loader.js test"
   },
   "main": "loader.js",
   "repository": "git@github.com:solcery/solcery_server.git",

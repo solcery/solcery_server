@@ -7,4 +7,6 @@ mixins:
     match: true
   GameServer:
     gameServer: true
+tests:
+  testMatch: true
     

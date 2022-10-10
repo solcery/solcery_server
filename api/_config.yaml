@@ -6,3 +6,8 @@ mixins:
     core: true
   Api: 
     api: true
+tests:
+  testHelp: true
+api:
+  paths:
+    help: true

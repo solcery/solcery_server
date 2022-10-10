@@ -6,7 +6,7 @@ Master.onCreate = function(data) {
     this.commands = {}
     const PORT = process.env.API_PORT || 3000;
     const app = express();
-    app.get("/api", (request, response) => this.apiGetRequest(request, response));
+    app.get("/api", (request, response) => this.getRequest(request, response));
     app.listen(PORT, function () {
         console.error(`Node ${process.pid}: listening on port ${PORT}`);
     });
@@ -54,7 +54,7 @@ Master.sendResult = function(result, response) {
     response.json(result)
 }
 
-Master.apiGetRequest = async function(request, response) {
+Master.getRequest = async function(request, response) {
     let res = await this.apiCall(request.query);
     this.sendResult(res, response);
 }
@@ -64,9 +64,6 @@ Master.apiCall = async function(query) {
     let params = {};
     let result = {};
     try {
-        if (query.help && !command) {
-            return this.commands;
-        }
         assert(command, 'API error: No command specified in request!');
         let commandConfig = this.commands[command];
         assert(commandConfig, `API error: Unknown command ${command}!`);
@@ -84,9 +81,9 @@ Master.apiCall = async function(query) {
                 params[paramName] = value;
             }
         }
-        let arrayCommand = command.split('.');
+        let commandPath = command.split('.');
         // TODO: Check for responses
-        await this.execAllMixins('onApiCommand', arrayCommand, result, params)
+        await this.execAllMixins('onApiCommand', commandPath, result, params)
     } catch (e) {
         console.error(e)
         return {
@@ -98,6 +95,11 @@ Master.apiCall = async function(query) {
         status: true,
         data: result,
     }
+}
+
+Master.onApiCommand = async function(commandPath, result, params) {
+    if (commandPath[0] !== 'help') return;
+    result.commands = this.commands;
 }
 
 module.exports = Master

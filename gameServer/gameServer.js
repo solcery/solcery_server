@@ -2,7 +2,7 @@ const Master = {};
 
 Master.onCreate = async function(data) {
     this.gameId = data.gameId;
-    this.mongo = this.create(Mongo, {
+    this.create(Mongo, {
         id: 'main',
         db: this.gameId,
         collections: [
@@ -11,6 +11,12 @@ Master.onCreate = async function(data) {
             'gameInfo'
         ]
     })
+}
+
+Master.onMongoConnected = function(data) {
+    if (data.mongo.id === 'main') {
+        this.mongo = data.mongo;
+    }
 }
 
 Master.onApiCommandGetGameInfo = async function(result, params) {

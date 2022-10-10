@@ -52,13 +52,17 @@ function parseConfig(configPath) {
 	return config;
 }
 
-function runTests(tests) {
+async function runTests(tests) {
+	console.log('runTests')
+	global.testContext = {
+		addMixin
+	}
 	let total = 0;
 	let failed = 0;
 	for (let [ testName, testFunc ] of Object.entries(tests)) {
 		total++;
 		try {
-			testFunc()
+			await testFunc()
 		} catch (e) {
 			failed++;
 			console.error(`Test '${testName}' failed: ${e.message}`)
@@ -66,15 +70,26 @@ function runTests(tests) {
 	}
 	console.log(`${total - failed} of ${total} tests passed`)
 	if (failed === 0) {
-		console.log('Tests successfully passed!')
+		console.log('Tests passed!')
 	} else {
-		console.error('Test were not passed!')
+		console.error('Test failed!')
 	}
+}
+
+
+global.createCore = async () => {
+	const core = Object.create(Core); //Creating core
+	core.id = 'core'
+	core.core = core;
+	core.loadedModules = loadedModules;
+	await core.execAllMixins('onCreate')
+	return core;
 }
 
 let test = process.argv.includes('--test');
 
 loadModule('core', test); // Loading core module
+
 
 if (test) {
 	let tests = {}
@@ -85,9 +100,5 @@ if (test) {
 	}
 	runTests(tests)
 } else {
-	const core = Object.create(Core); //Creating core
-	core.id = 'core'
-	core.core = core;
-	core.loadedModules = loadedModules;
-	core.execAllMixins('onCreate')
+	createCore();
 }

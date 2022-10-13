@@ -7,3 +7,5 @@ requiredModules:
   websocket: true
 dwellers:
   Core: true
+# tests:
+#   testGeneric: true

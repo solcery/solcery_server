@@ -1,8 +1,15 @@
 const Master = {}
 
-Master.onCreate = async function(data) {
-	if (!data.matchmaker) return;
-	this.matchmaker = await this.create(Matchmaker, Object.assign({ id: uuid() }, data.matchmaker));
+Master.onStart = async function(data) {
+	let gameInfo = await this.getGameInfo();
+	if (!gameInfo) return;
+	this.matchmaker = await this.create(Matchmaker, { 
+		id: uuid(),
+		playerQuantity: gameInfo.playerQuantity ?? 1,
+		botFillTimeout: gameInfo.botFillTimeout ?? 30000,
+		tickPeriod: gameInfo.tickPeriod ?? 2000,
+
+	});
 }
 
 Master.onPlayRequest = function(player) {

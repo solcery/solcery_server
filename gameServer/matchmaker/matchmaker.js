@@ -7,9 +7,11 @@ Master.onCreate = function(data) {
 	if (data.tickPeriod) {
 		setInterval( () => { this.execAllMixins('onTick') }, data.tickPeriod);
 	}
+	console.log(this.playerQuantity, this.botFillTimeout)
 }
 
 Master.onTick = function() {
+	console.log('tick')
 	this.checkQueue();
 }
 

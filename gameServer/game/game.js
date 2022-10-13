@@ -6,6 +6,7 @@ Master.onCreate = function(data) {
 	this.players = data.players ?? [];
 	this.started = data.started;
 	this.finished = data.finished;
+	this.gameVersion = data.version;
 }
 
 Master.start = function(data) {

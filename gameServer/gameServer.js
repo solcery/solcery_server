@@ -2,8 +2,9 @@ const Master = {};
 
 Master.onCreate = async function(data) {
     this.gameId = data.gameId;
-    this.create(Mongo, {
+    this.mongo = await this.create(Mongo, {
         id: 'main',
+        virtualDb: data.virtualDb,
         db: this.gameId,
         collections: [
             'games',
@@ -11,12 +12,7 @@ Master.onCreate = async function(data) {
             'gameInfo'
         ]
     })
-}
-
-Master.onMongoConnected = function(data) {
-    if (data.mongo.id === 'main') {
-        this.mongo = data.mongo;
-    }
+    await this.execAllMixins('onStart');
 }
 
 Master.onApiCommandGetGameInfo = async function(result, params) {

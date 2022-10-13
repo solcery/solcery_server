@@ -2,7 +2,7 @@ moduleName: 'editor/project'
 mixins:
   Editor:
     editor: true
-  Api:
+  Core:
     api: true
 
 api:

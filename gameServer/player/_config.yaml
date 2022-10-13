@@ -1,0 +1,15 @@
+moduleName: 'gameServer/player'
+requiredModules:
+  websocket: true
+dwellers: 
+  Player: 
+    id: 'string'
+mixins: 
+  Player:
+    player: true
+  WSConnection:
+    wsConnection: true
+  GameServer:
+    gameServer: true
+tests:
+  testChallenge: true

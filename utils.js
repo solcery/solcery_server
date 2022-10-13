@@ -4,10 +4,11 @@ const {
 
 global.assert = (value, message = 'Assertion failed') => {
 	if (value) return true;
-	throw new Error(message);
+	throw new Error (message);
 }
 
 global.objget = (obj, ...path) => {
+	assert(obj)
 	return path.reduce((acc, pathElement, idx) => {
 		if (!acc) return undefined;
 		if (!acc[pathElement]) return undefined;
@@ -16,6 +17,7 @@ global.objget = (obj, ...path) => {
 }
 
 global.objset = (obj, value, ...path) => {
+	assert(obj)
 	path.reduce((acc, pathElement, idx) => {
 		if (idx < path.length - 1) {
 			if (!acc[pathElement]) {
@@ -29,6 +31,7 @@ global.objset = (obj, value, ...path) => {
 }
 
 global.objinsert = (obj, value, ...path) => {
+	assert(obj)
 	path.reduce((acc, pathElement, idx) => {
 		if (idx < path.length - 1) {
 			if (!acc[pathElement]) {
@@ -64,6 +67,14 @@ global.objmerge = (target, source) => {
 		}
 	});
 	return target;
+}
+
+global.sleep = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+global.now = () => {
+	return Math.floor(Date.now() / 1000);
 }
 
 global.uuid = uuidv1;

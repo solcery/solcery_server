@@ -1,13 +1,6 @@
-const ApiMixin = {
-	onApiCommand: function(command, result, params) {
-		//
-	}
-}
-
-module.exports = async function() {
-	// testContext.addMixin(Api, ApiMixin)
+async function test() {
 	const core = await createCore();
-	assert(core.api, 'API handler was not created by core!');
+	// testContext.addMixin(Api, ApiMixin)
 	let request = {
 		query: {
 			command: 'help'
@@ -21,6 +14,7 @@ module.exports = async function() {
 		}
 	}
 	await new Promise(r => setTimeout(r, 500));
-	await core.api.getRequest(request, response)
-	
+	await core.getRequest(request, response)
 }
+
+module.exports = { test }

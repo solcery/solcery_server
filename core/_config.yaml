@@ -4,5 +4,6 @@ requiredModules:
   gameServer: true
   mongo: true
   editor: true
+  websocket: true
 dwellers:
   Core: true

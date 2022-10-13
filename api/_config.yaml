@@ -1,11 +1,7 @@
 moduleName: 'api'
-dwellers: 
-  Api: true
 mixins: 
   Core: 
     core: true
-  Api: 
-    api: true
 tests:
   testHelp: true
 api:

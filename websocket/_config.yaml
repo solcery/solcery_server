@@ -1,0 +1,11 @@
+moduleName: 'websocket'
+dwellers:
+  WSConnection: 
+    id: 'string'
+mixins:
+  Core:
+    core: true
+  WSConnection: 
+    wsConnection: true
+tests:
+  testWebSocket: true

@@ -1,7 +1,9 @@
 moduleName: 'game'
 requiredModules:
   api: true
-  gameServer/match: true
+  gameServer/game: true
+  gameServer/player: true
+  gameServer/matchmaker: true
 dwellers:
   GameServer: true
 mixins:
@@ -9,7 +11,6 @@ mixins:
     gameServer: true
   Core:
     core: true
-  Api:
     api: true
 api:
   paths:
@@ -27,15 +28,15 @@ api:
             version:
               type: 'string'
               description: 'Game version'
-        findMatch:
-          description: 'Find new match using matchmaker'
-          params: 
-            nfts:
-              type: 'array(string)'
-              description: 'List of player nfts'
-            gameVersion:
-              type: 'int'
-              description: 'Version of the game. Latest if not specified'
+        # findMatch:
+        #   description: 'Find new match using matchmaker'
+        #   params: 
+        #     nfts:
+        #       type: 'array(string)'
+        #       description: 'List of player nfts'
+        #     gameVersion:
+        #       type: 'int'
+        #       description: 'Version of the game. Latest if not specified'
         # joinMatch:
         #   params:
         #     matchId:

@@ -11,11 +11,6 @@ Master.onStart = async function(data) {
 	});
 }
 
-Master.onJoinQueueRequest = async function(player) {
-	if (!this.matchmaker) return; // TODO
-	await this.matchmaker.execAllMixins('onPlayerQueued', player);
-}
-
 Master.createBot = async function() {
 	return await this.create(Player, { id: uuid(), bot: true })
 }

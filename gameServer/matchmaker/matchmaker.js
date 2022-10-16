@@ -54,7 +54,7 @@ Master.onPlayerQueued = async function(player) {
 }
 
 Master.onPlayerLeft = function(player) {
-	let index = this.queue.findIndex(queueEntry => queueEntry.playerId === playerId);
+	let index = this.queue.findIndex(queueEntry => queueEntry.playerId === player.id);
 	if (index > -1) {
 		this.queue.splice(index, 1);
 	}

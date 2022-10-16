@@ -35,6 +35,9 @@ class VirtualCollection {
     dump() {
         return  this.db.source[this.name];
     }
+    count() {
+        return this.db.source[this.name].length;
+    }
     find(query) {
         let res = [];
         for (let doc of this.db.source[this.name]) {

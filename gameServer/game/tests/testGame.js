@@ -5,7 +5,10 @@ const mixins = [
 		dweller: Player,
 		mixin: {
 			_name: 'Test player message receiver',
-			onGameUpdate: function(data) {
+			onGameAction: function(data) {
+				objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
+			},
+			onGameStart: function(data) {
 				objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
 			}
 		}
@@ -26,17 +29,13 @@ async function test() {
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 	assert(gameServer);
-	await gameServer.execAllMixins('onUserConnected', PUBKEY1);
-	await gameServer.execAllMixins('onUserConnected', PUBKEY2);
+	let player1 = await gameServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
+	let player2 = await gameServer.create(Player, { id: PUBKEY2, pubkey: PUBKEY2 });
 	let game = await gameServer.createGame();
-	
-	let player1 = gameServer.get(Player, PUBKEY1);
-	let player2 = gameServer.get(Player, PUBKEY2);
-	assert(player1 && player2);
 
 	await game.addPlayer(player1);
 	await game.addPlayer(player2);
-	game.start();
+	await game.start();
 
 	await player1.execAllMixins('onWSRequestAction', { type: 'rightClick' });
 	await player2.execAllMixins('onWSRequestAction', { type: 'leftClick' });
@@ -48,8 +47,8 @@ async function test() {
 	assert(!gameServer.get(Game, game.id));
 
 	assert(game.actionLog[4].player === 2 && game.actionLog[4].action.outcome === -1);
-	assert(playerMessages[PUBKEY1] && playerMessages[PUBKEY1].length === 5);
-	assert(playerMessages[PUBKEY2] && playerMessages[PUBKEY2].length === 6);
+	assert(playerMessages[PUBKEY1] && playerMessages[PUBKEY1].length === 4);
+	assert(playerMessages[PUBKEY2] && playerMessages[PUBKEY2].length === 5);
 }
 
 module.exports = { test, mixins }

@@ -1,7 +1,7 @@
 const Master = {}
 
 Master.onWSRequestPlay = async function(data) {
-    if (objget(this, 'status', 'status') !== 'online') return; // TODO: error
+    if (objget(this, 'status', 'code') !== 'online') return; // TODO: error
     await this.parent.execAllMixins('onPlayRequest', this);
 }
 

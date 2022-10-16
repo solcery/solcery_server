@@ -4,6 +4,7 @@ requiredModules:
   gameServer/game: true
   gameServer/player: true
   gameServer/matchmaker: true
+  unityBuilds: true
 dwellers:
   GameServer: true
 mixins:
@@ -22,7 +23,7 @@ api:
       paths:
         getGameInfo:
           description: 'Returns game info'
-        getContentVersion:
+        getGameVersion:
           description: 'Return content version'
           params: 
             version:

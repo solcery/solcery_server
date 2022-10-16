@@ -1,11 +1,10 @@
 const Master = {}
 
-Master.createGame = async function(data) {
-	let version;
-	if (data && data.version) {
-		version = data.version;
-	} else {
-		version = await this.mongo.versions.find().sort({ contentVersion :-1 }).limit(1);
+Master.createGame = async function(data = {}) {
+	if (!data.version) {
+		data.version = await this.mongo.versions.count();
+		// let latest = await this.mongo.versions.find().sort({ version :-1 }).limit(1).toArray();
+		// data.version = latest[0].version;
 	}
 	let game = await this.create(Game, Object.assign({ id: uuid() }, data ));
 	return game;
@@ -23,14 +22,6 @@ Master.onStart = async function(data) {
 	for (let game of games) {
 		await this.loadGame(game);
 	}
-}
-
-Master.onDelete = function(data) {
-
-}
-
-Master.saveGame = function(data) {
-	
 }
 
 module.exports = Master

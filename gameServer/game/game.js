@@ -2,21 +2,22 @@ const Master = {}
 
 Master.onCreate = function(data) {
 	this.actionLog = data.actionLog ?? [];
-	this.gameVersion = data.gameVersion;
 	this.players = data.players ?? [];
 	this.started = data.started;
 	this.finished = data.finished;
-	this.gameVersion = data.version;
+	this.version = data.version;
+	this.seed = data.seed ?? Math.floor(Math.random() * 256);
 }
 
 Master.start = function(data) {
 	this.started = now();
-	this.broadcastToPlayers(['id', 'started']);
+	this.actionLog.push({ 
+		action: { 
+			type: 'init',
+		},
+	});
+	this.execAllPlayers('onGameStart', this.getSaveData());
 	this.save();
-}
-
-Master.cancel = function(data) {
-	// TODO
 }
 
 Master.end = function(data) {
@@ -26,7 +27,7 @@ Master.end = function(data) {
 }
 
 Master.getSaveData = function(fields) {
-	const defaultFields = [ 'gameVersion', 'started', 'finished', 'actionLog', 'players'];
+	const defaultFields = [ 'id', 'version', 'started', 'finished', 'actionLog', 'players', 'seed' ];
 	let res = {};
 	if (!fields) {
 		fields = defaultFields;
@@ -73,7 +74,7 @@ Master.removePlayer = function(player, outcome) {
 	player.execAllMixins('onGameLeft');
 	for (let participant of this.players) {
 		if (participant.outcome === undefined) {
-			this.broadcastToPlayers(['actionLog']);
+			this.execAllPlayers('onGameAction', this.getSaveData(['actionLog']));
 			return;
 		};
 	}
@@ -88,16 +89,15 @@ Master.onPlayerAction = function(player, action) {
 		action
 	})
 	this.save();
-	this.broadcastToPlayers([ 'actionLog' ]);
+	this.execAllPlayers('onGameAction', this.getSaveData([ 'actionLog' ]));
 }
 
-Master.broadcastToPlayers = function(fields) {
-	let update = this.getSaveData(fields);
+Master.execAllPlayers = function(callbackName, data) {
 	for (let playerData of this.players) {
-		if (playerData.outcome) continue;
+		if (playerData.outcome !== undefined) continue;
 		let player = this.parent.get(Player, playerData.id);
 		if (!player) continue;
-		player.execAllMixins('onGameUpdate', update)
+		player.execAllMixins(callbackName, data)
 	}
 }
 

@@ -7,22 +7,21 @@ Master.onCreate = function(data) {
 	if (data.tickPeriod) {
 		setInterval( () => { this.execAllMixins('onTick') }, data.tickPeriod);
 	}
-	console.log(this.playerQuantity, this.botFillTimeout)
 }
 
 Master.onTick = function() {
-	console.log('tick')
 	this.checkQueue();
 }
 
 Master.createGame = async function() {
 	const game = await this.parent.createGame();
-	let queuePlayers = this.queue.splice(0, this.playerQuantity);
-	for (let { playerId } of queuePlayers) {
+	let selectedPlayers = this.queue.splice(0, this.playerQuantity);
+	for (let { playerId } of selectedPlayers) {
 		let player = this.parent.get(Player, playerId);
 		assert(player, `Matchmaking: Error creating game - no player '${playerId}'!`);
 		game.addPlayer(player);
 	}
+	game.start(); // TODO: move to game?
 }
 
 Master.checkQueue = async function() {
@@ -41,7 +40,7 @@ Master.checkQueue = async function() {
 				time: Date.now(),
 			})
 		}
-		this.createGame();
+		await this.createGame();
 	}
 }
 
@@ -50,10 +49,7 @@ Master.onPlayerQueued = async function(player) {
 		playerId: player.id,
 		time: Date.now(),
 	})
-	player.setStatus({
-		status: 'queued',
-		time: Date.now(),
-	})
+	player.setStatus('queued', { time: Date.now() })
 	await this.checkQueue();
 }
 
@@ -62,9 +58,7 @@ Master.onPlayerLeft = function(player) {
 	if (index > -1) {
 		this.queue.splice(index, 1);
 	}
-	player.setStatus({
-		status: 'online',
-	})
+	player.setStatus('online')
 }
 
 module.exports = Master

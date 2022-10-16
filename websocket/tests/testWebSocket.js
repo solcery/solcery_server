@@ -22,7 +22,7 @@ async function connectToServer() {
     return new Promise((resolve, reject) => {
     	setTimeout(function() {
     		if (!connected) reject('Socket timeout: Failed to handshake');
-    	}, 1000);
+    	}, 3000);
     	ws.onopen = () => {
     		connected = true;
     		resolve(ws);

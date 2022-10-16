@@ -1,4 +1,5 @@
 const clientPlayer = {
+	status: {},
 	gameMessages: [],
 }
 
@@ -7,12 +8,17 @@ const mixins = [
 		dweller: Player,
 		mixin: {
 			_name: 'Test player message receiver',
-			onStatusChanged: function(status) {
-				clientPlayer.status = status;
-			},
-			onGameUpdate: function(message) {
-				clientPlayer.gameMessages.push(message)
-			},
+			onWSMessage: function(type, data) {
+				if (type === 'playerStatus') {
+					clientPlayer.status = data;
+				}
+				if (type === 'gameAction') {
+					clientPlayer.gameMessages.push(data)
+				}
+				if (type === 'gameStart') {
+					clientPlayer.gameMessages.push(data)
+				}
+			}
 		}
 	}
 ]
@@ -30,35 +36,39 @@ async function test() {
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 
-	await gameServer.execAllMixins('onUserConnected', PUBKEY);
-	assert(clientPlayer.status.status === 'online');
+	// let wsConnection = core.create(WSConnection, { id: 1 });
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY)
+	let player = await gameServer.get(Player, PUBKEY);
+	assert(clientPlayer.status.code === 'online');
 	let game = await gameServer.createGame();
-	let player = gameServer.get(Player, PUBKEY);
 	await game.addPlayer(player);
-	assert(clientPlayer.status.status === 'ingame' && clientPlayer.status.gameId === game.id);
+	game.start();
+	assert(clientPlayer.status.code === 'ingame' && clientPlayer.status.data.gameId === game.id);
 	assert(clientPlayer.gameMessages.length === 1);
 	await game.start();
 	assert(clientPlayer.gameMessages.length === 2);
 	await player.execAllMixins('onWSRequestAction', { type: 'leftClick' });
+	assert(clientPlayer.gameMessages.length === 3);
+	clientPlayer.gameMessages = [];
 
 	// player reconnects on their side
 
 	delete clientPlayer.status;
-	await gameServer.execAllMixins('onUserConnected', PUBKEY);
-	assert(clientPlayer.status.status === 'ingame' && clientPlayer.status.gameId === game.id);
-	assert(clientPlayer.gameMessages.length === 4);
-	await player.execAllMixins('onWSRequestAction', { type: 'rightClick' });
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
+	assert(clientPlayer.status.code === 'ingame' && clientPlayer.status.data.gameId === game.id);
+	assert(clientPlayer.gameMessages.length === 1);
+	clientPlayer.gameMessages = [];
 
 	// deleting player on server then reconnecting
 	delete clientPlayer.status;
 	await player.delete();
-	await gameServer.execAllMixins('onUserConnected', PUBKEY);
-	assert(clientPlayer.status.status === 'ingame' && clientPlayer.status.gameId === game.id);
-	assert(clientPlayer.gameMessages.length === 6);
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
+	assert(clientPlayer.status.code === 'ingame' && clientPlayer.status.data.gameId === game.id);
+	assert(clientPlayer.gameMessages.length === 1);
 
 	// player leaves game
 	await player.execAllMixins('onWSRequestLeaveGame', { outcome: 1 });
-	assert(clientPlayer.status.status === 'online')
+	assert(clientPlayer.status.code === 'online')
 }
 
 module.exports = { test, mixins }

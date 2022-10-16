@@ -1,14 +1,17 @@
 const Master = {};
 
-Master.onUserConnected = async function(pubkey) {
+Master.onPlayerWSConnected = async function(pubkey, wsConnection) {
 	let player = this.get(Player, pubkey);
 	if (!player) {
-		player = await this.create(Player, { 
+		player = await this.create(Player, {
 			id: pubkey,
 			pubkey: pubkey,
+			status: { // TODO: remove
+				code: 'online',
+			}
 		});
 	}
-	player.execAllMixins('onConnected');
+	await player.execAllMixins('onWSConnected', wsConnection);
 }
 
 module.exports = Master

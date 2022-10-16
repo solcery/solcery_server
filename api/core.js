@@ -1,4 +1,6 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require('cors');
 
 const Master = {};
 
@@ -8,9 +10,13 @@ Master.onDelete = function(data) {
 
 Master.onCreate = function(data) {
     this.apiCommands = {}
-    const PORT = process.env.API_PORT || 3000;
+    const PORT = process.env.API_PORT || 5000;
     const app = express();
+    app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
+    app.use(bodyParser.json({ limit: "1mb" }));
+    app.use(cors());
     app.get("/api", (request, response) => this.getRequest(request, response));
+    app.post("/api", (request, response) => this.postRequest(request, response));
     this.apiListener = app.listen(PORT);
 
     const exportCommands = function(command, data, ctx) {
@@ -61,10 +67,16 @@ Master.getRequest = async function(request, response) {
     this.sendResult(res, response);
 }
 
+Master.postRequest = async function(request, response) {
+    let res = await this.apiCall(request.body);
+    this.sendResult(res, response);
+}
+
 Master.apiCall = async function(query) {
     let command = query.command;
-    let params = {};
-    let result = {};
+    let data = {
+        params: {},
+    }
     try {
         assert(command, 'API error: No command specified in request!');
         let commandConfig = this.apiCommands[command];
@@ -80,12 +92,13 @@ Master.apiCall = async function(query) {
                 if (paramConfig.type === 'json' && typeof value === 'string') {
                     value = JSON.parse(value);
                 }
-                params[paramName] = value;
+                data.params[paramName] = value
+                objset(data, value, paramName);
             }
         }
         let commandPath = command.split('.');
         // TODO: Check for responses
-        await this.execAllMixins('onApiCommand', commandPath, result, params)
+        await this.execAllMixins('onApiCommand', commandPath, data)
     } catch (e) {
         return {
             status: false,
@@ -94,13 +107,15 @@ Master.apiCall = async function(query) {
     }
     return {
         status: true,
-        data: result,
+        data: data.result,
     }
 }
 
-Master.onApiCommand = async function(commandPath, result, params) {
+Master.onApiCommand = async function(commandPath, data) {
     if (commandPath[0] !== 'help') return;
-    result.commands = this.apiCommands;
+    data.result = {
+        commands: this.apiCommands,
+    }
 }
 
 module.exports = Master

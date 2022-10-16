@@ -60,6 +60,7 @@ Dweller.create = async function(classObject, data) {
 }
 
 Dweller.delete = async function() {
+    this.deleting = true;
     await this.execAllMixins('onDelete');
     if (this.parent) {
         delete this.parent.objects[this.classname][this.id]

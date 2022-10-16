@@ -36,9 +36,9 @@ async function test() {
 	let matchmaker = gameServer.matchmaker;
 	assert(matchmaker)
 
-	await gameServer.execAllMixins('onUserConnected', PUBKEY1);
-	await gameServer.execAllMixins('onUserConnected', PUBKEY2);
-	await gameServer.execAllMixins('onUserConnected', PUBKEY3);
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY1);
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY2);
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY3);
 
 	let player1 = gameServer.get(Player, PUBKEY1);
 	let player2 = gameServer.get(Player, PUBKEY2);
@@ -58,9 +58,9 @@ async function test() {
 
 	assert(gameServer.getAll(Game).length === 0);
 	await player3.execAllMixins('onWSRequestPlay');
-	await sleep(30);
+	await sleep(10);
 	assert(matchmaker.queue.length === 1);
-	await sleep(30);
+	await sleep(50);
 	assert(matchmaker.queue.length === 0);
 	game = gameServer.getAll(Game)[0];
 	assert(game);

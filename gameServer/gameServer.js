@@ -20,25 +20,33 @@ Master.getGameInfo = async function() {
     return await this.mongo.gameInfo.findOne({});
 }
 
-Master.getGameVersion = async function(contentVersion) {
-    let version;
-    if (gameVersion) {
-        version = await this.mongo.versions.find({ contentVersion })
-    } else {
-        version = await this.mongo.versions.find().sort({ contentVersion :-1 }).limit(1)
-    }
+// Master.getGameVersion = async function(contentVersion) { 
+//     let version;
+//     if (contentVersion) {
+//         version = await this.mongo.versions.find({ contentVersion })
+//     } else {
+//         version = await this.mongo.versions.find().sort({ contentVersion :-1 }).limit(1)
+//     }
+//     return version;
+// }
+
+Master.onApiCommandGetGameInfo = async function(data) {
+    data.result = await this.mongo.gameInfo.findOne({});
 }
 
-Master.onApiCommandGetGameInfo = async function(result, params) {
-    result.gameInfo = await this.mongo.gameInfo.findOne({});
-}
-
-Master.onApiCommandGetGameVersion = async function (result, params) {
-    let version = params.gameVersion;
+Master.onApiCommandGetGameVersion = async function (data) {
+    let version = data.params.version;
     if (!version) {
         version = await this.mongo.versions.count();
     }
-    result.version = await this.mongo.versions.findOne({ version })
+    let gameVersion = await this.mongo.versions.findOne({ version });
+    let unityBuildId = objget(gameVersion, 'content', 'meta', 'gameSettings', 'build');
+    let unityBuild = await this.core.getUnityBuild(unityBuildId);
+    data.result = {
+        version: gameVersion.version,
+        content: gameVersion.content,
+        unityBuild,
+    };
 }
 
 module.exports = Master

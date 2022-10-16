@@ -6,18 +6,39 @@ Master.onCreate = function(data) {
         try {
             let msg = JSON.parse(message.toString());
             await this.execAllMixins('onSocketMessage', msg)
-        } catch (e) {
-            this.execAllMixins('onError', e)
+        } catch (err) {
+            this.send({
+                type: 'error',
+                data: err.message,
+            })
         }
     });
-    this.webSocket.on('close', () => this.execAllMixins('onDisconnect'))
+    this.webSocket.on('close', () => this.execAllMixins('onClose'));
+    sleep(data.timeout).then(() => {
+        if (!this.confirmed) this.close();
+    })
+    
 }
 
-Master.onError = function (err) {
-    this.send({
-        type: 'error',
-        data: err.message,
-    })
+Master.onSocketMessage = async function(message) {
+    if (this.confirmed) return;
+    if (message.type !== 'challenge') return;
+    await this.challenge(message.data);
+}
+
+Master.onDelete = function() {
+    this.close();
+}
+
+Master.challenge = async function (data) {
+    let result = { 
+        confirmed: true,
+    }
+    await this.execAllMixins('onChallenge', data, result);
+    this.confirmed = result.confirmed;  
+    if (result.confirmed) {
+        this.execAllMixins('onConfirmed', data);
+    }
 }
 
 Master.send = function (message) {
@@ -29,7 +50,8 @@ Master.close = function (message) {
     this.webSocket.close();
 }
 
-Master.onDisconnect = function (data) {
+Master.onClose = function (data) {
+    if (this.deleting) return;
     this.delete();
 }
 

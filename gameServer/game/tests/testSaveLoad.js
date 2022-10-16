@@ -13,7 +13,7 @@ async function test() {
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 
-	await gameServer.execAllMixins('onUserConnected', PUBKEY);
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
 	let game = await gameServer.createGame();
 	let gameId = game.id;
 	let player1 = gameServer.get(Player, PUBKEY);
@@ -30,7 +30,7 @@ async function test() {
 		virtualDb, 
 	});
 
-	await gameServer.execAllMixins('onUserConnected', PUBKEY);
+	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
 	player1 = gameServer.get(Player, PUBKEY);
 	await player1.execAllMixins('onWSRequestAction', { type: 'leftClick' });
 	game = gameServer.get(Game, gameId)

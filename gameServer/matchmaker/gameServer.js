@@ -11,7 +11,7 @@ Master.onStart = async function(data) {
 	});
 }
 
-Master.onPlayRequest = async function(player) {
+Master.onJoinQueueRequest = async function(player) {
 	if (!this.matchmaker) return; // TODO
 	await this.matchmaker.execAllMixins('onPlayerQueued', player);
 }

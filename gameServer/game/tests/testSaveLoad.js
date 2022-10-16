@@ -37,7 +37,7 @@ async function test() {
 	assert(player1);
 	assert(game);
 	assert(game.actionLog.length = 2);
-	assert(game.actionLog[0].player === 1, game.actionLog[1].player === 1);
+	assert(game.actionLog[1].player === 1);
 	assert(game.id === gameId);
 	assert(game.started === started);
 }

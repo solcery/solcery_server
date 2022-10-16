@@ -47,17 +47,17 @@ async function test() {
 
 	assert(gameServer.getAll(Game).length === 0)
 
-	await player1.execAllMixins('onWSRequestPlay');
+	await player1.execAllMixins('onWSRequestJoinQueue');
 	assert(matchmaker.queue.length === 1);
 
-	await player2.execAllMixins('onWSRequestPlay');
+	await player2.execAllMixins('onWSRequestJoinQueue');
 	let game = gameServer.getAll(Game)[0];
 	assert(game);
 	assert(game.players.length === 2 && game.players[0].id === PUBKEY1 && game.players[1].id === PUBKEY2);
 	await game.delete();
 
 	assert(gameServer.getAll(Game).length === 0);
-	await player3.execAllMixins('onWSRequestPlay');
+	await player3.execAllMixins('onWSRequestJoinQueue');
 	await sleep(10);
 	assert(matchmaker.queue.length === 1);
 	await sleep(50);

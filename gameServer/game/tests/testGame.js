@@ -46,7 +46,7 @@ async function test() {
 	await player2.execAllMixins('onWSRequestLeaveGame', { outcome: -1 });
 	assert(!gameServer.get(Game, game.id));
 
-	assert(game.actionLog[4].player === 2 && game.actionLog[4].action.outcome === -1);
+	assert(game.actionLog[5].player === 2 && game.actionLog[5].action.outcome === -1);
 	assert(playerMessages[PUBKEY1] && playerMessages[PUBKEY1].length === 4);
 	assert(playerMessages[PUBKEY2] && playerMessages[PUBKEY2].length === 5);
 }

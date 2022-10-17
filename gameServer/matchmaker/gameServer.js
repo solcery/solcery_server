@@ -5,7 +5,7 @@ Master.onMongoReady = function(mongo) {
 		if (!gameInfo) return;
 		this.matchmaker = this.create(Matchmaker, { 
 			id: 'main',
-			playerQuantity: gameInfo.playerQuantity ?? 1,
+			playerQuantity: 2,
 			botFillTimeout: gameInfo.botFillTimeout ?? 30000,
 			tickPeriod: gameInfo.tickPeriod ?? 2000,
 		});

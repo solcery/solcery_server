@@ -19,7 +19,7 @@ Master.onCreate = function(data) {
             webSocket.close();
         }
     });
-    this.webSocketServer.listen(process.env.port || 5000); 
+    this.webSocketServer.listen(process.env.PORT || 5000); 
 }
 
 Master.onDelete = function(data) {

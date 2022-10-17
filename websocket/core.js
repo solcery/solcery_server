@@ -1,18 +1,25 @@
 const Master = {};
 
 Master.onCreate = function(data) {
-    const WebSocket = require('ws');
     this.connections = [];
     this.webSocketTimeout = 100;
-    this.webSocketServer = new WebSocket.Server({ port: 7000 });
-    this.webSocketServer.on('connection', (webSocket) => {
+    assert(this.app)
+    this.webSocketServer = require('http').createServer(this.app);
+    this.io = require('socket.io')(this.webSocketServer, {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"]
+        }
+    });
+    this.io.on('connection', (socket) => {
         try {
-            this.connectWebSocket(webSocket)
+            this.connectWebSocket(socket)
         } catch (e) {
-            webSocket.send(`Error: ${e.message}`);
+            // webSocket.send(`Error: ${e.message}`);
             webSocket.close();
         }
     });
+    this.webSocketServer.listen(process.env.port || 5000); 
 }
 
 Master.onDelete = function(data) {

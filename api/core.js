@@ -10,14 +10,13 @@ Master.onDelete = function(data) {
 
 Master.onCreate = function (data) {
     this.apiCommands = {}
-    const PORT = process.env.API_PORT || 5000;
     const app = express();
+    this.app = app;
     app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
     app.use(bodyParser.json({ limit: "1mb" }));
     app.use(cors());
     app.get("/api", (request, response) => this.apiCall(request.query, response));
     app.post("/api", (request, response) => this.apiCall(request.body, response));
-    this.apiListener = app.listen(PORT);
 
     const extractCommands = function(command, data, ctx) {
         let oldParams = ctx.params;

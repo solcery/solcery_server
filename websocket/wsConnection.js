@@ -4,8 +4,7 @@ Master.onCreate = function(data) {
     this.webSocket = data.webSocket;
     this.webSocket.on('message', (message) => {
         try {
-            let msg = JSON.parse(message.toString());
-            this.execAllMixins('onSocketMessage', msg)
+            this.execAllMixins('onSocketMessage', message)
         } catch (err) {
             this.send({
                 type: 'error',
@@ -42,12 +41,11 @@ Master.challenge = function (data) {
 }
 
 Master.send = function (message) {
-    let json = JSON.stringify(message)
-    this.webSocket.send(json)
+    this.webSocket.emit('message', message)
 }
 
 Master.close = function (message) {
-    this.webSocket.close();
+    this.webSocket.disconnect();
 }
 
 Master.onClose = function (data) {

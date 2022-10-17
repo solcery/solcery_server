@@ -58,6 +58,7 @@ Master.onCreate = function (data) {
 }
 
 Master.apiCall = function(query, response) {
+    response.header("Access-Control-Allow-Origin", '*');
     let command = query.command;
     let params = {};
 

@@ -9,6 +9,7 @@ Master.onMongoReady = function(mongo) {
 			botFillTimeout: gameInfo.botFillTimeout ?? 30000,
 			tickPeriod: gameInfo.tickPeriod ?? 2000,
 		});
+		this.ready = true; // TODO: proper loading
 	});
 }
 

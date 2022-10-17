@@ -1,38 +1,40 @@
 const virtualDb = {};
 
 async function test() {
-	let core = await createCore();
+	let core = createCore();
 
 	const SERVER_NAME = 'testGameSrv';
 	const PUBKEY = 'pubkey';
 
-	await core.create(GameServer, { 
+	core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
 		virtualDb, 
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 
-	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
-	let game = await gameServer.createGame();
+	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
+	let game = gameServer.createGame();
 	let gameId = game.id;
 	let player1 = gameServer.get(Player, PUBKEY);
-	await game.addPlayer(player1);
+	game.addPlayer(player1);
 	game.start();
 	let started = game.started;
-	await player1.execAllMixins('onWSRequestAction', { type: 'rightClick' });
-	await gameServer.delete();
+	player1.execAllMixins('onWSRequestAction', { type: 'rightClick' });
+	gameServer.delete();
 
-	core = await createCore();
-	gameServer = await core.create(GameServer, { 
+	core.delete();
+
+	core = createCore();
+	gameServer = core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
 		virtualDb, 
 	});
 
-	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
+ 	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);
 	player1 = gameServer.get(Player, PUBKEY);
-	await player1.execAllMixins('onWSRequestAction', { type: 'leftClick' });
+	player1.execAllMixins('onWSRequestAction', { type: 'leftClick' });
 	game = gameServer.get(Game, gameId)
 	assert(player1);
 	assert(game);

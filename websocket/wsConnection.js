@@ -2,10 +2,10 @@ const Master = {};
 
 Master.onCreate = function(data) {
     this.webSocket = data.webSocket;
-    this.webSocket.on('message', async (message) => {
+    this.webSocket.on('message', (message) => {
         try {
             let msg = JSON.parse(message.toString());
-            await this.execAllMixins('onSocketMessage', msg)
+            this.execAllMixins('onSocketMessage', msg)
         } catch (err) {
             this.send({
                 type: 'error',
@@ -20,21 +20,21 @@ Master.onCreate = function(data) {
     
 }
 
-Master.onSocketMessage = async function(message) {
+Master.onSocketMessage = function(message) {
     if (this.confirmed) return;
     if (message.type !== 'challenge') return;
-    await this.challenge(message.data);
+    this.challenge(message.data);
 }
 
 Master.onDelete = function() {
     this.close();
 }
 
-Master.challenge = async function (data) {
+Master.challenge = function (data) {
     let result = { 
         confirmed: true,
     }
-    await this.execAllMixins('onChallenge', data, result);
+    this.execAllMixins('onChallenge', data, result);
     this.confirmed = result.confirmed;  
     if (result.confirmed) {
         this.execAllMixins('onConfirmed', data);

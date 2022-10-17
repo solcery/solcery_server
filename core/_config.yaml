@@ -3,9 +3,9 @@ requiredModules:
   api: true
   gameServer: true
   mongo: true
-  editor: true
+  # editor: true
   websocket: true
 dwellers:
   Core: true
-# tests:
-#   testGeneric: true
+tests:
+  testDisableMixin: true

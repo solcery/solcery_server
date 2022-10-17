@@ -11,9 +11,9 @@ Master.onCreate = function(data) {
     }
 }
 
-Master.onWSConnected = async function(wsConnection) {
+Master.onWSConnected = function(wsConnection) {
     if (!this.game) return;
-    await this.execAllMixins('onGameStart', this.game.getSaveData());
+    this.execAllMixins('onGameStart', this.game.getSaveData());
 }
 
 Master.onGameJoined = function(game) {

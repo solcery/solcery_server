@@ -44,10 +44,11 @@ Master.getSaveData = function(fields) {
 }
 
 Master.save = function() {
-	if (!this.parent.mongo) return;
+	let mongo = this.parent.get(Mongo, 'main');
+	if (!mongo) return;
 	let filter = { id: this.id };
 	let saveData = this.getSaveData();
-	this.parent.mongo.games.replaceOne(filter, saveData);
+	mongo.games.replaceOne(filter, saveData);
 }
 
 Master.addPlayer = function(player) {

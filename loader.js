@@ -58,9 +58,6 @@ function parseConfig(configPath) {
 
 async function runTests(tests, mask) {
 	console.log('==================== TESTING ====================');
-	global.testContext = {
-		addMixin
-	}
 	let total = 0;
 	let failed = 0;
 	for (let [ testName, { test, mixins } ] of Object.entries(tests)) {
@@ -77,6 +74,10 @@ async function runTests(tests, mask) {
 		} catch(e) {
 			failed++;
 			console.error(e);
+		}
+		for (let core of cores) {
+			core.delete();
+			global.cores = [];
 		}
 		if (mixins) {
 			for (let testMixin of mixins) {
@@ -99,16 +100,15 @@ async function runTests(tests, mask) {
 }
 
 
-global.createCore = async () => {
-	if (global['core']) {
-		await global.core.delete();
-	}
+global.cores = [];
+global.createCore = (data = {}) => {
 	const core = Object.create(Core); //Creating core
-	core.id = 'core'
+	core.id = data.id ?? 'core';
 	core.core = core;
+	core.disabledMixins = {};
 	core.loadedModules = loadedModules;
-	await core.execAllMixins('onCreate')
-	global['core'] = core;
+	cores.push(core);
+	core.execAllMixins('onCreate', data)
 	return core;
 }
 

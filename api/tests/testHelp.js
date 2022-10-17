@@ -1,20 +1,23 @@
 async function test() {
-	const core = await createCore();
-	// testContext.addMixin(Api, ApiMixin)
+
+	const core = createCore({ id: 'core1' });
 	let request = {
 		query: {
 			command: 'help'
 		}
 	}
+	let result;
 	let response = {
 		header: () => {},
-		json: (res) => {
-			assert(res.status)
-			assert(res.data.commands.help, 'Help command did not return itself in response!')
-		}
+		// json: (res) => console.log(res)
+		json: res => result = res,
 	}
-	await new Promise(r => setTimeout(r, 500));
-	await core.getRequest(request, response)
+
+	core.apiCall(request.query, response);
+	await sleep(1);
+	assert(result)
+	assert(result.status)
+	assert(result.data.commands.help)
 }
 
 module.exports = { test }

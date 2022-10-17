@@ -11,14 +11,14 @@ const mixins = [
 ]
 
 async function test() {
-	const core = await createCore();
+	const core = createCore();
 
 	const SERVER_NAME = 'testGameSrv';
 	const PUBKEY1 = 'pubkey1';
 	const PUBKEY2 = 'pubkey2';
 	const PUBKEY3 = 'pubkey3';
 
-	await core.create(GameServer, { 
+	core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
 		virtualDb: { 
@@ -33,12 +33,13 @@ async function test() {
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 	assert(gameServer);
+	await sleep(1);
 	let matchmaker = gameServer.matchmaker;
 	assert(matchmaker)
 
-	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY1);
-	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY2);
-	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY3);
+	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY1);
+	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY2);
+	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY3);
 
 	let player1 = gameServer.get(Player, PUBKEY1);
 	let player2 = gameServer.get(Player, PUBKEY2);
@@ -47,17 +48,17 @@ async function test() {
 
 	assert(gameServer.getAll(Game).length === 0)
 
-	await player1.execAllMixins('onWSRequestJoinQueue');
+	player1.execAllMixins('onWSRequestJoinQueue');
 	assert(matchmaker.queue.length === 1);
 
-	await player2.execAllMixins('onWSRequestJoinQueue');
+	player2.execAllMixins('onWSRequestJoinQueue');
 	let game = gameServer.getAll(Game)[0];
 	assert(game);
 	assert(game.players.length === 2 && game.players[0].id === PUBKEY1 && game.players[1].id === PUBKEY2);
-	await game.delete();
+	game.delete();
 
 	assert(gameServer.getAll(Game).length === 0);
-	await player3.execAllMixins('onWSRequestJoinQueue');
+	player3.execAllMixins('onWSRequestJoinQueue');
 	await sleep(10);
 	assert(matchmaker.queue.length === 1);
 	await sleep(50);

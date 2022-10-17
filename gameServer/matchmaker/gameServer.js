@@ -1,18 +1,19 @@
 const Master = {}
 
-Master.onStart = async function(data) {
-	let gameInfo = await this.getGameInfo();
-	if (!gameInfo) return;
-	this.matchmaker = await this.create(Matchmaker, { 
-		id: uuid(),
-		playerQuantity: gameInfo.playerQuantity ?? 1,
-		botFillTimeout: gameInfo.botFillTimeout ?? 30000,
-		tickPeriod: gameInfo.tickPeriod ?? 2000,
+Master.onMongoReady = function(mongo) {
+	let gameInfo = this.getGameInfo().then(gameInfo => {
+		if (!gameInfo) return;
+		this.matchmaker = this.create(Matchmaker, { 
+			id: 'main',
+			playerQuantity: gameInfo.playerQuantity ?? 1,
+			botFillTimeout: gameInfo.botFillTimeout ?? 30000,
+			tickPeriod: gameInfo.tickPeriod ?? 2000,
+		});
 	});
 }
 
-Master.createBot = async function() {
-	return await this.create(Player, { id: uuid(), bot: true })
+Master.createBot = function() {
+	return this.create(Player, { id: uuid(), bot: true })
 }
 
 module.exports = Master

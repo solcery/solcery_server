@@ -1,8 +1,8 @@
 const { ObjectId } = require('mongodb');
 const Master = {}
 
-Master.onCreate = async function(data) {
-      this.mongo = await this.create(Mongo, {
+Master.onCreate = function(data) {
+      this.create(Mongo, {
             id: 'solcery',
             db: 'solcery',
             collections: [
@@ -11,14 +11,11 @@ Master.onCreate = async function(data) {
       })
 }
 
-Master.onApiCommand = async function(commandPath, result, params) {
-      if (commandPath[0] !== 'getUnityBuild') return;
-      result.build = await this.getUnityBuild(params.buildId);
-}
-
+// API
 Master.getUnityBuild = async function(buildId) {
-      let res = await this.mongo.objects.findOne({ _id: ObjectId(buildId) });
+      let res = await this.get(Mongo, 'solcery').objects.findOne({ _id: ObjectId(buildId) });
       assert(res);
+      console.log('core: ', res)
       return res.fields;
 }
 

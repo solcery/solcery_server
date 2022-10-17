@@ -1,6 +1,6 @@
 const Master = {};
 
-Master.onCreate = async function(data) {
+Master.onCreate = function(data) {
     const WebSocket = require('ws');
     this.connections = [];
     this.webSocketTimeout = 100;
@@ -15,9 +15,9 @@ Master.onCreate = async function(data) {
     });
 }
 
-Master.onDelete = async function(data) {
+Master.onDelete = function(data) {
     if (!this.webSocketServer) return;
-    await this.webSocketServer.close();
+    this.webSocketServer.close();
 }
 
 Master.connectWebSocket = function(webSocket) {

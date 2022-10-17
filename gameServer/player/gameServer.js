@@ -1,9 +1,9 @@
 const Master = {};
 
-Master.onPlayerWSConnected = async function(pubkey, wsConnection) {
+Master.onPlayerWSConnected = function(pubkey, wsConnection) {
 	let player = this.get(Player, pubkey);
 	if (!player) {
-		player = await this.create(Player, {
+		player = this.create(Player, {
 			id: pubkey,
 			pubkey: pubkey,
 			status: { // TODO: remove
@@ -11,7 +11,7 @@ Master.onPlayerWSConnected = async function(pubkey, wsConnection) {
 			}
 		});
 	}
-	await player.execAllMixins('onWSConnected', wsConnection);
+	player.execAllMixins('onWSConnected', wsConnection);
 }
 
 module.exports = Master

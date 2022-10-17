@@ -1,7 +1,12 @@
 moduleName: 'api'
+dwellers:
+  ApiRequest:
+    id: 'string'
 mixins: 
   Core: 
     core: true
+  ApiRequest:
+    apiRequest: true
 tests:
   testHelp: true
 api:

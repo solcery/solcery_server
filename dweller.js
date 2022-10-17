@@ -9,7 +9,7 @@ function addMixin(base, mixin) {
         if (typeof prop === 'function' && propName.substring(0, 2) === 'on') {
             objset(base, prop, 'callbacks', propName, mixin._name);
         } else {
-            assert(!base[propName], `Error applying mixin '${mixin.path}' to '${base.classname}'! Name conflicted property '${propName}'`)
+            assert(!base[propName], `Error applying mixin '${mixin._name}' to '${base.classname}'! Name conflicted property '${propName}'`)
             base[propName] = mixin[propName];
         }
     }
@@ -21,47 +21,47 @@ function removeMixin(base, mixin) {
     for (let propName in mixin) {
         if (propName === '_name') continue;
         let prop = mixin[propName];
-        if (typeof prop === 'function' && propName.substring(0, 2) === 'on') {
-            delete base.callbacks[propName][mixin._name]
-        } else {
-            delete base[propName][mixin._name];
+        if (typeof prop === 'function') {
+            if (propName.substring(0, 2) === 'on') {
+                delete base.callbacks[propName][mixin._name]
+            } else {
+                delete base[propName];
+            }
+        } 
+    }
+}
+
+Dweller.disableMixinCallbacks = function(mixin) {
+    this.disabledMixins[mixin._name] = true;
+}
+
+Dweller.execAllMixins = function(event, ...args) {
+    let proto = Object.getPrototypeOf(this);
+    let classCallbacks = objget(proto, 'callbacks', event);
+    if (classCallbacks) {
+        for (let [ mixinName, callback ] of Object.entries(classCallbacks)) {
+            if (this.disabledMixins[mixinName]) continue;
+            callback.apply(this, args);
         }
     }
 }
 
-Dweller.execAllMixins = async function(event, ...args) {
-        let proto = Object.getPrototypeOf(this);
-        let classCallbacks = objget(proto, 'callbacks', event);
-        // Generic dweller mixin
-        // let dweller = Object.getPrototypeOf(proto);
-        // let dwellerCallbacks = objget(dweller, 'callbacks', event);
-        // if (dwellerCallbacks) {
-        //     for (let callback of dwellerCallbacks) {
-        //         await callback.apply(this, args);
-        //     }
-        // }
-        if (classCallbacks) {
-            for (let callback of Object.values(classCallbacks)) {
-                await callback.apply(this, args);
-            }
-        }
-}
-
-Dweller.create = async function(classObject, data) {
+Dweller.create = function(classObject, data) {
     assert(data, 'Dweller create error: no data provided!');
     assert(!this.get(classObject, data.id), `Failed to create ${classObject.classname}: dweller with id ${data.id} already exists!`);
     let obj = Object.create(classObject);
     obj.id = data.id;
     obj.core = this.core;
+    obj.disabledMixins = {};
     objset(this, obj, 'objects', classObject.classname, data.id)
-    obj.parent = this
-    await obj.execAllMixins('onCreate', data);
+    obj.parent = this;
+    obj.execAllMixins('onCreate', data);
     return obj;
 }
 
-Dweller.delete = async function() {
+Dweller.delete = function() {
     this.deleting = true;
-    await this.execAllMixins('onDelete');
+    this.execAllMixins('onDelete');
     if (this.parent) {
         delete this.parent.objects[this.classname][this.id]
     }

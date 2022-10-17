@@ -33,10 +33,10 @@ class VirtualCollection {
         objinsert(this.db.source, obj, this.name);
     }
     dump() {
-        return  this.db.source[this.name];
+        return this.db.source[this.name];
     }
     count() {
-        return this.db.source[this.name].length;
+        return Promise.resolve(this.db.source[this.name].length);
     }
     find(query) {
         let res = [];
@@ -63,7 +63,6 @@ class VirtualCollection {
         } else {
             this.db.source[this.name].push(doc)
         }
-
     }
 }
 
@@ -72,8 +71,12 @@ class Response {
         this.documents = [...documents];
     }
 
+    then(onSuccess) {
+        onSuccess(this.documents)
+    }
+
     toArray() {
-        return this.documents;
+        return new Response(this.documents);
     }
 
     sort(data) {
@@ -88,9 +91,6 @@ class Response {
         return new Response(this.documents.slice(limit))
     }
 
-    toArray() {
-        return this.documents;
-    }
 }
 
 module.exports = VirtualMongoDB;

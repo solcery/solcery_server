@@ -12,7 +12,8 @@ mixins:
     gameServer: true
   Core:
     core: true
-    api: true
+  ApiRequest:
+    apiRequest: true
 api:
   paths:
     game:

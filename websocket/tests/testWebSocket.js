@@ -31,7 +31,7 @@ async function connectToServer() {
 }
 
 async function test() {
-	const core = await createCore();
+	const core = createCore();
 	assert(core.webSocketServer)
 
 	let clientWs1 = await connectToServer();

@@ -13,8 +13,8 @@ Master.onTick = function() {
 	this.checkQueue();
 }
 
-Master.createGame = async function() {
-	const game = await this.parent.createGame();
+Master.createGame = function() {
+	const game = this.parent.createGame();
 	let selectedPlayers = this.queue.splice(0, this.playerQuantity);
 	for (let { playerId } of selectedPlayers) {
 		let player = this.parent.get(Player, playerId);
@@ -24,33 +24,33 @@ Master.createGame = async function() {
 	game.start(); // TODO: move to game?
 }
 
-Master.checkQueue = async function() {
+Master.checkQueue = function() {
 	if (this.queue.length === 0) return;
 	if (this.queue.length >= this.playerQuantity) {
-		await this.createGame();
+		this.createGame();
 		return;
 	}
 	if (!this.botFillTimeout) return;
 	if (Date.now() - this.queue[0].time >= this.botFillTimeout) {
 		let botsQuantity = this.playerQuantity - this.queue.length;
 		for (let i = 0; i < botsQuantity; i++) {
-			let bot = await this.parent.createBot();
+			let bot = this.parent.createBot();
 			this.queue.push({
 				playerId: bot.id,
 				time: Date.now(),
 			})
 		}
-		await this.createGame();
+		this.createGame();
 	}
 }
 
-Master.onPlayerQueued = async function(player) {
+Master.onPlayerQueued = function(player) {
 	this.queue.push({
 		playerId: player.id,
 		time: Date.now(),
 	})
 	player.setStatus('queued', { time: Date.now() })
-	await this.checkQueue();
+	this.checkQueue();
 }
 
 Master.onPlayerLeft = function(player) {

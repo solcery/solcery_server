@@ -1,0 +1,4 @@
+moduleName: 'task'
+mixins:
+  Core:
+    core: true

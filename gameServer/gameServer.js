@@ -1,8 +1,8 @@
 const Master = {};
 
-Master.onCreate = async function(data) {
+Master.onCreate = function(data) {
     this.gameId = data.gameId;
-    this.mongo = await this.create(Mongo, {
+    this.create(Mongo, {
         id: 'main',
         virtualDb: data.virtualDb,
         db: this.gameId,
@@ -12,37 +12,25 @@ Master.onCreate = async function(data) {
             'gameInfo'
         ]
     })
-    await this.execAllMixins('onStart');
 }
 
+// API
 Master.getGameInfo = async function() {
-    assert(this.mongo);
-    return await this.mongo.gameInfo.findOne({});
+    // let res =  await this.get(Mongo, 'main').gameInfo.findOne({});
+    return await this.get(Mongo, 'main').gameInfo.findOne({});
 }
 
-// Master.getGameVersion = async function(contentVersion) { 
-//     let version;
-//     if (contentVersion) {
-//         version = await this.mongo.versions.find({ contentVersion })
-//     } else {
-//         version = await this.mongo.versions.find().sort({ contentVersion :-1 }).limit(1)
-//     }
-//     return version;
-// }
-
-Master.onApiCommandGetGameInfo = async function(data) {
-    data.result = await this.mongo.gameInfo.findOne({});
-}
-
-Master.onApiCommandGetGameVersion = async function (data) {
-    let version = data.params.version;
+// API
+Master.getGameVersion = async function (params) {
+    let version = params.version;
     if (!version) {
-        version = await this.mongo.versions.count();
+        version = await this.get(Mongo, 'main').versions.count();
+//      version = await this.mongo.versions.find().sort({ contentVersion :-1 }).limit(1)
     }
-    let gameVersion = await this.mongo.versions.findOne({ version });
+    let gameVersion = await this.get(Mongo, 'main').versions.findOne({ version });
     let unityBuildId = objget(gameVersion, 'content', 'meta', 'gameSettings', 'build');
     let unityBuild = await this.core.getUnityBuild(unityBuildId);
-    data.result = {
+    return {
         version: gameVersion.version,
         content: gameVersion.content,
         unityBuild,

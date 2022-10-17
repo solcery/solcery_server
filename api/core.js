@@ -8,24 +8,24 @@ Master.onDelete = function(data) {
     this.apiListener.close();
 }
 
-Master.onCreate = function(data) {
+Master.onCreate = function (data) {
     this.apiCommands = {}
     const PORT = process.env.API_PORT || 5000;
     const app = express();
     app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
     app.use(bodyParser.json({ limit: "1mb" }));
     app.use(cors());
-    app.get("/api", (request, response) => this.getRequest(request, response));
-    app.post("/api", (request, response) => this.postRequest(request, response));
+    app.get("/api", (request, response) => this.apiCall(request.query, response));
+    app.post("/api", (request, response) => this.apiCall(request.body, response));
     this.apiListener = app.listen(PORT);
 
-    const exportCommands = function(command, data, ctx) {
+    const extractCommands = function(command, data, ctx) {
         let oldParams = ctx.params;
         ctx.params = Object.assign({}, ctx.params, data.params);
         if (data.paths) {
             ctx.path.push(command);
             for (let [ command, commandData ] of Object.entries(data.paths)) {
-                exportCommands(command, commandData, ctx);
+                extractCommands(command, commandData, ctx);
             }
             ctx.path.pop();
         } else {
@@ -38,7 +38,7 @@ Master.onCreate = function(data) {
         ctx.params = oldParams;
     }
 
-    for (let { config } of Object.values(this.core.loadedModules)) {
+    for (let { config } of Object.values(this.loadedModules)) {
         let paths = objget(config, 'api', 'paths');
         if (!paths) continue;
         for (let [ path, props ] of Object.entries(paths)) {
@@ -47,7 +47,7 @@ Master.onCreate = function(data) {
                 params: {},
                 result: []
             }
-            exportCommands(path, props, ctx)
+            extractCommands(path, props, ctx)
             for (let cmd of ctx.result) {
                 commandName = cmd.name.join('.');
                 delete cmd.name;
@@ -57,26 +57,11 @@ Master.onCreate = function(data) {
     }
 }
 
-Master.sendResult = function(result, response) {
+Master.apiCall = function(query, response) {
     response.header("Access-Control-Allow-Origin", '*');
-    response.json(result)
-}
-
-Master.getRequest = async function(request, response) {
-    let res = await this.apiCall(request.query);
-    this.sendResult(res, response);
-}
-
-Master.postRequest = async function(request, response) {
-    let res = await this.apiCall(request.body);
-    this.sendResult(res, response);
-}
-
-Master.apiCall = async function(query) {
     let command = query.command;
-    let data = {
-        params: {},
-    }
+    let params = {};
+
     try {
         assert(command, 'API error: No command specified in request!');
         let commandConfig = this.apiCommands[command];
@@ -92,30 +77,21 @@ Master.apiCall = async function(query) {
                 if (paramConfig.type === 'json' && typeof value === 'string') {
                     value = JSON.parse(value);
                 }
-                data.params[paramName] = value
-                objset(data, value, paramName);
+                params[paramName] = value;
             }
         }
-        let commandPath = command.split('.');
-        // TODO: Check for responses
-        await this.execAllMixins('onApiCommand', commandPath, data)
     } catch (e) {
-        return {
+        response.json({
             status: false,
             data: e.message,
-        }
+        })
     }
-    return {
-        status: true,
-        data: data.result,
-    }
-}
-
-Master.onApiCommand = async function(commandPath, data) {
-    if (commandPath[0] !== 'help') return;
-    data.result = {
-        commands: this.apiCommands,
-    }
+    this.create(ApiRequest, {
+        id: uuid(),
+        response,
+        commandPath: command.split('.'),
+        params,
+    });
 }
 
 module.exports = Master

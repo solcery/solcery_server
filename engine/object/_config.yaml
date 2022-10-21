@@ -27,3 +27,6 @@ api:
               description: 'Returns object data'
             delete:
               description: 'Returns object data'
+
+tests:
+  testObjectApi: true

@@ -4,7 +4,6 @@ async function test() {
 	let result;
 	let response = {
 		header: () => {},
-		// json: (res) => console.log(res)
 		json: res => result = res,
 	}
 

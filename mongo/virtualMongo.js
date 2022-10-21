@@ -1,3 +1,5 @@
+const { ObjectId } = require('mongodb');
+
 class VirtualMongoDB {
     constructor (name, source) {
         if (typeof source !== 'object') {
@@ -16,6 +18,10 @@ class VirtualMongoDB {
 
 const checkQuery = (query, doc) => {
     for (let [ field, value ] of Object.entries(query)) {
+        if (field === '_id') {
+            if (doc._id.toString() !== value.toString()) return false;
+            continue;
+        }
         if ((value === undefined || value === null) && (doc[field] === undefined || doc.field === null)) continue;
         if (doc[field] !== value) {
             return false;
@@ -28,19 +34,75 @@ class VirtualCollection {
     constructor (name, db) {
         this.name = name;
         this.db = db;
+        this.source = this.db.source[this.name];
     }
     insertOne(obj) {
+        if (!obj._id) {
+            obj._id = new ObjectId();
+        }
         objinsert(this.db.source, obj, this.name);
+        return {
+            acknowledged: true,
+            insertedId: obj._id.toString(),
+        }
+    }
+    deleteOne(query) {
+        for (let index in this.source) {
+            if (checkQuery(query, this.source[index])) {
+                this.source.splice(index, 1);
+                return { 
+                    acknowledged: true,
+                    deletedCount: 1,
+                }
+            }
+        }
+        return {
+            acknowledged: true,
+            deletedCount: 0
+        }
+    }
+    updateOne(query, update, config) {
+        if (config.upsert) throw ('Not supported!');
+        let obj = this.findOne(query);
+        if (!obj) return {
+            acknowledged: true,
+            matchedCount: 0,
+            modifiedCount: 0,
+        };
+        if (update['$set']) {
+            for (let [ prop, value ] of Object.entries(update['$set'])) {
+                let path = prop.split('.');
+                objset(obj, value, ...path);
+            }
+        }
+        if (update['$unset']) {
+            for (let [ prop, value ] of Object.entries(update['$unset'])) {
+                let path = prop.split('.');
+                objset(obj, null, ...path);
+            }
+        }
+        return {
+            acknowledged: true,
+            matchedCount: 1,
+            modifiedCount: 1,
+        }
     }
     dump() {
-        return this.db.source[this.name];
+        return source;
     }
     count() {
-        return Promise.resolve(this.db.source[this.name].length);
+        return Promise.resolve(this.source.length);
+    }
+    findOne(query) {
+        for (let doc of this.source) {
+            if (checkQuery(query, doc)) {
+                return doc;
+            }
+        }
     }
     find(query) {
         let res = [];
-        for (let doc of this.db.source[this.name]) {
+        for (let doc of this.source) {
             if (checkQuery(query, doc)) {
                 res.push(doc)
             }
@@ -49,7 +111,7 @@ class VirtualCollection {
     }
     
     findOne(query) {
-        for (let doc of this.db.source[this.name]) {
+        for (let doc of this.source) {
             if (checkQuery(query, doc)) {
                 return doc;
             }
@@ -57,11 +119,11 @@ class VirtualCollection {
     }
 
     replaceOne(query, doc) {
-        let index = this.db.source[this.name].findIndex(doc => checkQuery(query, doc));
+        let index = this.source.findIndex(doc => checkQuery(query, doc));
         if (index > -1) {
-            this.db.source[this.name][index] = doc;
+            this.source[index] = doc;
         } else {
-            this.db.source[this.name].push(doc)
+            this.source.push(doc)
         }
     }
 }

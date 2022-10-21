@@ -15,7 +15,6 @@ Master.onCreate = function(data) {
 Master.getUnityBuild = async function(buildId) {
       let res = await this.get(Mongo, 'solcery').objects.findOne({ _id: ObjectId(buildId) });
       assert(res);
-      console.log('core: ', res)
       return res.fields;
 }
 

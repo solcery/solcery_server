@@ -2,7 +2,7 @@ const Master = { api: {} }
 
 Master.engine = function(params) {
       let engine = this.core.get(Engine, params.gameId);
-      assert(engine, `API Error: No game with id '${params.gameId}'`);
+      assert(engine, `API Error: No engine with game id '${params.gameId}'`);
       let mongo = engine.get(Mongo, 'content');
       assert(mongo, `API Error: EngineServer '${params.gameId}' doesn't have DB connection`);
       return { engine, mongo }

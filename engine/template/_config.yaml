@@ -1,0 +1,37 @@
+moduleName: 'engine/template'
+mixins:
+  Api:
+    api: true
+
+api:
+  paths:
+    engine:
+      paths:
+        template:
+          params:
+            templateCode:
+              description: 'Snake-case code of the templateCode'
+              type: 'string'
+              required: true
+          commands:
+            getObjects:
+              description: 'Returns all objects'
+            getSchema:
+              description: 'Returns template schema'
+            setSchema:
+              description: 'Sets template schema'
+              params: 
+                schema:
+                  description: 'JSON-serialized schema'
+                  type: 'json'
+                  required: true
+            updateObjects:
+              description: 'Updates many objects'
+              params: 
+                objects:
+                  description: 'JSON array with new object fields'
+                  type: 'json'
+                  required: true
+
+tests:
+  testTemplateApi: true

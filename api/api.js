@@ -79,8 +79,19 @@ Master.onCreate = function(data) {
     }
     extractCommands(apiData);
 
-    data.app.get("/api", (request, response) => this.apiCall(request.query, response));
-    data.app.post("/api", (request, response) => this.apiCall(request.body, response));
+    data.app.get("/api/*", (request, response) => {
+        if (request.params['0'] && !request.query.command) {
+            request.query.command = request.params['0'];
+        }
+        console.log(request.query)
+        this.apiCall(request.query, response)
+    });
+    data.app.post("/api/*", (request, response) => {
+        if (request.params['0'] && !request.body.command) {
+            request.body.command = request.params['0'];
+        }
+        this.apiCall(request.body, response)
+    });
     this.apiCommands = apiCommands;
 }
 
@@ -114,7 +125,7 @@ Master.apiCall = async function(query, response) {
         result = await cmd.call(this, params);
         status = true;
     } catch (error) {
-        result = error;
+        result = error.message;
     }
     response.json({
         status, 

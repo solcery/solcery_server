@@ -2,8 +2,37 @@ const Client = require('socket.io-client');
 
 // const { Server } = require('socket.io');
 
-const client1Messages = [];
-const client2Messages = [];
+const createClientSocket = () => {
+	const port = process.env.PORT || 5000;
+	let messages = [];
+	let errors = [];
+	let socket = Client(`ws://localhost:${port}`);
+	socket.on('message', (message) => {
+		messages.push(message.data);
+	});
+	socket.on('exception', (error) => {
+		errors.push(error);
+	});
+	let emit = (...args) => {
+		return new Promise(resolve => {
+			socket.timeout(500).emit(...args, (response => {
+				resolve(response)
+			}))
+		})
+	}
+	let disconnect = () => socket.disconnect();
+	return new Promise(resolve => {
+		socket.on('connect', () => {
+			resolve({ 
+				socket,
+				messages, 
+				errors,
+				emit,
+				disconnect
+			})
+		});
+	})
+}
 
 const mixins = [
 	{
@@ -20,33 +49,6 @@ const mixins = [
 		}
 	}
 ]
-
-
-const createClientSocket = () => {
-	const port = process.env.PORT || 5000;
-	let messages = []
-	let socket = Client(`ws://localhost:${port}`);
-	socket.on('message', (message) => {
-		messages.push(message.data);
-	});
-	let emit = (...args) => {
-		return new Promise(resolve => {
-			socket.emit(...args, (response => {
-				resolve(response)
-			}))
-		})
-	}
-	let disconnect = () => socket.disconnect();
-	return new Promise(resolve => {
-		socket.on('connect', () => {
-			resolve({ 
-				messages, 
-				emit,
-				disconnect
-			})
-		});
-	})
-}
 
 async function test() {
 

@@ -2,6 +2,7 @@ const Master = {};
 
 Master.onCreate = function(data) {
     this.webSocket = data.webSocket;
+    assert(this.webSocket)
     this.webSocket.on('message', (message, callback) => {
         try {
             this.execAllMixins('onSocketMessage', message)
@@ -31,16 +32,20 @@ Master.onSocketMessage = function(message) {
 }
 
 Master.onDelete = function() {
+    this.deleting = true;
     this.disconnect();
 }
 
 Master.challenge = function (data) {
-    let result = { 
-        confirmed: true,
+    try {
+        this.execAllMixins('onChallenge', data);
+    } catch (e) {
+        this.webSocket.emit('exception', e.message);
+        this.disconnect();
+        return;
     }
-    this.execAllMixins('onChallenge', data, result);
-    this.confirmed = result.confirmed;
-    if (result.confirmed) {
+    this.confirmed = true;
+    if (this.confirmed) {
         this.execAllMixins('onConfirmed', data);
     }
 }

@@ -49,18 +49,9 @@ async function test() {
 	const api = core.get(Api, 'api');
 	assert(api);
 
-
-	// console.log(core.get(Engine, 'test'))
-
-	// let content = await apiCall({
-	// 	gameId: 'test',
-	// 	command: 'engine.getContent',
-	// 	templates: true,
-	// 	objects: true
-	// });
-
 	let newObjId = await apiCall({
-		command: 'engine.object.clone',
+		command: 'engine.template.object.clone',
+		templateCode: 'testTemplate',
 		gameId: 'test',
 		objectId: '00000041a3bc45846b9e9c5b',
 	})
@@ -68,8 +59,9 @@ async function test() {
 	assert(newObjId);
 
 	await apiCall({
-		command: 'engine.object.update',
+		command: 'engine.template.object.update',
 		gameId: 'test',
+		templateCode: 'testTemplate',
 		objectId: newObjId,
 		fields: {
 			name: 'new Object',
@@ -78,7 +70,8 @@ async function test() {
 	})
 
 	await apiCall({
-		command: 'engine.object.delete',
+		command: 'engine.template.object.delete',
+		templateCode: 'testTemplate',
 		gameId: 'test',
 		objectId: '00000041a3bc45846b9e9c5b',
 	})
@@ -88,6 +81,19 @@ async function test() {
 	assert(newObj._id.toString() === newObjId);
 	assert(!newObj.fields.number);
 	assert(newObj.fields.name === 'new Object');
+
+	newObjId = await apiCall({
+		command: 'engine.template.object.new',
+		templateCode: 'testTemplate',
+		gameId: 'test',
+	})
+
+	assert(virtualDb.objects.length === 2);
+	newObj = virtualDb.objects[1];
+	assert(newObj._id.toString() === newObjId);
+	assert(!newObj.fields.number);
+	assert(!newObj.fields.name);
+
 }
 
 module.exports = { test }

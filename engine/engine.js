@@ -18,14 +18,14 @@ Master.onCreate = function(data) {
 Master.onProjectConfigUpdate = function(data) {
 	let gameProjectId = objget(data, 'config', 'releaseProjectId');
 	if (!gameProjectId) return;
-	this.create(Mongo, { 
-		id: 'game',
-		db: gameProjectId,
-		collections: [
-			'versions',
-			'gameInfo'
-		]
-	})
+	// this.create(Mongo, { 
+	// 	id: 'game',
+	// 	db: gameProjectId,
+	// 	collections: [
+	// 		'versions',
+	// 		'gameInfo'
+	// 	]
+	// })
 }
 
 Master.restoreContent = async function (data) {

@@ -2,14 +2,18 @@ const Client = require('socket.io-client');
 
 const createClientSocket = () => {
 	const port = process.env.PORT || 5000;
-	let messages = []
+	let messages = [];
+	let errors = [];
 	let socket = Client(`ws://localhost:${port}`);
 	socket.on('message', (message) => {
 		messages.push(message.data);
 	});
+	socket.on('exception', (error) => {
+		errors.push(error);
+	});
 	let emit = (...args) => {
 		return new Promise(resolve => {
-			socket.emit(...args, (response => {
+			socket.timeout(500).emit(...args, (response => {
 				resolve(response)
 			}))
 		})
@@ -20,6 +24,7 @@ const createClientSocket = () => {
 			resolve({ 
 				socket,
 				messages, 
+				errors,
 				emit,
 				disconnect
 			})
@@ -32,9 +37,8 @@ async function test() {
 	const core = await createCore();
 	const SERVER_NAME = 'game_test';
 	const PLAYER_PUBKEY = 'stuff';
-	const TIMEOUT = 10;
 
-	core.webSocketTimeout = TIMEOUT;
+	core.webSocketTimeout = 100;
 	core.create(GameServer, { id: SERVER_NAME, gameId: SERVER_NAME, virtualDb: {} });
 	let gameServer = core.get(GameServer, SERVER_NAME);
 	assert(gameServer)
@@ -55,17 +59,21 @@ async function test() {
 
 	await client1.emit('message', challenge);
 	assert(!client1.socket.disconnected && client1.socket.connected);
+
+
 	assert(gameServer.get(Player, PLAYER_PUBKEY))
+	core.webSocketTimeout = 1;
 
 	let client2 = await createClientSocket();
-	await sleep(TIMEOUT + 10)
+	await sleep(core.webSocketTimeout + 10)
 	assert(client2.socket.disconnected);
 
+	core.webSocketTimeout = 100;
 	let client3 = await createClientSocket();
 	challenge.data.server = SERVER_NAME + '!';
-	client3.emit('message', challenge);
-	await sleep(TIMEOUT + 10)
+	await client3.emit('message', challenge);
 	assert(client3.socket.disconnected);
+	assert(client3.errors.length > 0);
 }
 
 module.exports = { test }

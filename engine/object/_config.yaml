@@ -7,26 +7,31 @@ api:
   paths:
     engine:
       paths:
-        object:
-          params:
-            objectId:
-              description: 'Object Id'
-              type: 'string'
-              required: true
+        template:
           commands:
-            get:
-              description: 'Returns object data'
-            update:
-              description: 'Updates object fields'
-              params: 
-                fields:
-                  description: 'JSON payload with new object fields'
-                  type: 'json'
+            object.new:
+              description: 'Creates new empty object, returns its ID'
+          paths:
+            object:
+              params:
+                objectId:
+                  description: 'Object Id'
+                  type: 'string'
                   required: true
-            clone:
-              description: 'Returns object data'
-            delete:
-              description: 'Returns object data'
+              commands:
+                get:
+                  description: 'Returns object data'
+                update:
+                  description: 'Updates object fields'
+                  params: 
+                    fields:
+                      description: 'JSON payload with new object fields'
+                      type: 'json'
+                      required: true
+                clone:
+                  description: 'Clones object'
+                delete:
+                  description: 'Deletes object'
 
 tests:
   testObjectApi: true

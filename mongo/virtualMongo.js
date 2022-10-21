@@ -62,7 +62,9 @@ class VirtualCollection {
         }
     }
     updateOne(query, update, config) {
-        if (config.upsert) throw ('Not supported!');
+        if (config) {
+            if (config.upsert) throw ('Not supported!');
+        }
         let obj = this.findOne(query);
         if (!obj) return {
             acknowledged: true,
@@ -124,6 +126,17 @@ class VirtualCollection {
             this.source[index] = doc;
         } else {
             this.source.push(doc)
+        }
+    }
+
+    bulkWrite(operations) {
+        for (let operation of operations) {
+            if (operation.updateOne) {
+                this.updateOne(operation.updateOne.filter, operation.updateOne.update)
+            }
+        }
+        return {
+            acknowledged: true
         }
     }
 }

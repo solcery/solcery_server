@@ -1,6 +1,7 @@
 moduleName: 'engine'
 requiredModules: 
   engine/object: true
+  engine/template: true
 mixins:
   Engine:
     engine: true

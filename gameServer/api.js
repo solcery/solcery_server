@@ -1,22 +1,21 @@
 const Master = {}
 
-Master.game = function(params) {
+Master.gameServer = function(params) {
       let gameServer = this.core.get(GameServer, gameId);
       assert(gameServer, `API Error: No game with id '${gameId}'`);
       return gameServer;
 
 }
 
-
 Master['game.getGameInfo'] = async function(params) {
-    let gameServer = this.game(params);
+    let gameServer = this.gameServer(params);
     // let res =  await this.get(Mongo, 'main').gameInfo.findOne({});
     return await gameServer.get(Mongo, 'main').gameInfo.findOne({});
 }
 
 // API
 Master['game.getGameVersion'] = async function (params) {
-    let gameServer = this.game(params);
+    let gameServer = this.gameServer(params);
     let version = params.version;
     if (!version) {
         version = await gameServer.get(Mongo, 'main').versions.count();

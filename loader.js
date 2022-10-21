@@ -26,12 +26,12 @@ function loadModule(modulePath, test) {
 	}
 	if (mixins) {
 		for (let [ dwellerName, mixinList ] of Object.entries(mixins)) {
-			for (let [mixinName, mixinProps] of Object.entries(mixinList)) {
-				let mixinPath = `./${modulePath}/${mixinName}`
-				let mixin = require(mixinPath);
-				mixin._name = mixinPath;
-				assert(global[dwellerName], `Error loading mixin ${mixinPath}: No dweller '${dwellerName}'!`)
-				// console.log(`Dweller ${dwellerName}: adding mixin ${mixinPath}`);
+			for (let [mixinLocalPath, mixinProps] of Object.entries(mixinList)) {
+				let mixinName = `${modulePath}/${mixinLocalPath}`
+				let mixin = require(`./${mixinName}`);
+				mixin._name = mixinName;
+				assert(global[dwellerName], `Error loading mixin ${mixinName}: No dweller '${dwellerName}'!`)
+				// console.log(`Dweller ${dwellerName}: adding mixin '${mixinName}'`);
 				addMixin(global[dwellerName], mixin)
 			}
 		}
@@ -108,7 +108,7 @@ global.createCore = (data = {}) => {
 	core.disabledMixins = {};
 	core.loadedModules = loadedModules;
 	cores.push(core);
-	core.execAllMixins('onCreate', data)
+	core.execAllMixins('onCreate', data);
 	return core;
 }
 

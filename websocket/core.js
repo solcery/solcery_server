@@ -1,11 +1,9 @@
 const Master = {};
 
-Master.onCreate = function(data) {
+Master.onHttpServerCreated = function(httpServer) {
     this.connections = [];
-    this.webSocketTimeout = 100;
-    assert(this.app)
-    this.webSocketServer = require('http').createServer(this.app);
-    this.io = require('socket.io')(this.webSocketServer, {
+    this.webSocketTimeout = 1000;
+    this.io = require('socket.io')(httpServer, {
         cors: {
             origin: "*",
             methods: ["GET", "POST"]
@@ -19,12 +17,6 @@ Master.onCreate = function(data) {
             webSocket.close();
         }
     });
-    this.webSocketServer.listen(process.env.PORT || 5000); 
-}
-
-Master.onDelete = function(data) {
-    if (!this.webSocketServer) return;
-    this.webSocketServer.close();
 }
 
 Master.connectWebSocket = function(webSocket) {

@@ -3,7 +3,7 @@ requiredModules:
   api: true
   gameServer: true
   mongo: true
-  # editor: true
+  engine: true
   websocket: true
 dwellers:
   Core: true

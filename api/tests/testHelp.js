@@ -1,11 +1,6 @@
 async function test() {
 
 	const core = createCore({ id: 'core1' });
-	let request = {
-		query: {
-			command: 'help'
-		}
-	}
 	let result;
 	let response = {
 		header: () => {},
@@ -13,7 +8,12 @@ async function test() {
 		json: res => result = res,
 	}
 
-	core.apiCall(request.query, response);
+	let api = core.get(Api, 'api');
+	assert(api);
+
+	api.apiCall({
+		command: 'help'
+	}, response);
 	await sleep(1);
 	assert(result)
 	assert(result.status)

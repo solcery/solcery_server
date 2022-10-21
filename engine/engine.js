@@ -3,21 +3,16 @@ const Master = {}
 
 Master.onCreate = function(data) {
 	this.create(Mongo, {
-		id: 'forge',
-		db: 'nfts',
+		id: 'content',
+		db: data.gameId,
+		virtualDb: data.virtualDb,
 		collections: [
-			'objects'
+			'objects',
+			'templates',
+			'users',
+			'logs'
 		]
 	})
-}
-
-Master.onMongoConnected = function(data) {
-	if (data.mongo.id === 'forge') {
-		this.forgeMongo = data.mongo;
-	}
-	if (data.mongo.id === 'game') {
-		this.gameMongo = data.mongo;
-	}
 }
 
 Master.onProjectConfigUpdate = function(data) {
@@ -31,17 +26,6 @@ Master.onProjectConfigUpdate = function(data) {
 			'gameInfo'
 		]
 	})
-}
-
-Master.getContent = async function (data) {
-	let result = {}
-    if (data.objects) {
-        result.objects = await this.mongo.objects.find({}).toArray();
-    }
-    if (data.templates) {
-        result.templates = await this.mongo.templates.find({}).toArray();
-    }
-    return result;
 }
 
 Master.restoreContent = async function (data) {

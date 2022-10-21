@@ -1,4 +1,6 @@
 moduleName: 'websocket'
+requiredModules:
+  http: true
 dwellers:
   WSConnection: 
     id: 'string'

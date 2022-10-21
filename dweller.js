@@ -6,6 +6,14 @@ function addMixin(base, mixin) {
     for (let propName in mixin) {
         if (propName === '_name') continue;
         let prop = mixin[propName];
+        if (propName === 'api') {
+            base.api = base.api ?? {};
+            for (let [ apiCommand, apiFunc] of Object.entries(prop)) {
+                assert(!base.api.apiCommand);
+                base.api[apiCommand] = apiFunc;
+            }
+            continue;
+        }
         if (typeof prop === 'function' && propName.substring(0, 2) === 'on') {
             objset(base, prop, 'callbacks', propName, mixin._name);
         } else {

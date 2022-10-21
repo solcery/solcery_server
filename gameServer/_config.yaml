@@ -1,8 +1,8 @@
 moduleName: 'game'
 requiredModules:
   api: true
-  gameServer/game: true
   gameServer/player: true
+  gameServer/game: true
   gameServer/matchmaker: true
   unityBuilds: true
 dwellers:
@@ -12,8 +12,8 @@ mixins:
     gameServer: true
   Core:
     core: true
-  ApiRequest:
-    apiRequest: true
+  Api:
+    api: true
 api:
   paths:
     game:

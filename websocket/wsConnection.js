@@ -2,19 +2,24 @@ const Master = {};
 
 Master.onCreate = function(data) {
     this.webSocket = data.webSocket;
-    this.webSocket.on('message', (message) => {
+    this.webSocket.on('message', (message, callback) => {
         try {
             this.execAllMixins('onSocketMessage', message)
         } catch (err) {
-            this.send({
+            this.webSocket.emit('message', {
                 type: 'error',
                 data: err.message,
             })
         }
+        if (callback) {
+            callback({
+                status: true,
+            })
+        }
     });
-    this.webSocket.on('close', () => this.execAllMixins('onClose'));
+    this.webSocket.on('disconnect', () => this.execAllMixins('onDisconnect'));
     sleep(data.timeout).then(() => {
-        if (!this.confirmed) this.close();
+        if (!this.confirmed) this.disconnect();
     })
     
 }
@@ -26,7 +31,7 @@ Master.onSocketMessage = function(message) {
 }
 
 Master.onDelete = function() {
-    this.close();
+    this.disconnect();
 }
 
 Master.challenge = function (data) {
@@ -34,7 +39,7 @@ Master.challenge = function (data) {
         confirmed: true,
     }
     this.execAllMixins('onChallenge', data, result);
-    this.confirmed = result.confirmed;  
+    this.confirmed = result.confirmed;
     if (result.confirmed) {
         this.execAllMixins('onConfirmed', data);
     }
@@ -44,11 +49,11 @@ Master.send = function (message) {
     this.webSocket.emit('message', message)
 }
 
-Master.close = function (message) {
+Master.disconnect = function (message) {
     this.webSocket.disconnect();
 }
 
-Master.onClose = function (data) {
+Master.onDisconnect = function (data) {
     if (this.deleting) return;
     this.delete();
 }

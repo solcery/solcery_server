@@ -21,6 +21,11 @@ async function test() {
 	core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
+		matchmaker: {
+			playerQuantity: 2,
+			botFillTimeout: 50,
+			tickPeriod: 10,
+		},
 		virtualDb: { 
 			gameInfo: [
 				{

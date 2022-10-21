@@ -1,14 +1,21 @@
 moduleName: 'api'
+requiredModules:
+  http: true
 dwellers:
-  ApiRequest:
+  Api:
     id: 'string'
 mixins: 
   Core: 
     core: true
-  ApiRequest:
-    apiRequest: true
-tests:
-  testHelp: true
+  Api:
+    api: true
 api:
   paths:
     help: true
+    test:
+      paths:
+        cmd: true
+
+tests:
+  testHelp: true
+  # testNestedCommand: true

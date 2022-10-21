@@ -1,4 +1,6 @@
-const WebSocket = require('ws')
+const Client = require('socket.io-client');
+
+// const { Server } = require('socket.io');
 
 const client1Messages = [];
 const client2Messages = [];
@@ -10,70 +12,76 @@ const mixins = [
 			_name: 'Test socket responder',
 			onSocketMessage: function(message) {
 				if (message.type !== 'testHello') return;
-				this.webSocket.send(message.data + '!');
+				this.webSocket.emit('message', {
+					type: 'response',
+					data: message.data + '!',
+				});
 			}
 		}
 	}
 ]
 
-async function connectToServer() {
-    let connected = false;
-	var ws = new WebSocket('ws://localhost:7000/ws');
-    return new Promise((resolve, reject) => {
-    	setTimeout(function() {
-    		if (!connected) reject('Socket timeout: Failed to handshake');
-    	}, 3000);
-    	ws.onopen = () => {
-    		connected = true;
-    		resolve(ws);
-    	}
-    });
+
+const createClientSocket = () => {
+	const port = process.env.PORT || 5000;
+	let messages = []
+	let socket = Client(`ws://localhost:${port}`);
+	socket.on('message', (message) => {
+		messages.push(message.data);
+	});
+	let emit = (...args) => {
+		return new Promise(resolve => {
+			socket.emit(...args, (response => {
+				resolve(response)
+			}))
+		})
+	}
+	let disconnect = () => socket.disconnect();
+	return new Promise(resolve => {
+		socket.on('connect', () => {
+			resolve({ 
+				messages, 
+				emit,
+				disconnect
+			})
+		});
+	})
 }
 
 async function test() {
-	const core = createCore();
-	assert(core.webSocketServer)
 
-	let clientWs1 = await connectToServer();
-	clientWs1.onmessage = (event) => {
-		client1Messages.push(event.data);
-	}
-	assert(clientWs1);
+	const SOCKET_PING = 10
+
+	const core = createCore();
+
+	let client1 = await createClientSocket();
+	assert(client1);
 	assert(core.getAll(WSConnection).length === 1);
 
-	let clientWs2 = await connectToServer();
-	clientWs2.onmessage = (event) => {
-		client2Messages.push(event.data);
-	}
-	assert(clientWs2, 'Client socket 2 creation failed');
+	let client2 = await createClientSocket();
+	assert(client2);
 	assert(core.getAll(WSConnection).length === 2);
 
-	let hey = {
+	await client1.emit('message', {
 		type: 'testHello',
 		data: 'Hey',
-	}
-
-	let hello = {
+	});
+	await client2.emit('message', {
 		type: 'testHello',
 		data: 'Hello',
-	}
+	});
 
+	assert(client1.messages.length === 1);
+	assert(client2.messages.length === 1);
+	assert(client1.messages[0] === 'Hey!');
+	assert(client2.messages[0] === 'Hello!')
 
-	clientWs1.send(JSON.stringify(hey));
-	clientWs2.send(JSON.stringify(hello));
-	await sleep(10);
-
-	assert(client1Messages.length === 1);
-	assert(client2Messages.length === 1);
-	assert(client1Messages[0] === 'Hey!');
-	assert(client2Messages[0] === 'Hello!')
-
-	clientWs1.close();
-	await sleep(10);
+	client1.disconnect();
+	await sleep(SOCKET_PING);
 	assert(core.getAll(WSConnection).length === 1);
 
-	clientWs2.close();
-	await sleep(10);
+	client2.disconnect();
+	await sleep(SOCKET_PING);
 	assert(core.getAll(WSConnection).length === 0);
 }
 

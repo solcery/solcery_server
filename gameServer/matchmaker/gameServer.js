@@ -1,16 +1,9 @@
 const Master = {}
 
-Master.onMongoReady = function(mongo) {
-	let gameInfo = this.getGameInfo().then(gameInfo => {
-		if (!gameInfo) return;
-		this.matchmaker = this.create(Matchmaker, { 
-			id: 'main',
-			playerQuantity: 2,
-			botFillTimeout: gameInfo.botFillTimeout ?? 30000,
-			tickPeriod: gameInfo.tickPeriod ?? 2000,
-		});
-		this.ready = true; // TODO: proper loading
-	});
+Master.onCreate = function(data) {
+	let matchmakerSettings = Object.assign({ id: 'main' }, data.matchmaker);
+	this.matchmaker = this.create(Matchmaker, matchmakerSettings);
+	this.ready = true
 }
 
 Master.createBot = function() {

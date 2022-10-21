@@ -1,17 +1,30 @@
-const WebSocket = require('ws')
+const Client = require('socket.io-client');
 
-async function connectToServer() {
-    let connected = false;
-	var ws = new WebSocket('ws://localhost:7000/ws');
-    return new Promise((resolve, reject) => {
-    	setTimeout(function() {
-    		if (!connected) reject('Socket timeout: Failed to handshake');
-    	}, 3000);
-    	ws.onopen = () => {
-    		connected = true;
-    		resolve(ws);
-    	}
-    });
+const createClientSocket = () => {
+	const port = process.env.PORT || 5000;
+	let messages = []
+	let socket = Client(`ws://localhost:${port}`);
+	socket.on('message', (message) => {
+		messages.push(message.data);
+	});
+	let emit = (...args) => {
+		return new Promise(resolve => {
+			socket.emit(...args, (response => {
+				resolve(response)
+			}))
+		})
+	}
+	let disconnect = () => socket.disconnect();
+	return new Promise(resolve => {
+		socket.on('connect', () => {
+			resolve({ 
+				socket,
+				messages, 
+				emit,
+				disconnect
+			})
+		});
+	})
 }
 
 async function test() {
@@ -21,9 +34,8 @@ async function test() {
 	const PLAYER_PUBKEY = 'stuff';
 	const TIMEOUT = 10;
 
-	assert(core.webSocketServer);
 	core.webSocketTimeout = TIMEOUT;
-	await core.create(GameServer, { id: SERVER_NAME, gameId: SERVER_NAME, virtualDb: {} });
+	core.create(GameServer, { id: SERVER_NAME, gameId: SERVER_NAME, virtualDb: {} });
 	let gameServer = core.get(GameServer, SERVER_NAME);
 	assert(gameServer)
 
@@ -36,26 +48,24 @@ async function test() {
 	}
 
 	// Client 1 sends the challenge
-	let clientWs1 = await connectToServer();
+	let client1 = await createClientSocket();
 
 	let wsConnection = core.getAll(WSConnection)[0];
 	assert(wsConnection);
 
-	clientWs1.send(JSON.stringify(challenge))
-	await sleep(TIMEOUT + 10)
-	assert(clientWs1.readyState === 1);
+	await client1.emit('message', challenge);
+	assert(!client1.socket.disconnected && client1.socket.connected);
 	assert(gameServer.get(Player, PLAYER_PUBKEY))
 
-	let clientWs2 = await connectToServer();
+	let client2 = await createClientSocket();
 	await sleep(TIMEOUT + 10)
+	assert(client2.socket.disconnected);
 
-	assert(clientWs2.readyState !== 1);
-
-	let clientWs3 = await connectToServer();
+	let client3 = await createClientSocket();
 	challenge.data.server = SERVER_NAME + '!';
-	clientWs3.send(JSON.stringify(challenge))
+	client3.emit('message', challenge);
 	await sleep(TIMEOUT + 10)
-	assert(clientWs3.readyState !== 1);
+	assert(client3.socket.disconnected);
 }
 
 module.exports = { test }

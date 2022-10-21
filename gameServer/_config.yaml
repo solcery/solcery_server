@@ -21,7 +21,7 @@ api:
         gameId:
           type: 'string'
           required: true
-      paths:
+      commands:
         getGameInfo:
           description: 'Returns game info'
         getGameVersion:

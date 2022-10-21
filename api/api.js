@@ -6,50 +6,82 @@ const Master = {
     api: {},
 };
 
-Master.onExpressAppCreated = function(app) {
-    app.get("/api", (request, response) => this.apiCall(request.query, response));
-    app.post("/api", (request, response) => this.apiCall(request.body, response));
-}
-
 Master.onCreate = function(data) {
-    this.apiCommands = {};
+    const apiData = {
+        params: {},
+        commands: {}
+    }
+    const apiCommands = {};
 
-    const extractCommands = function(command, data, ctx) {
-        let oldParams = ctx.params;
-        ctx.params = Object.assign({}, ctx.params, data.params);
-        if (data.paths) {
-            ctx.path.push(command);
-            for (let [ command, commandData ] of Object.entries(data.paths)) {
-                extractCommands(command, commandData, ctx);
+    const handleApiPath = function(props, params = {}, path = []) {
+        let apiPath = objget(apiData, ...path);
+        if (!apiPath) {
+            let data = {
+                params: {},
+                commands: {}
             }
-            ctx.path.pop();
-        } else {
-            ctx.result.push({
-                name: ctx.path.concat([command]),
-                description: data.description,
-                params: ctx.params,
-            })
+            objset(apiData, data, ...path)
         }
-        ctx.params = oldParams;
+        apiPath = objget(apiData, ...path)
+        for (let [paramName, param] of Object.entries(params)) {
+            apiPath.params[paramName] = param;
+        }
+        if (props.params) {
+            for (let [paramName, param] of Object.entries(props.params)) {
+                apiPath.params[paramName] = param;
+            }
+        }
+        if (props.commands) {
+            for (let [commandName, command] of Object.entries(props.commands)) {
+                apiPath.commands[commandName] = command
+            }
+        }
+        if (props.paths) {
+            for (let [ next, nextProps ] of Object.entries(props.paths)) {
+                path.push(next)
+                handleApiPath(nextProps, { ...params}, path)
+                path.pop()
+            }
+        }
+
+    }
+
+    const extractCommands = function(props, params = {}, path = []) {
+        let propsParams = {}
+        if (props.params) {
+            propsParams = { ...props.params }
+            delete props.params
+        }
+        if (props.commands) {
+            for (let [commandName, command] of Object.entries(props.commands)) {
+                let fullCommandPath = [...path, commandName];
+                let fullCommandName = fullCommandPath.join('.');
+                apiCommands[fullCommandName] = {
+                    name: fullCommandName,
+                    params: { ...params, ...propsParams, ...command.params },
+                    description: command.description,
+                }
+            }
+            delete props.commands
+        }
+        for (let [next, nextProps] of Object.entries(props)) {
+            path.push(next)
+            extractCommands(nextProps, { ...params, ...propsParams }, path)
+            path.pop()
+            
+        }
     }
 
     for (let { config } of Object.values(data.loadedModules)) {
-        let paths = objget(config, 'api', 'paths');
-        if (!paths) continue;
-        for (let [ path, props ] of Object.entries(paths)) {
-            let ctx = {
-                path: [],
-                params: {},
-                result: []
-            }
-            extractCommands(path, props, ctx)
-            for (let cmd of ctx.result) {
-                commandName = cmd.name.join('.');
-                delete cmd.name;
-                this.apiCommands[commandName] = cmd;
-            }
-        }
+        let apiConfig = objget(config, 'api');
+        if (!apiConfig) continue;
+        handleApiPath(apiConfig);
     }
+    extractCommands(apiData);
+
+    data.app.get("/api", (request, response) => this.apiCall(request.query, response));
+    data.app.post("/api", (request, response) => this.apiCall(request.body, response));
+    this.apiCommands = apiCommands;
 }
 
 Master.apiCall = async function(query, response) {
@@ -90,7 +122,7 @@ Master.apiCall = async function(query, response) {
     })
 }
 
-Master.api['help'] = function() {
+Master.api['api.help'] = function() {
     return {
         commands: this.apiCommands,
     }

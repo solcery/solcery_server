@@ -1,6 +1,6 @@
 moduleName: 'engine'
-# requiredModules: 
-  # engine/object: true
+requiredModules: 
+  engine/object: true
 mixins:
   Engine:
     engine: true
@@ -20,7 +20,7 @@ api:
           description: 'Game Id'
           type: 'string'
           required: true
-      paths:
+      commands:
         getContent:
           description: 'Returns project content'
           params:

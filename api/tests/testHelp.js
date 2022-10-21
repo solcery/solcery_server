@@ -12,12 +12,12 @@ async function test() {
 	assert(api);
 
 	api.apiCall({
-		command: 'help'
+		command: 'api.help'
 	}, response);
 	await sleep(1);
 	assert(result)
 	assert(result.status)
-	assert(result.data.commands.help)
+	assert(result.data.commands['api.help'])
 }
 
 module.exports = { test }

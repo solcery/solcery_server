@@ -1,0 +1,24 @@
+moduleName: 'engine/user'
+mixins:
+  Api:
+    api: true
+
+api:
+  paths:
+    engine:
+      paths:
+        user:
+          commands:
+            checkAccess:
+              description: 'Get user access mask'
+            get:
+              description: 'Get user data'
+            update:
+              params:
+                fields:
+                  description: 'Fields to update'
+                  type: 'json'
+                  required: true
+          
+tests:
+  testUserApi: true

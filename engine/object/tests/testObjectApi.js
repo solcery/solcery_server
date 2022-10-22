@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 
-const virtualDb = {
+const db = {
 	objects: [
 		{
 			_id: ObjectId(),
@@ -23,7 +23,8 @@ async function test(testEnv) {
 	const core = createCore({ id: 'core' });
 	core.create(Engine, { 
 		id: 'test',
-		virtualDb,
+		virtualContentDb: db,
+		virtualSystemDb: true,
 		gameId: 'test',
 	});
 
@@ -35,7 +36,7 @@ async function test(testEnv) {
 	assert(api);
 	const apiCall = testEnv.createClientApi(api);
 
-	let objectId = virtualDb.objects[0]._id.toString();
+	let objectId = db.objects[0]._id.toString();
 
 	let newObjId = await apiCall({
 		command: 'engine.template.object.clone',
@@ -64,8 +65,8 @@ async function test(testEnv) {
 		objectId,
 	})
 	
-	assert(virtualDb.objects.length === 1);
-	let newObj = virtualDb.objects[0];
+	assert(db.objects.length === 1);
+	let newObj = db.objects[0];
 	assert(newObj._id.toString() === newObjId);
 	assert(!newObj.fields.number);
 	assert(newObj.fields.name === 'new Object');
@@ -76,8 +77,8 @@ async function test(testEnv) {
 		gameId: 'test',
 	})
 
-	assert(virtualDb.objects.length === 2);
-	newObj = virtualDb.objects[1];
+	assert(db.objects.length === 2);
+	newObj = db.objects[1];
 	assert(newObj._id.toString() === newObjId);
 	assert(!newObj.fields.number);
 	assert(!newObj.fields.name);

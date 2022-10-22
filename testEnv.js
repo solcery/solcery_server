@@ -6,11 +6,10 @@ const createClientApi = (api) => {
 			let response = {
 				header: () => {},
 				json: res => {
-					let json = JSON.parse(JSON.stringify(res)); // Copy links
-					if (json.status) {
-						resolve(json.data);
+					if (res.status) {
+						resolve(res.data);
 					} else {
-						reject(json.data);
+						reject(res.data);
 					}
 				}
 			}

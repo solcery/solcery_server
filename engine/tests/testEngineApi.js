@@ -62,12 +62,14 @@ async function test(testEnv) {
 	const core = createCore({ id: 'core' });
 	core.create(Engine, { 
 		id: 'project1',
-		virtualDb: projectDb1,
+		virtualContentDb: projectDb1,
+		virtualSystemDb: projectDb1,
 		gameId: 'project1',
 	});
 	core.create(Engine, { 
 		id: 'project2',
-		virtualDb: projectDb2,
+		virtualContentDb: projectDb2,
+		virtualSystemDb: true,
 		gameId: 'project2',
 	});
 
@@ -87,7 +89,7 @@ async function test(testEnv) {
 		objects: true,
 	});
 	assert(content.objects[0].template === 'oldTemplate');
-
+	
 	let failed = false;
 	await apiCall({
 		command: 'engine.sync',
@@ -176,10 +178,6 @@ async function test(testEnv) {
 	assert(content.objects[2].fields.number === 100);
 	assert(content.templates[0].fields[1].code === 'secondField');
 	assert(content.templates[1].code === 'migrationTemplate')
-
-
-	// console.log(result)
-	// assert(result.data.objects[0].template === 'oldTemplate');
 
 }
 

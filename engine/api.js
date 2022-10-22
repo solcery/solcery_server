@@ -17,10 +17,9 @@ Master.api['engine.restore'] = async function(params) {
       await engine.importContent(params.src);
 }
 
-
 Master.api['engine.getConfig'] = async function(params) {
       let engine = this.engine(params);
-      return await engine.content.config.findOne({});
+      return await engine.getConfig();
 }
 
 Master.api['engine.setConfig'] = async function(params) {
@@ -29,12 +28,12 @@ Master.api['engine.setConfig'] = async function(params) {
       for (let [ field, value ] of Object.entries(params.fields)) {
             fields[`fields.${field}`] = value;
       };
-      await engine.content.config.updateOne({}, { $set: fields });
+      await engine.updateConfig({ $set: fields });
 }
 
 Master.api['engine.sync'] = async function(params) {
       let engine = this.engine(params);
-      let config = await engine.content.config.findOne({});
+      let config = await engine.getConfig();
       let sync = objget(config, 'fields', 'sync');
       assert(sync, 'Sync API error: Project cannot be synced, see project config!');
       assert(sync.sourceProjectId, 'Sync API error: No sourceProjectId in sync config!');

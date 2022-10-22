@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 
-const virtualDb = {
+const db = {
 	objects: [
 		{
 			_id: ObjectId(),
@@ -45,7 +45,8 @@ async function test(testEnv) {
 	const core = createCore({ id: 'core' });
 	core.create(Engine, { 
 		id: 'test',
-		virtualDb,
+		virtualContentDb: db,
+		virtualSystemDb: true,
 		gameId: 'test',
 	});
 	const engine = core.get(Engine, 'test')

@@ -2,6 +2,7 @@ moduleName: 'engine'
 requiredModules: 
   engine/object: true
   engine/template: true
+  engine/user: true
 mixins:
   Engine:
     engine: true

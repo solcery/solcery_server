@@ -5,15 +5,33 @@ Master.onCreate = function(data) {
 	this.content = this.create(Mongo, {
 		id: 'content',
 		db: data.gameId,
-		virtualDb: data.virtualDb,
+		virtualDb: data.virtualContentDb,
 		collections: [
 			'objects',
 			'templates',
+		]
+	})
+	this.system = this.create(Mongo, {
+		id: 'system',
+		db: data.gameId,
+		virtualDb: data.virtualSystemDb,
+		collections: [
 			'users',
 			'logs',
 			'config'
 		]
 	})
+}
+
+Master.getConfig = async function(data) {
+	if (!this.config) {
+		this.config = await this.system.config.findOne({});
+	}
+	return this.config;
+}
+
+Master.updateConfig = async function(update) {
+	await this.system.config.updateOne({}, update);
 }
 
 Master.exportContent = async function(data) {

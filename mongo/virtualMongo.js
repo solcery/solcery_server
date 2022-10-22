@@ -122,7 +122,7 @@ class VirtualCollection {
         }
     }
     dump() {
-        return source;
+        return this.source;
     }
     count() {
         return Promise.resolve(this.source.length);

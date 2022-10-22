@@ -6,35 +6,29 @@ const Master = {
     api: {},
 };
 
-Master.onCreate = function(data) {
-    const apiData = {
-        params: {},
-        commands: {}
-    }
-    const apiCommands = {};
-
+Master.listCommands = function(data = {}) {
     const handleApiPath = function(props, params = {}, path = []) {
         let apiPath = objget(apiData, ...path);
         if (!apiPath) {
-            let data = {
+            let pathData = {
                 params: {},
-                commands: {}
+                commands: {},
+                access: {}
             }
-            objset(apiData, data, ...path)
+            objset(apiData, pathData, ...path)
         }
         apiPath = objget(apiData, ...path)
         for (let [paramName, param] of Object.entries(params)) {
             apiPath.params[paramName] = param;
         }
         if (props.params) {
-            for (let [paramName, param] of Object.entries(props.params)) {
-                apiPath.params[paramName] = param;
-            }
+            Object.assign(apiPath.params, props.params)
+        }
+        if (props.access && !data.public) {
+           Object.assign(apiPath.access, props.access)
         }
         if (props.commands) {
-            for (let [commandName, command] of Object.entries(props.commands)) {
-                apiPath.commands[commandName] = command
-            }
+            Object.assign(apiPath.commands, props.commands)
         }
         if (props.paths) {
             for (let [ next, nextProps ] of Object.entries(props.paths)) {
@@ -46,44 +40,60 @@ Master.onCreate = function(data) {
 
     }
 
-    const extractCommands = function(props, params = {}, path = []) {
+    const extractCommands = function(props, params = {}, access = {}, path = []) {
         let propsParams = {}
         if (props.params) {
             propsParams = { ...props.params }
             delete props.params
         }
+        let propsAccess = {}
+        if (props.access) {
+            propsAccess = { ...props.access }
+            delete props.access
+        }
         if (props.commands) {
             for (let [commandName, command] of Object.entries(props.commands)) {
                 let fullCommandPath = [...path, commandName];
                 let fullCommandName = fullCommandPath.join('.');
-                apiCommands[fullCommandName] = {
+                let cmd = {
                     name: fullCommandName,
                     params: { ...params, ...propsParams, ...command.params },
                     description: command.description,
                 }
+                if (!command.public) {
+                    Object.assign(cmd.params, access, propsAccess);
+                }
+                apiCommands[fullCommandName] = cmd;
             }
             delete props.commands
         }
         for (let [next, nextProps] of Object.entries(props)) {
             path.push(next)
-            extractCommands(nextProps, { ...params, ...propsParams }, path)
+            extractCommands(nextProps, { ...params, ...propsParams }, { ...access, ...propsAccess }, path)
             path.pop()
-            
         }
     }
 
-    for (let { config } of Object.values(data.loadedModules)) {
+    const apiData = {
+        params: {},
+        commands: {},
+        access: {},
+    }
+    for (let { config } of Object.values(this.core.loadedModules)) {
         let apiConfig = objget(config, 'api');
         if (!apiConfig) continue;
         handleApiPath(apiConfig);
     }
+    const apiCommands = {};
     extractCommands(apiData);
+    this.apiCommands = apiCommands;
+}
 
+Master.onCreate = function(data) {
     data.app.get("/api/*", (request, response) => {
         if (request.params['0'] && !request.query.command) {
             request.query.command = request.params['0'];
         }
-        console.log(request.query)
         this.apiCall(request.query, response)
     });
     data.app.post("/api/*", (request, response) => {
@@ -92,10 +102,11 @@ Master.onCreate = function(data) {
         }
         this.apiCall(request.body, response)
     });
-    this.apiCommands = apiCommands;
+    this.listCommands();
 }
 
-Master.apiCall = async function(query, response) {
+Master.apiCall = async function(queryParams, response) {
+    let query = process.env.TEST ? JSON.parse(JSON.stringify(queryParams)) : queryParams;
     response.header("Access-Control-Allow-Origin", '*');
     let command = query.command;
     let params = {};
@@ -125,7 +136,7 @@ Master.apiCall = async function(query, response) {
         result = await cmd.call(this, params);
         status = true;
     } catch (error) {
-        result = error.message;
+        result = process.env.TEST ? error : error.message;
     }
     response.json({
         status, 

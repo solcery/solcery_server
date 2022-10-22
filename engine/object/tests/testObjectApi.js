@@ -3,7 +3,7 @@ const { ObjectId } = require('mongodb');
 const virtualDb = {
 	objects: [
 		{
-			_id: ObjectId('00000041a3bc45846b9e9c5b'),
+			_id: ObjectId(),
 			template: 'testTemplate',
 			fields: {
 				name: 'testObject',
@@ -13,7 +13,7 @@ const virtualDb = {
 	],
 	templates: [
 		{
-			_id: 6,
+			_id: ObjectId(),
 			code: 'testTemplate'
 		}
 	]
@@ -47,13 +47,16 @@ async function test() {
 	assert(engine)
 
 	const api = core.get(Api, 'api');
+	api.listCommands({ public: true });
 	assert(api);
+
+	let objectId = virtualDb.objects[0]._id.toString();
 
 	let newObjId = await apiCall({
 		command: 'engine.template.object.clone',
 		templateCode: 'testTemplate',
 		gameId: 'test',
-		objectId: '00000041a3bc45846b9e9c5b',
+		objectId,
 	})
 
 	assert(newObjId);
@@ -73,7 +76,7 @@ async function test() {
 		command: 'engine.template.object.delete',
 		templateCode: 'testTemplate',
 		gameId: 'test',
-		objectId: '00000041a3bc45846b9e9c5b',
+		objectId,
 	})
 	
 	assert(virtualDb.objects.length === 1);

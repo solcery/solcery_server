@@ -1,19 +1,19 @@
 const Master = { api: {} }
 
 Master.template = async function(params) {
-	let { mongo } = this.engine(params);
-	let template = await mongo.templates.findOne({ code: params.templateCode })
+	let engine = this.engine(params);
+	let template = await engine.content.templates.findOne({ code: params.templateCode })
 	assert(template, `No template with id '${params.templateCode}' found!`);
 	return template;
 }
 
 Master.api['engine.template.getObjects'] = async function(params) {
-	let { mongo } = this.engine(params);
-	return await mongo.objects.find({ template: params.templateCode }).toArray();
+	let engine = this.engine(params);
+	return await engine.content.objects.find({ template: params.templateCode }).toArray();
 }
 
 Master.api['engine.template.setSchema'] = async function(params) {
-	let { mongo } = this.engine(params);
+	let engine = this.engine(params);
 	let template = await this.template(params);
 	let schema = params.schema;
 	var values = {
@@ -26,7 +26,7 @@ Master.api['engine.template.setSchema'] = async function(params) {
 			singleton: schema.singletons,
 		},
 	};
-	await mongo.templates.updateOne({ code: template.code }, values);
+	await engine.content.templates.updateOne({ code: template.code }, values);
 }
 
 Master.api['engine.template.getSchema'] = async function(params) {
@@ -34,7 +34,7 @@ Master.api['engine.template.getSchema'] = async function(params) {
 }
 
 Master.api['engine.template.updateObjects'] = async function(params) {
-	let { mongo } = this.engine(params);
+	let engine = this.engine(params);
 	let bulkWrite = [];
 	for (let object of params.objects) {
 		let filter = { _id: require('mongodb').ObjectId(object._id) };
@@ -53,7 +53,7 @@ Master.api['engine.template.updateObjects'] = async function(params) {
 			}
 		})
 	}
-	await mongo.objects.bulkWrite(bulkWrite);
+	await engine.content.objects.bulkWrite(bulkWrite);
 }
 
 module.exports = Master;

@@ -5,7 +5,7 @@ Master.onExpressAppCreated = function(app) {
         id: 'api',
         loadedModules: this.loadedModules,
         app
-    })
+    });
 }
 
 

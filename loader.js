@@ -58,6 +58,7 @@ function parseConfig(configPath) {
 
 async function runTests(tests, mask) {
 	console.log('==================== TESTING ====================');
+	process.env.TEST = true;
 	let total = 0;
 	let failed = 0;
 	for (let [ testName, { test, mixins } ] of Object.entries(tests)) {

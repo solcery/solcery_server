@@ -1,5 +1,33 @@
 const { ObjectId } = require('mongodb');
 
+function filterInPlace(a, condition, thisArg) {
+    let j = 0;
+
+    a.forEach((e, i) => { 
+        if (condition.call(thisArg, e, i, a)) {
+            if (i!==j) a[j] = e; 
+            j++;
+        }
+    });
+
+    a.length = j;
+    return a;
+}
+
+const checkQuery = (query, doc) => {
+    for (let [ field, value ] of Object.entries(query)) {
+        if (field === '_id') {
+            if (doc._id.toString() !== value.toString()) return false;
+            continue;
+        }
+        if ((value === undefined || value === null) && (doc[field] === undefined || doc.field === null)) continue;
+        if (doc[field] !== value) {
+            return false;
+        }
+    }
+    return true;
+}
+
 class VirtualMongoDB {
     constructor (name, source) {
         if (typeof source !== 'object') {
@@ -16,19 +44,6 @@ class VirtualMongoDB {
     }
 }
 
-const checkQuery = (query, doc) => {
-    for (let [ field, value ] of Object.entries(query)) {
-        if (field === '_id') {
-            if (doc._id.toString() !== value.toString()) return false;
-            continue;
-        }
-        if ((value === undefined || value === null) && (doc[field] === undefined || doc.field === null)) continue;
-        if (doc[field] !== value) {
-            return false;
-        }
-    }
-    return true;
-}
 
 class VirtualCollection {
     constructor (name, db) {
@@ -46,6 +61,15 @@ class VirtualCollection {
             insertedId: obj._id.toString(),
         }
     }
+    insertMany(objects) {
+        for (let obj of objects) {
+            this.insertOne(obj);
+        }
+        return {
+            acknowledged: true,
+            insertedCount: objects.length,
+        }
+    }
     deleteOne(query) {
         for (let index in this.source) {
             if (checkQuery(query, this.source[index])) {
@@ -59,6 +83,14 @@ class VirtualCollection {
         return {
             acknowledged: true,
             deletedCount: 0
+        }
+    }
+    deleteMany(query) {
+        let oldLength = this.source.length;
+        filterInPlace(this.source, item => !checkQuery(query, item));
+        return {
+            acknowledged: true,
+            deletedCount: this.source.length - oldLength,
         }
     }
     updateOne(query, update, config) {
@@ -120,12 +152,12 @@ class VirtualCollection {
         }
     }
 
-    replaceOne(query, doc) {
+    replaceOne(query, replacement) {
         let index = this.source.findIndex(doc => checkQuery(query, doc));
         if (index > -1) {
-            this.source[index] = doc;
+            this.source[index] = replacement;
         } else {
-            this.source.push(doc)
+            this.source.push(replacement)
         }
     }
 
@@ -133,6 +165,12 @@ class VirtualCollection {
         for (let operation of operations) {
             if (operation.updateOne) {
                 this.updateOne(operation.updateOne.filter, operation.updateOne.update)
+            }
+            if (operation.replaceOne) {
+                this.replaceOne(operation.replaceOne.filter, operation.replaceOne.replacement)
+            }
+            if (operation.insertOne) {
+                this.insertOne(operation.insertOne.document)
             }
         }
         return {

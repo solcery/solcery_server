@@ -1,6 +1,6 @@
 const commands = {};
 
-commands.login = {
+commands.getAccess = {
 	params: {
 		login: {
 			required: true,
@@ -11,24 +11,7 @@ commands.login = {
 	},
 };
 
-commands.getById = {
-	params: {
-		id: {
-			required: true,
-		},
-	},
-};
-
-commands.getSession = {
-	params: {
-		session: {
-			required: true,
-		},
-	},
-};
-
-commands.create = {
-	private: true,
+commands.get = {
 	params: {
 		login: {
 			required: true,

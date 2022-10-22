@@ -2,8 +2,8 @@ const { ObjectId } = require('mongodb');
 const Master = { api: {} }
 
 Master.object = async function(params) {
-	let { mongo } = this.engine(params);
-	let object = await mongo.objects.findOne({ _id: ObjectId(params.objectId)})
+	let engine = this.engine(params);
+	let object = await engine.content.objects.findOne({ _id: ObjectId(params.objectId)})
 	assert(object, `No object with id '${params.objectId}' found!`);
 	return object;
 }
@@ -14,7 +14,7 @@ Master.api['engine.template.object.get'] = async function(params) {
 
 Master.api['engine.template.object.update'] = async function(params) {
 	// assert(false);
-	let { mongo } = this.engine(params);
+	let engine = this.engine(params);
 	let object = await this.object(params);
 
 	let query = { _id: ObjectId(params.objectId) };
@@ -26,35 +26,35 @@ Master.api['engine.template.object.update'] = async function(params) {
 			objset(update, null, '$unset', `fields.${field}`);
 		}
 	}
-	let res = await mongo.objects.updateOne(query, update, { upsert: false });
+	let res = await engine.content.objects.updateOne(query, update, { upsert: false });
 	if (!res.modifiedCount) throw new Error(`Updating object '${params.objectId}' failed with MongoDB error`);
 }
 
 Master.api['engine.template.object.clone'] = async function(params) {
-	let { mongo } = this.engine(params);
+	let engine = this.engine(params);
 	let object = await this.object(params);
 	let newObject = { ...object }
 	delete newObject._id;
-	let res = await mongo.objects.insertOne(newObject);
+	let res = await engine.content.objects.insertOne(newObject);
 	if (!res.insertedId) throw new Error(`Cloning object '${params.objectId}' failed with MongoDB error`);
 	return res.insertedId;
 
 }
 
 Master.api['engine.template.object.delete'] = async function(params) {
-	let { mongo } = this.engine(params);
+	let engine = this.engine(params);
 	let object = await this.object(params);
-	let res = await mongo.objects.deleteOne({ _id: ObjectId(object._id)});
+	let res = await engine.content.objects.deleteOne({ _id: ObjectId(object._id)});
 	if (!res.deletedCount) throw new Error(`Deleting object '${params.objectId}' failed with MongoDB error`)
 }
 
 Master.api['engine.template.object.new'] = async function(params) {
-	let { mongo } = this.engine(params);
+	let engine = this.engine(params);
 	let newObject = {
 		template: params.templateCode,
 		fields: {}
 	}
-	let res = await mongo.objects.insertOne(newObject);
+	let res = await engine.content.objects.insertOne(newObject);
 	if (!res.insertedId) throw new Error(`Creating new object for template '${params.templateCode}' failed with MongoDB error`);
 	return res.insertedId;
 }

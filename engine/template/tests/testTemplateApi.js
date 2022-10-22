@@ -3,7 +3,7 @@ const { ObjectId } = require('mongodb');
 const virtualDb = {
 	objects: [
 		{
-			_id: ObjectId('00000041a3bc45846b9e9c5b'),
+			_id: ObjectId(),
 			template: 'testTemplate',
 			fields: {
 				name: 'Object 1',
@@ -11,7 +11,7 @@ const virtualDb = {
 			}
 		},
 		{
-			_id: ObjectId('00000041a3bc45846b9e9c51'),
+			_id: ObjectId(),
 			template: 'testTemplate',
 			fields: {
 				name: 'Object 2',
@@ -21,7 +21,7 @@ const virtualDb = {
 	],
 	templates: [
 		{
-			_id: 6,
+			_id: ObjectId(),
 			code: 'testTemplate',
 			name: 'Test template',
 			revision: 17,
@@ -67,9 +67,8 @@ async function test() {
 	const engine = core.get(Engine, 'test')
 	assert(engine)
 	const api = core.get(Api, 'api');
+	api.listCommands({ public: true });
 	assert(api);
-
-	
 
 	let schema = await apiCall({
 		command: 'engine.template.getSchema',

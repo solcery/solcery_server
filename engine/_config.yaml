@@ -16,6 +16,11 @@ dwellers:
 api:
   paths:
     engine:
+      access:
+        pubkey:
+          description: 'Public key of user'
+          type: 'Pubkey'
+          required: true
       params:
         gameId:
           description: 'Game Id'
@@ -23,6 +28,7 @@ api:
           required: true
       commands:
         getContent:
+          public: true
           description: 'Returns project content'
           params:
             objects:
@@ -31,39 +37,41 @@ api:
             templates:
               type: 'bool'
               description: 'Set to true if you want to receive template schemas in response'
-        # restore:
-        #   description: 'Returns project content'
-        #   params:
-        #     src:
-        #       required: true
-        #       type: 'json'
-        #       description: 'Source JSON to restore content from'
-        # migrate:
-        #   description: 'Content migration payload'
-        #   params: 
-        #     objects: 
-        #       type: 'array(json)'
-        #       description: 'Objects to be edited'
-        #     newObjects: 
-        #       type: 'array(json)'
-        #       description: 'Objects to be created'
-        #     templates: 
-        #       type: 'array(json)'
-        #       description: 'Templates to be edited'
-        #     newTemplates: 
-        #       type: 'array(json)'
-        #       description: 'Templates to be created'
-        # getConfig:
-        #   description: 'Returns project config'
-        # setConfig:
-        #   description: 'Sets project config'
-        #   params:
-        #     fields:
-        #       type: 'json'
-        #       description: 'New config data'
-        #       required: true
+        restore:
+          description: 'Imports full content from JSON'
+          params:
+            src:
+              required: true
+              type: 'json'
+              description: 'Source JSON to restore content from'
+        migrate:
+          description: 'Content migration payload'
+          params: 
+            objects: 
+              type: 'array(json)'
+              description: 'Objects to be edited'
+            newObjects: 
+              type: 'array(json)'
+              description: 'Objects to be created'
+            templates: 
+              type: 'array(json)'
+              description: 'Templates to be edited'
+            newTemplates: 
+              type: 'array(json)'
+              description: 'Templates to be created'
+        getConfig:
+          description: 'Returns project config'
+        setConfig:
+          description: 'Sets project config'
+          params:
+            fields:
+              type: 'json'
+              description: 'New config data'
+              required: true
+        sync:
+          description: 'Synchronizes game content with source project'
         # release:
-        #   description: 'Releases new version of the game to public'
+        #   description: 'Releases new version of the game to gameServer'
         #   params:
         #     contentWeb:
         #       type: 'json'
@@ -77,8 +85,6 @@ api:
         #       type: 'json'
         #       description: 'Compiled content for game page'
         #       required: true
-        # sync:
-        #   description: 'Synchronizes game content with source project'
 
 tests:
   testEngineApi: true

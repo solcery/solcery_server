@@ -19,23 +19,7 @@ const virtualDb = {
 	]
 };
 
-async function test() {
-	const apiCall = (data) => {
-		return new Promise((resolve, reject) => {
-			let response = {
-				header: () => {},
-				json: res => {
-					if (res.status) {
-						resolve(res.data);
-					} else {
-						reject(res.data);
-					}
-				}
-			}
-			api.apiCall(data, response);
-		})
-	}
-
+async function test(testEnv) {
 	const core = createCore({ id: 'core' });
 	core.create(Engine, { 
 		id: 'test',
@@ -49,6 +33,7 @@ async function test() {
 	const api = core.get(Api, 'api');
 	api.listCommands({ public: true });
 	assert(api);
+	const apiCall = testEnv.createClientApi(api);
 
 	let objectId = virtualDb.objects[0]._id.toString();
 

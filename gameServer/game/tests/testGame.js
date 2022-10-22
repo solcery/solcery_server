@@ -15,7 +15,7 @@ const mixins = [
 	}
 ]
 
-async function test() {
+async function test(testEnv) {
 	const core = await createCore();
 
 	const SERVER_NAME = 'testGameSrv';

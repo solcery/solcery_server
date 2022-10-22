@@ -1,7 +1,6 @@
-async function test() {
+async function test(testEnv) {
 
 	const core = createCore({ id: 'core1' });
-	let result;
 	let response = {
 		header: () => {},
 		json: res => result = res,
@@ -9,14 +8,12 @@ async function test() {
 
 	let api = core.get(Api, 'api');
 	assert(api);
+	let apiCall = testEnv.createClientApi(api);
 
-	api.apiCall({
-		command: 'api.help'
-	}, response);
-	await sleep(1);
-	assert(result)
-	assert(result.status)
-	assert(result.data.commands['api.help'])
+	let result = await apiCall({
+		command: 'help'
+	})
+	assert(result.help)
 }
 
 module.exports = { test }

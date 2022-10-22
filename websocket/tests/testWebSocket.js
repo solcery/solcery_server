@@ -1,38 +1,5 @@
-const Client = require('socket.io-client');
 
 // const { Server } = require('socket.io');
-
-const createClientSocket = () => {
-	const port = process.env.PORT || 5000;
-	let messages = [];
-	let errors = [];
-	let socket = Client(`ws://localhost:${port}`);
-	socket.on('message', (message) => {
-		messages.push(message.data);
-	});
-	socket.on('exception', (error) => {
-		errors.push(error);
-	});
-	let emit = (...args) => {
-		return new Promise(resolve => {
-			socket.timeout(500).emit(...args, (response => {
-				resolve(response)
-			}))
-		})
-	}
-	let disconnect = () => socket.disconnect();
-	return new Promise(resolve => {
-		socket.on('connect', () => {
-			resolve({ 
-				socket,
-				messages, 
-				errors,
-				emit,
-				disconnect
-			})
-		});
-	})
-}
 
 const mixins = [
 	{
@@ -50,17 +17,17 @@ const mixins = [
 	}
 ]
 
-async function test() {
+async function test(testEnv) {
 
 	const SOCKET_PING = 10
 
 	const core = createCore();
 
-	let client1 = await createClientSocket();
+	let client1 = await testEnv.createClientSocket();
 	assert(client1);
 	assert(core.getAll(WSConnection).length === 1);
 
-	let client2 = await createClientSocket();
+	let client2 = await testEnv.createClientSocket();
 	assert(client2);
 	assert(core.getAll(WSConnection).length === 2);
 

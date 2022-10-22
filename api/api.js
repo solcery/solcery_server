@@ -114,9 +114,9 @@ Master.apiCall = async function(queryParams, response) {
     let status = false;
     let result;
     try {
-        assert(command, 'API error: No command specified in request!');
+        assert(command, 'API error: No command specified in request');
         let commandConfig = this.apiCommands[command];
-        assert(commandConfig, `API error: Unknown command ${command}!`);
+        assert(commandConfig, `API error: Unknown command '${command}'`);
         if (query.help) {
             return commandConfig;
         }
@@ -138,16 +138,22 @@ Master.apiCall = async function(queryParams, response) {
     } catch (error) {
         result = process.env.TEST ? error : error.message;
     }
-    response.json({
+    result = {
         status, 
         data: result
-    })
+    }
+    if (!queryParams.format) {
+        response.json(result);
+        return;
+    }
+    if (queryParams.format === 'prettyJson') {
+        response.header("Content-Type",'application/json');
+        response.send(JSON.stringify(result, null, 2));
+    } 
 }
 
-Master.api['api.help'] = function() {
-    return {
-        commands: this.apiCommands,
-    }
+Master.api['help'] = function(params) {
+    return this.apiCommands;
 }
 
 module.exports = Master

@@ -57,25 +57,7 @@ const projectDb2 = {
 	],
 };
 
-async function test() {
-
-	const apiCall = (data) => {
-		return new Promise((resolve, reject) => {
-			let response = {
-				header: () => {},
-				json: res => {
-					let json = JSON.parse(JSON.stringify(res)); // Copy links
-					if (json.status) {
-						resolve(json.data);
-					} else {
-						reject(json.data);
-					}
-				}
-			}
-			api.apiCall(data, response);
-		})
-	}
-
+async function test(testEnv) {
 	// Init
 	const core = createCore({ id: 'core' });
 	core.create(Engine, { 
@@ -92,6 +74,7 @@ async function test() {
 	const api = core.get(Api, 'api');
 	api.listCommands({ public: true });
 	assert(api);
+	const apiCall = testEnv.createClientApi(api);
 
 
 

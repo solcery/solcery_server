@@ -1,6 +1,6 @@
 const virtualDb = {};
 
-async function test() {
+async function test(testEnv) {
 	let core = createCore();
 
 	const SERVER_NAME = 'testGameSrv';

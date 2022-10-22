@@ -10,11 +10,9 @@ mixins:
   Api:
     api: true
 api:
-  paths:
-    api:
-      commands:
-        help:
-          description: 'Shows Help'
+  commands:
+    help:
+      description: 'Shows Help'
 
 tests:
   testHelp: true

@@ -5,6 +5,7 @@ requiredModules:
   mongo: true
   engine: true
   websocket: true
+  unityBuilds: true
 dwellers:
   Core: true
 tests:

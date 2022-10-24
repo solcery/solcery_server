@@ -4,10 +4,14 @@ requiredModules:
 mixins:
   Core:
     core: true
+  Api:
+    api: true
 api:
   paths:
-    getUnityBuild:
-      params: 
-        buildId:
-          type: 'string'
-          required: true
+    system:
+      commands:
+        getUnityBuild:
+          params: 
+            buildId:
+              type: 'string'
+              required: true

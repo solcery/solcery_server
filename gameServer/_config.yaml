@@ -4,7 +4,6 @@ requiredModules:
   gameServer/player: true
   gameServer/game: true
   gameServer/matchmaker: true
-  unityBuilds: true
 dwellers:
   GameServer: true
 mixins:

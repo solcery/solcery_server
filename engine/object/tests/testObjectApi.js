@@ -72,7 +72,7 @@ async function test(testEnv) {
 	assert(newObj.fields.name === 'new Object');
 
 	newObjId = await apiCall({
-		command: 'engine.template.object.new',
+		command: 'engine.template.createObject',
 		templateCode: 'testTemplate',
 		gameId: 'test',
 	})

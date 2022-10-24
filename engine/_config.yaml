@@ -61,6 +61,7 @@ api:
               type: 'array(json)'
               description: 'Templates to be created'
         getConfig:
+          public: true
           description: 'Returns project config'
         setConfig:
           description: 'Sets project config'

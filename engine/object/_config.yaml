@@ -9,7 +9,7 @@ api:
       paths:
         template:
           commands:
-            object.new:
+            createObject:
               description: 'Creates new empty object, returns its ID'
           paths:
             object:

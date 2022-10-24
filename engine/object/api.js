@@ -48,7 +48,7 @@ Master.api['engine.template.object.delete'] = async function(params) {
 	if (!res.deletedCount) throw new Error(`Deleting object '${params.objectId}' failed with MongoDB error`)
 }
 
-Master.api['engine.template.object.new'] = async function(params) {
+Master.api['engine.template.createObject'] = async function(params) {
 	let engine = this.engine(params);
 	let newObject = {
 		template: params.templateCode,

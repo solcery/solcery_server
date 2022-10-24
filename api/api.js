@@ -25,7 +25,7 @@ Master.listCommands = function(data = {}) {
             Object.assign(apiPath.params, props.params)
         }
         if (props.access && !data.public) {
-           Object.assign(apiPath.access, props.access)
+            Object.assign(apiPath.access, props.access)
         }
         if (props.commands) {
             Object.assign(apiPath.commands, props.commands)
@@ -44,12 +44,10 @@ Master.listCommands = function(data = {}) {
         let propsParams = {}
         if (props.params) {
             propsParams = { ...props.params }
-            delete props.params
         }
         let propsAccess = {}
         if (props.access) {
             propsAccess = { ...props.access }
-            delete props.access
         }
         if (props.commands) {
             for (let [commandName, command] of Object.entries(props.commands)) {
@@ -65,9 +63,11 @@ Master.listCommands = function(data = {}) {
                 }
                 apiCommands[fullCommandName] = cmd;
             }
-            delete props.commands
         }
         for (let [next, nextProps] of Object.entries(props)) {
+            if (next === 'commands') continue;
+            if (next === 'access') continue;
+            if (next === 'params') continue;
             path.push(next)
             extractCommands(nextProps, { ...params, ...propsParams }, { ...access, ...propsAccess }, path)
             path.pop()
@@ -86,6 +86,7 @@ Master.listCommands = function(data = {}) {
     }
     const apiCommands = {};
     extractCommands(apiData);
+    this.apiData = apiData;
     this.apiCommands = apiCommands;
 }
 
@@ -153,6 +154,7 @@ Master.apiCall = async function(queryParams, response) {
 }
 
 Master.api['help'] = function(params) {
+    if (params.paths) return this.apiData;
     return this.apiCommands;
 }
 

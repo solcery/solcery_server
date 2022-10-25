@@ -15,6 +15,7 @@ api:
               required: true
           commands:
             getObjects:
+              public: true
               description: 'Returns all objects'
             getSchema:
               description: 'Returns template schema'

@@ -29,31 +29,4 @@ api:
             version:
               type: 'string'
               description: 'Game version'
-        # findMatch:
-        #   description: 'Find new match using matchmaker'
-        #   params: 
-        #     nfts:
-        #       type: 'array(string)'
-        #       description: 'List of player nfts'
-        #     gameVersion:
-        #       type: 'int'
-        #       description: 'Version of the game. Latest if not specified'
-        # joinMatch:
-        #   params:
-        #     matchId:
-        #       type: 'string'
-        #       required: true
-        # leaveMatch:
-        #   params:
-        #     matchId:
-        #       type: 'string'
-        #       description: 'matchId'
-        #       required: true
-
-        # bugreport:
-        #   description: 'Send bug report'
-        #   params:
-        #     payload:
-        #       description: 'JSON serialized payload with report'
-        #       type: 'json'
-        #       required: true
+              

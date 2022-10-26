@@ -11,7 +11,7 @@ Master.onCreate = function(data) {
             'versions',
             'gameInfo'
         ]
-    })
+    });
 }
 
 // // API

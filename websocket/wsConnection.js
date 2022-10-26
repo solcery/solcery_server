@@ -2,7 +2,7 @@ const Master = {};
 
 Master.onCreate = function(data) {
     this.webSocket = data.webSocket;
-    assert(this.webSocket)
+    assert(this.webSocket);
     this.webSocket.on('message', (message, callback) => {
         try {
             this.execAllMixins('onSocketMessage', message)
@@ -15,14 +15,13 @@ Master.onCreate = function(data) {
         if (callback) {
             callback({
                 status: true,
-            })
+            });
         }
     });
     this.webSocket.on('disconnect', () => this.execAllMixins('onDisconnect'));
     sleep(data.timeout).then(() => {
         if (!this.confirmed) this.disconnect();
-    })
-    
+    });
 }
 
 Master.onSocketMessage = function(message) {

@@ -1,4 +1,3 @@
-const Client = require('socket.io-client');
 async function test(testEnv) {
 
 	const core = await createCore();

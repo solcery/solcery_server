@@ -4,7 +4,6 @@ Master.gameServer = function(params) {
       let gameServer = this.core.get(GameServer, gameId);
       assert(gameServer, `API Error: No game with id '${gameId}'`);
       return gameServer;
-
 }
 
 Master['game.getGameInfo'] = async function(params) {

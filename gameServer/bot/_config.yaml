@@ -1,0 +1,10 @@
+moduleName: 'bot'
+requiredModules:
+  gameServer/player: true
+  gameServer/game: true
+mixins:
+  Player:
+    player: true
+
+tests:
+  testBot: true

@@ -36,7 +36,6 @@ async function test(testEnv) {
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 
-	// let wsConnection = core.create(WSConnection, { id: 1 });
 	await gameServer.execAllMixins('onPlayerWSConnected', PUBKEY)
 	let player = await gameServer.get(Player, PUBKEY);
 	assert(clientPlayer.status.code === 'online');

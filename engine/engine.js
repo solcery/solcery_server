@@ -24,10 +24,7 @@ Master.onCreate = function(data) {
 }
 
 Master.getConfig = async function(data) {
-	if (!this.config) {
-		this.config = await this.system.config.findOne({});
-	}
-	return this.config;
+	return await this.system.config.findOne({});
 }
 
 Master.updateConfig = async function(update) {

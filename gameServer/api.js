@@ -9,7 +9,6 @@ Master.gameServer = function(params) {
 
 Master.api['game.getGameInfo'] = async function(params) {
     let gameServer = this.gameServer(params);
-    // let res =  await this.get(Mongo, 'main').gameInfo.findOne({});
     return await gameServer.get(Mongo, 'main').gameInfo.findOne({});
 }
 

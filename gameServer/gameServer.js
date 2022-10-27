@@ -5,7 +5,7 @@ Master.onCreate = function(data) {
     this.create(Mongo, {
         id: 'main',
         virtualDb: data.virtualDb,
-        db: this.gameId,
+        db: data.db,
         collections: [
             'games',
             'versions',

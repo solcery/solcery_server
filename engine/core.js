@@ -6,6 +6,7 @@ Master.onCreate = function(data) {
     this.create(Engine, { id: 'nfts', gameId: 'nfts' });
 
     // TODO: load from config
+    this.create(Engine, { id: 'eclipse', gameId: 'eclipse' });
     this.create(Engine, { id: 'polygon', gameId: 'polygon' });
     this.create(Engine, { id: 'lightmor', gameId: 'lightmor' });
     this.create(Engine, { id: 'summoner', gameId: 'summoner' });

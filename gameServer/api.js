@@ -33,4 +33,10 @@ Master.api['game.getGameVersion'] = async function (params) {
     };
 }
 
+Master.api['core.reloadGameServers'] = async function(params) {
+      await this.core.loadGameServers();
+      return 'Game servers reloaded, current number of servers: ' + this.core.getAll(GameServer).length;
+}
+
+
 module.exports = Master;

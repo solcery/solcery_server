@@ -8,5 +8,25 @@ requiredModules:
   unityBuilds: true
 dwellers:
   Core: true
+mixins:
+  Core:
+    core: true
+  Api:
+    api: true
+
+api:
+  paths:
+    core:
+      params:
+        userId:
+          type: 'pubkey'
+          required: true
+      commands:
+        eval:
+          params:
+            code:
+              type: 'javascript'
+              required: true
+
 tests:
   testDisableMixin: true

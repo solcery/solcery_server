@@ -16,6 +16,9 @@ dwellers:
 
 api:
   paths:
+    core:
+      commands:
+        reloadEngines: true
     engine:
       access:
         pubkey:

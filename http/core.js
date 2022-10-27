@@ -9,15 +9,15 @@ Master.onCreate = function (data) {
     app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
     app.use(bodyParser.json({ limit: "1mb" }));
     app.use(cors());
+    let httpServer = app.listen(process.env.PORT || 5000);
     this.execAllMixins('onExpressAppCreated', app);
-    httpServer = require('http').createServer(app);
     this.execAllMixins('onHttpServerCreated', httpServer);
     this.httpServer = httpServer;
-    this.httpServer.listen(process.env.PORT || 5000);
+    this.app = app;
 }
 
 Master.onDelete = function(data) {
-    this.httpServer.close();
+    this.httpServer.close(); // TODO: doesn't forcefully close open connections
 }
 
 module.exports = Master

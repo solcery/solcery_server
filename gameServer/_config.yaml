@@ -15,6 +15,9 @@ mixins:
     api: true
 api:
   paths:
+    core:
+      commands:
+        reloadGameServers: true
     game:
       params: 
         gameId:

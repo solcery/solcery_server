@@ -2,8 +2,6 @@ moduleName: 'unityBuilds'
 requiredModules:
   api: true
 mixins:
-  Core:
-    core: true
   Api:
     api: true
 api:

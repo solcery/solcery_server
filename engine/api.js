@@ -144,4 +144,9 @@ Master.api['engine.release'] = async function(params) {
       return currentLatest + 1;
 }
 
+Master.api['core.reloadEngines'] = async function(params) {
+      await this.core.loadEngines();
+      return 'Engines reloaded, current number of engines: ' + this.core.getAll(Engine).length;
+}
+
 module.exports = Master;

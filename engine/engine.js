@@ -4,7 +4,7 @@ const Master = {}
 Master.onCreate = function(data) {
 	this.content = this.create(Mongo, {
 		id: 'content',
-		db: data.gameId,
+		db: data.db,
 		virtualDb: data.virtualContentDb,
 		collections: [
 			'objects',
@@ -13,7 +13,7 @@ Master.onCreate = function(data) {
 	})
 	this.system = this.create(Mongo, {
 		id: 'system',
-		db: data.gameId,
+		db: data.db,
 		virtualDb: data.virtualSystemDb,
 		collections: [
 			'users',

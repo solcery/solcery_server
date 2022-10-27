@@ -26,7 +26,7 @@ async function test(testEnv) {
 			botFillTimeout: 50,
 			tickPeriod: 10,
 		},
-		virtualDb: { 
+		db: { 
 			gameInfo: [
 				{
 					playerQuantity: 2,

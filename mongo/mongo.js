@@ -6,17 +6,14 @@ const Master = {};
 
 Master.onCreate = function(data) {
     if (!data.db || !data.collections) return; // TODO
-    this.dbName = data.db;
-
-    if (data.virtualDb) {
-        this.db = new VirtualMongoDB(data.db, data.virtualDb);
+    if (typeof data.db === 'object') {
+        this.db = new VirtualMongoDB(data.id, data.db);
         for (let collection of data.collections) {
             this[collection] = this.db.collection(collection);
         }
         this.parent.execAllMixins('onMongoReady', this)
         return;
     }
-
     const client = new MongoClient(databaseUri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,

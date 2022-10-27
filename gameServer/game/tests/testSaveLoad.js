@@ -1,4 +1,4 @@
-const virtualDb = {};
+const db = {};
 
 async function test(testEnv) {
 	let core = createCore();
@@ -9,7 +9,7 @@ async function test(testEnv) {
 	core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
-		virtualDb, 
+		db, 
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 
@@ -29,7 +29,7 @@ async function test(testEnv) {
 	gameServer = core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
-		virtualDb, 
+		db, 
 	});
 
  	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY);

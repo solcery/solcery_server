@@ -62,14 +62,12 @@ async function test(testEnv) {
 	const core = createCore({ id: 'core' });
 	core.create(Engine, { 
 		id: 'project1',
-		virtualContentDb: projectDb1,
-		virtualSystemDb: projectDb1,
+		db: projectDb1,
 		gameId: 'project1',
 	});
 	core.create(Engine, { 
 		id: 'project2',
-		virtualContentDb: projectDb2,
-		virtualSystemDb: true,
+		db: projectDb2,
 		gameId: 'project2',
 	});
 

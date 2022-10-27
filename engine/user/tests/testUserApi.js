@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 
-const virtualSystemDb = {
+const db = {
 	users: [
 		{
 			id: ObjectId(),
@@ -16,7 +16,7 @@ async function test(testEnv) {
 	const core = createCore({ id: 'core' });
 	core.create(Engine, { 
 		id: 'test',
-		virtualSystemDb,
+		db,
 		gameId: 'test',
 	});
 

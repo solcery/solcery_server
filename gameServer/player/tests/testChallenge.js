@@ -5,7 +5,7 @@ async function test(testEnv) {
 	const PLAYER_PUBKEY = 'stuff';
 
 	core.webSocketTimeout = 100;
-	core.create(GameServer, { id: SERVER_NAME, gameId: SERVER_NAME, virtualDb: {} });
+	core.create(GameServer, { id: SERVER_NAME, gameId: SERVER_NAME, db: {} });
 	let gameServer = core.get(GameServer, SERVER_NAME);
 	assert(gameServer)
 

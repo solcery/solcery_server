@@ -32,7 +32,7 @@ async function test(testEnv) {
 	await core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
-		virtualDb: {}, 
+		db: {}, 
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 

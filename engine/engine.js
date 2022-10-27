@@ -5,7 +5,6 @@ Master.onCreate = function(data) {
 	this.content = this.create(Mongo, {
 		id: 'content',
 		db: data.db,
-		virtualDb: data.virtualContentDb,
 		collections: [
 			'objects',
 			'templates',
@@ -14,7 +13,6 @@ Master.onCreate = function(data) {
 	this.system = this.create(Mongo, {
 		id: 'system',
 		db: data.db,
-		virtualDb: data.virtualSystemDb,
 		collections: [
 			'users',
 			'logs',

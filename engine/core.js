@@ -7,6 +7,7 @@ Master.onCreate = function(data) {
 
     // TODO: load from config
     this.create(Engine, { id: 'polygon', gameId: 'polygon' });
+    this.create(Engine, { id: 'lightmor', gameId: 'lightmor' });
     this.create(Engine, { id: 'summoner', gameId: 'summoner' });
 }
 

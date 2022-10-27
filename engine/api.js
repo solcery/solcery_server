@@ -100,4 +100,48 @@ Master.api['engine.migrate'] = async function(params) {
       }
 }
 
+Master.api['engine.release'] = async function(params) {
+      let engine = this.engine(params);
+      let config = await engine.getConfig();
+      let gameId = config.fields.releaseProjectId;
+      assert(gameId, 'Release API error: This project is not connected to game server. Check confiig')
+      let gameServer = engine.core.get(GameServer, gameId);
+      assert(gameServer, `Release API error: No game server with for game '${gameId}'`);
+      let gameMongo = gameServer.get(Mongo, 'main');
+      assert(gameMongo, 'No mongo connection!'); // TODO
+      let currentLatest = await gameMongo.versions.count();
+      let dist = {
+         version: currentLatest + 1,
+         content: {
+               meta: params.contentMeta,
+               web: params.contentWeb,
+               unity: params.contentUnity
+         }
+      }
+      let gameSettings = objget(params, 'contentMeta', 'gameSettings');
+      assert(gameSettings, 'Release API error: No game settings provided in contentMeta param!')
+      var update = { $set: gameSettings };
+
+      let forgeMongo = this.core.get(Mongo, 'nfts');
+      let supportedCollections = objget(params, 'contentMeta', 'collections');
+      if (forgeMongo && supportedCollections) {
+         supportedCollections = Object.values(supportedCollections).map(col => ObjectId(col.collection));
+         supportedCollections = await this.forgeMongo.objects
+               .find({ 
+                     _id: { $in: supportedCollections },
+                     template: 'collections',
+               })
+               .toArray();
+         supportedCollections = supportedCollections.map(collection => ({
+               name: collection.fields.name,
+               image: collection.fields.logo,
+               magicEdenUrl: collection.fields.magicEdenUrl,
+         }))
+         update['$set'].supportedCollections = supportedCollections;
+      }
+      await gameMongo.gameInfo.updateOne({}, update);
+      await gameMongo.versions.insertOne(dist);
+      return currentLatest + 1;
+}
+
 module.exports = Master;

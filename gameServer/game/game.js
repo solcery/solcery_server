@@ -12,9 +12,7 @@ Master.onCreate = function(data) {
 Master.start = function(data) {
 	this.started = now();
 	this.actionLog.push({ 
-		action: { 
-			type: 'init',
-		},
+		type: 'init',
 	});
 	this.execAllPlayers('onGameStart', this.getSaveData());
 	this.save();
@@ -86,8 +84,8 @@ Master.onPlayerAction = function(player, action) {
 	let playerData = this.players.find(agent => agent.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
 	this.actionLog.push({
-		player: playerData.index,
-		action
+		playerIndex: playerData.index,
+		...action,
 	})
 	this.save();
 	this.execAllPlayers('onGameAction', this.getSaveData([ 'actionLog' ]));

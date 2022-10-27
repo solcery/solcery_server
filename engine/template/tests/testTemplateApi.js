@@ -91,7 +91,7 @@ async function test(testEnv) {
 	assert(objects[0].fields.name === 'Object 1' && objects[1].fields.name === 'Object 2');
 
 	let newObjId = await apiCall({
-		command: 'engine.template.object.new',
+		command: 'engine.template.createObject',
 		gameId: 'test',
 		templateCode: 'testTemplate',
 	})

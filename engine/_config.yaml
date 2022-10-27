@@ -72,21 +72,21 @@ api:
               required: true
         sync:
           description: 'Synchronizes game content with source project'
-        # release:
-        #   description: 'Releases new version of the game to gameServer'
-        #   params:
-        #     contentWeb:
-        #       type: 'json'
-        #       description: 'Compiled content for web brick runtime'
-        #       required: true
-        #     contentUnity:
-        #       type: 'json'
-        #       description: 'Compiled content for thin Unity client'
-        #       required: true
-        #     contentMeta:
-        #       type: 'json'
-        #       description: 'Compiled content for game page'
-        #       required: true
+        release:
+          description: 'Releases new version of the game to gameServer'
+          params:
+            contentWeb:
+              type: 'json'
+              description: 'Compiled content for web brick runtime'
+              required: true
+            contentUnity:
+              type: 'json'
+              description: 'Compiled content for thin Unity client'
+              required: true
+            contentMeta:
+              type: 'json'
+              description: 'Compiled content for game page'
+              required: true
 
 tests:
   testEngineApi: true

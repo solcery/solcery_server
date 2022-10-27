@@ -6,20 +6,22 @@ Master.onCreate = function(data) {
 		return;
 	}
 	this.bot = data.bot;
-	console.log('I am a bot?', data.bot);
+	this.behaviour = data.behaviour;
+	console.log('start a bot that', data.behaviour);
 }
 
 Master.onGameAction = function(data) {
-	console.log('BOT onGameAction', data.actionLog);
-	let lastAction = data.actionLog.pop();
+	let lastAction = data.actionLog.slice(-1).pop();
+	if (!lastAction.playerIndex) { return; }
+
 	let myPlayerData = this.game.players.find(p => p.id === this.id);
 	assert(myPlayerData);
-	let myIndex = myPlayerData.index;
-	if (lastAction.player === myIndex) {
-		console.log('BOT last action is mine, skipping');
-		return;
+
+	if (this.behaviour === 'repeatLastAction') {
+		let myIndex = myPlayerData.index;
+		if (lastAction.playerIndex === myIndex) { return; }
+		this.execAllMixins('onWSRequestAction',  { action: lastAction.action } );
 	}
-	this.execAllMixins('onWSRequestAction', lastAction.action);
 }
 
 module.exports = Master

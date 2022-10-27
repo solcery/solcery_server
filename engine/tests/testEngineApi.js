@@ -100,11 +100,11 @@ async function test(testEnv) {
 		gameId: 'project1'
 	});
 
-	config.fields.sync.isLocked = false;
+	config.sync.isLocked = false;
 	await apiCall({
 		command: 'engine.setConfig',
 		gameId: 'project1',
-		fields: config.fields,
+		fields: config,
 	});
 	
 	await apiCall({

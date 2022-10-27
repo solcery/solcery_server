@@ -30,7 +30,7 @@ Master.api['engine.setConfig'] = async function(params) {
 Master.api['engine.sync'] = async function(params) {
       let engine = this.engine(params);
       let config = await engine.getConfig();
-      let sync = objget(config, 'fields', 'sync');
+      let sync = config.sync;
       assert(sync, 'Sync API error: Project cannot be synced, see project config!');
       assert(sync.sourceProjectId, 'Sync API error: No sourceProjectId in sync config!');
       assert(!sync.isLocked, 'Sync API error: Synchronization is locked!');

@@ -9,11 +9,12 @@ Master.onCreate = function (data) {
     app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
     app.use(bodyParser.json({ limit: "1mb" }));
     app.use(cors());
-    let httpServer = app.listen(process.env.PORT || 5000);
     this.execAllMixins('onExpressAppCreated', app);
+    let httpServer = require('http').createServer(app);
     this.execAllMixins('onHttpServerCreated', httpServer);
     this.httpServer = httpServer;
     this.app = app;
+    httpServer.listen(process.env.PORT || 5000);
 }
 
 Master.onDelete = function(data) {

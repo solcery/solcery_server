@@ -22,10 +22,19 @@ Master.onCreate = function(data) {
 }
 
 Master.getConfig = async function(data) {
-	return await this.system.config.findOne({});
+	let config = await this.system.config.findOne({});
+	return config.fields;
 }
 
-Master.updateConfig = async function(update) {
+Master.updateConfig = async function(fields) {
+	let update = {};
+	for (let [ field, value ] of Object.entries(fields)) {
+		if (value !== null) {
+			objset(update, value, '$set', `fields.${field}`);
+		} else {
+			objset(update, null, '$unset', `fields.${field}`);
+		}
+	}
 	await this.system.config.updateOne({}, update);
 }
 

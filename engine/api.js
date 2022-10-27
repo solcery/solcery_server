@@ -24,11 +24,7 @@ Master.api['engine.getConfig'] = async function(params) {
 
 Master.api['engine.setConfig'] = async function(params) {
       let engine = this.engine(params);
-      let fields = {};
-      for (let [ field, value ] of Object.entries(params.fields)) {
-            fields[`fields.${field}`] = value;
-      };
-      await engine.updateConfig({ $set: fields });
+      await engine.updateConfig(params.fields);
 }
 
 Master.api['engine.sync'] = async function(params) {

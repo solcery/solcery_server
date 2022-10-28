@@ -99,7 +99,7 @@ Master.api['engine.migrate'] = async function(params) {
 Master.api['engine.release'] = async function(params) {
       let engine = this.engine(params);
       let config = await engine.getConfig();
-      let gameId = config.fields.releaseProjectId;
+      let gameId = config.releaseProjectId;
       assert(gameId, 'Release API error: This project is not connected to game server. Check confiig')
       let gameServer = engine.core.get(GameServer, gameId);
       assert(gameServer, `Release API error: No game server with for game '${gameId}'`);

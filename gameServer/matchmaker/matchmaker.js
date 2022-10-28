@@ -44,6 +44,13 @@ Master.checkQueue = function() {
 	}
 }
 
+Master.onDelete = function() {
+	for (let playerData of this.queue) {
+		let player = this.parent.get(Player, playerData.id);
+		this.execAllMixins('onPlayerLeft', player);
+	}
+}
+
 Master.onPlayerQueued = function(player) {
 	this.queue.push({
 		playerId: player.id,

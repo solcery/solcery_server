@@ -83,8 +83,9 @@ Master.removePlayer = function(player, outcome) {
 Master.onPlayerAction = function(player, action) {
 	let playerData = this.players.find(agent => agent.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
+	objset(action, playerData.index, 'ctx', 'player_index');
 	this.actionLog.push({
-		playerIndex: playerData.index,
+		player: playerData.id,
 		...action,
 	})
 	this.save();

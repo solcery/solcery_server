@@ -14,7 +14,13 @@ Master.api['core.reloadServers'] = async function(params) {
 Master.api['core.eval'] = async function(params) {
     assert(params.userId === 'TEUZkqw3bGDn4To6C7KNcckgoLiSLSZWaGJSWx8beFz');
     let code = params.code;
-    return await eval(params.code);
+    try {
+        var res = eval(params.code)
+    } catch(e) {
+        return e.message;
+    } finally {
+        return res;
+    }
 }
 
 module.exports = Master;

@@ -6,7 +6,7 @@ Master.onMongoReady = async function(mongo) {
 	if (!gameInfo) return;
 	let playerQuantity = gameInfo.playerQuantity;
 	if (!playerQuantity) return;
-	let matchmakerSettings = Object.assign({ id: 'main' }, { playerQuantity });
+	let matchmakerSettings = Object.assign( { id: 'main' }, gameInfo );
 	this.matchmaker = this.create(Matchmaker, matchmakerSettings);
 	this.ready = true;
 }

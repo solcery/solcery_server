@@ -2,6 +2,7 @@ moduleName: 'game'
 requiredModules:
   api: true
   gameServer/player: true
+  gameServer/bot: true
   gameServer/game: true
   gameServer/matchmaker: true
 dwellers:

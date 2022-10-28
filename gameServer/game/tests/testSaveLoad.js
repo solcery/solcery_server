@@ -39,7 +39,8 @@ async function test(testEnv) {
 	assert(player1);
 	assert(game);
 	assert(game.actionLog.length = 2);
-	assert(game.actionLog[1].playerIndex === 1);
+	// assert(game.actionLog[1].playerIndex === 1);
+	assert(game.actionLog[1].player == PUBKEY);
 	assert(game.id === gameId);
 	assert(game.started === started);
 }

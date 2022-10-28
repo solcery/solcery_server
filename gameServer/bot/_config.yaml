@@ -7,4 +7,5 @@ mixins:
     player: true
 
 tests:
-  testBot: true
+  testBotRepeat: true
+  testPolygonRetrieval: true

@@ -2,11 +2,10 @@ const Master = {}
 
 Master.onMongoReady = async function(mongo) {
 	if (mongo.id !== 'main') return;
+	let matchmakerData = { id: 'main' };
 	let gameInfo = await this.get(Mongo, 'main').gameInfo.findOne({});
 	if (!gameInfo) return;
-	let playerQuantity = gameInfo.playerQuantity;
-	if (!playerQuantity) return;
-	let matchmakerSettings = Object.assign({ id: 'main' }, { playerQuantity });
+	let matchmakerSettings = Object.assign({ id: 'main' }, gameInfo.matchmakerSettings ?? {} );
 	this.matchmaker = this.create(Matchmaker, matchmakerSettings);
 	this.ready = true;
 }

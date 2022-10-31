@@ -29,9 +29,11 @@ async function test(testEnv) {
 		db: { 
 			gameInfo: [
 				{
-					playerQuantity: 2,
-					botFillTimeout: 50,
-					tickPeriod: 10,
+					matchmakerSettings: {
+						playerQuantity: 2,
+						botFillTimeout: 50,
+						tickPeriod: 10,
+					},
 				}
 			]
 		}

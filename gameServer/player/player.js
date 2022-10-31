@@ -15,7 +15,7 @@ Master.onWSConnected = function(wsConnection) {
 }
 
 Master.onCreate = function(data) {
-	this.status = data.status;
+	this.pubkey = data.pubkey;
 }
 
 Master.setStatus = function (code, data) {
@@ -23,6 +23,7 @@ Master.setStatus = function (code, data) {
 		code,
 		data
 	};
+	this.execAllMixins('onStatusChanged')
 	this.wsMessage('playerStatus', this.status);
 }
 

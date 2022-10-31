@@ -6,6 +6,7 @@ requiredModules:
   engine: true
   websocket: true
   unityBuilds: true
+  forge: true
 dwellers:
   Core: true
 mixins:

@@ -53,6 +53,7 @@ Master.addPlayer = function(player) {
 	this.players.push({
 		index: this.players.length + 1,
 		id: player.id,
+		nfts: player.nfts,
 	})
 	this.save();
 	player.execAllMixins('onGameJoined', this);

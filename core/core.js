@@ -1,11 +1,12 @@
 const Master = {}
 
 Master.onCreate = function(data) {
+  if (!data.db) return;
   this.create(Mongo, {
       id: 'solcery',
-      db: 'solcery',
+      db: data.db,
       collections: [
-            'objects',
+        'objects',
       ],
   })
 }

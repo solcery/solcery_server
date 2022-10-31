@@ -132,5 +132,8 @@ if (test) {
 	}
 	runTests(tests, testMask)
 } else {
-	createCore();
+	createCore({
+		forge: true,
+		db: 'solcery',
+	});
 }

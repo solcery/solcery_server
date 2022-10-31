@@ -6,10 +6,10 @@ Master.onPlayerWSConnected = function(pubkey, wsConnection) {
 		player = this.create(Player, {
 			id: pubkey,
 			pubkey: pubkey,
-			status: { // TODO: remove
-				code: 'online',
-			}
 		});
+		if (!player.status) {
+			player.setStatus('online');
+		}
 	}
 	player.execAllMixins('onWSConnected', wsConnection);
 }

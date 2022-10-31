@@ -97,10 +97,16 @@ Master.onCreate = function(data) {
         }
         this.apiCall(request.query, response)
     });
+    data.app.get("/api*", (request, response) => {
+        this.apiCall(request.query, response)
+    });
     data.app.post("/api/*", (request, response) => {
         if (request.params['0'] && !request.body.command) {
             request.body.command = request.params['0'];
         }
+        this.apiCall(request.body, response)
+    });
+    data.app.post("/api*", (request, response) => {
         this.apiCall(request.body, response)
     });
     this.listCommands();

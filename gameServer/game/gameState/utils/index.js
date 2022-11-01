@@ -26,4 +26,4 @@ function shuffleArray(array) {
 	}
 }
 
-module.exports = { insertTable };
+module.exports = { insertTable, getTable };

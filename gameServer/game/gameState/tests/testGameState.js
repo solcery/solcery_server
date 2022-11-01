@@ -52,11 +52,43 @@ async function test(testEnv) {
 	await game.addPlayer(playerTwo);
 	await game.start();
 
+	/* Test GameState creation */
+
 	let content = gameVersion.content.web;
 	console.log(content);
-	let runtime = game.create(GameState, {content: content, seed: 0 });
-	assert(runtime);
+	console.log(content.cardTypes);
+	let gameState = game.create(GameState, {content: content, seed: 0 });
 
+	// console.log(gameState.inner.attrs);
+	assert(gameState);
+
+	/* Test GameState start */
+
+	gameState.start(game.players);
+	assert(Object.keys(gameState.inner.objects).length == 5);
+
+	/* Test Apply Command */
+
+	console.log("game attrs", gameState.inner.attrs);
+
+	let rightButtonClick = {
+		commandId: 9, playerIndex: 0,
+		scopeVars: { object_id: 1 }
+	}
+	let leftButtonClick = {
+		commandId: 9, playerIndex: 0,
+		scopeVars: { object_id: 5 }
+	}
+
+	while(!gameState.inner.checkOutcome()) {
+		gameState.applyCommand(rightButtonClick);
+		gameState.applyCommand(leftButtonClick);
+
+		console.log("game attrs", gameState.inner.attrs);
+		console.log("outcome", gameState.inner.checkOutcome());
+	}
+
+	console.log("game attrs", gameState.inner.attrs);
 }
 
 module.exports = { test }

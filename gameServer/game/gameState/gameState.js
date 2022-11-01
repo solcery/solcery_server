@@ -1,5 +1,5 @@
 const { BrickRuntime } = require("./runtime");
-
+const { getTable } = require("./utils/index")
 
 class Entity {
 	id = undefined;
@@ -18,12 +18,12 @@ class Entity {
 	setAttr(attr, value) {
 		if (this.attrs[attr] === undefined) throw new Error(`trying to set unknown entity attr [${attr}]`);
 		this.attrs[attr] = value;
-		this.gameState.pushPackageEvent('onEntityAttrChanged', this, attr, value);
+		// this.gameState.pushPackageEvent('onEntityAttrChanged', this, attr, value);
 	}
 
 	transform(tplId) {
 		this.tplId = tplId;
-		this.gameState.pushPackageEvent('onEntityTransform', this, tplId);
+		// this.gameState.pushPackageEvent('onEntityTransform', this, tplId);
 	}
 }
 
@@ -67,10 +67,14 @@ class GameState {
 	// }
 
 	start = (players, layoutOverride) => {
-		let layout = layoutOverride ?? this.content.gameSettings.layout;
-		if (!layout) throw new Error('Error: Trying to initLayout without preset scheme');
+		// what is layoutOverride ??
+		// Do we need layouts, if true why there is no in gameSettings ??
+		// let layout = layoutOverride ?? this.content.gameSettings.layout;
+		// if (!layout) throw new Error('Error: Trying to initLayout without preset scheme');
+		console.log("FIX layouts");
+
 		for (let cardPack of Object.values(this.content.cards)) {
-			if (!layout.includes(cardPack.preset)) continue;
+			// if (!layout.includes(cardPack.preset)) continue;
 			for (let i = 0; i < cardPack.amount; i++) {
 				this.createEntity(cardPack.cardType, cardPack.place, cardPack.initializer);
 			}
@@ -143,7 +147,7 @@ class GameState {
 	setAttr(attr, value) {
 		if (this.attrs[attr] === undefined) throw new Error('Error trying to set unknown game attr ' + attr);
 		this.attrs[attr] = value;
-		this.pushPackageEvent('onGameAttrChanged', attr, value);
+		// this.pushPackageEvent('onGameAttrChanged', attr, value);
 	}
 
 	createEntity(cardTypeId, place, initAction, ctx) {
@@ -154,7 +158,9 @@ class GameState {
 		entity.attrs.place = place;
 		let cardType = this.content.cardTypes[cardTypeId];
 		if (!cardType) throw new Error('Game.createEntity error: Unknown cardType!');
-		this.pushPackageEvent('onEntityCreated', entity);
+
+		// this.pushPackageEvent('onEntityCreated', entity);
+
 		if (cardType.action_on_create) {
 			this.runtime.execBrick(cardType.action_on_create, this.createContext(entity, ctx));
 		}
@@ -192,6 +198,20 @@ const Master = {};
 /* Simple Dweller-Wrapper around GameState class */
 Master.onCreate = function(data) {
 	this.inner = new GameState(data); 
+}
+
+Master.start = function(players) {
+	this.inner.start(players, undefined);
+}
+
+Master.applyCommand = function(data) {
+	let commandId = data.commandId;
+	assert(commandId);
+	let playerIndex = data.playerIndex;
+	assert(playerIndex !== undefined);
+	let scopeVars = data.scopeVars;
+	assert(scopeVars);
+	this.inner.applyCommand(commandId, playerIndex, scopeVars);
 }
 
 module.exports = Master

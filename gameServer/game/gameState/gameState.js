@@ -67,14 +67,11 @@ class GameState {
 	// }
 
 	start = (players, layoutOverride) => {
-		// what is layoutOverride ??
-		// Do we need layouts, if true why there is no in gameSettings ??
-		// let layout = layoutOverride ?? this.content.gameSettings.layout;
-		// if (!layout) throw new Error('Error: Trying to initLayout without preset scheme');
-		console.log("FIX layouts");
+		let layout = layoutOverride ?? this.content.gameSettings.layout;
+		if (!layout) throw new Error('Error: Trying to initLayout without preset scheme');
 
 		for (let cardPack of Object.values(this.content.cards)) {
-			// if (!layout.includes(cardPack.preset)) continue;
+			if (!layout.includes(cardPack.preset)) continue;
 			for (let i = 0; i < cardPack.amount; i++) {
 				this.createEntity(cardPack.cardType, cardPack.place, cardPack.initializer);
 			}
@@ -115,17 +112,10 @@ class GameState {
 		}
 	};
 
-	applyCommand = (commandId, playerIndex, scopeVars) => {
+	applyCommand = (commandId, scopeVars) => {
 		let command = this.content.commands[commandId];
 		if (!command) throw 'No such game command';
-		if (playerIndex) {
-			var extra = { 
-				vars: { 
-					player_index: playerIndex 
-				} 
-			}
-		}
-		let ctx = this.createContext(undefined, extra);
+		let ctx = this.createContext(undefined);
 		if (scopeVars) Object.assign(ctx.scopes[0].vars, scopeVars);
 		if (command.action) {
 			this.runtime.execBrick(command.action, ctx);
@@ -207,11 +197,9 @@ Master.start = function(players) {
 Master.applyCommand = function(data) {
 	let commandId = data.commandId;
 	assert(commandId);
-	let playerIndex = data.playerIndex;
-	assert(playerIndex !== undefined);
 	let scopeVars = data.scopeVars;
 	assert(scopeVars);
-	this.inner.applyCommand(commandId, playerIndex, scopeVars);
+	this.inner.applyCommand(commandId, scopeVars);
 }
 
 module.exports = Master

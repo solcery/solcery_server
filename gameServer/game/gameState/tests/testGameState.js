@@ -56,7 +56,6 @@ async function test(testEnv) {
 
 	let content = gameVersion.content.web;
 	console.log(content);
-	console.log(content.cardTypes);
 	let gameState = game.create(GameState, {content: content, seed: 0 });
 
 	// console.log(gameState.inner.attrs);

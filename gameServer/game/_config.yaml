@@ -2,6 +2,7 @@ moduleName: 'gameServer/game'
 requiredModules:
   websocket: true
   gameServer/player: true
+  gameServer/game/gameState: true
 dwellers:
   Game: 
     id: 'string'

@@ -1,7 +1,10 @@
-const { Collection } = require("mongodb");
+const { Collection, ConnectionClosedEvent } = require("mongodb");
 
 const playerMessages = {}
 
+function getRandomInt(max) {
+	return Math.floor(Math.random() * max);
+}
 
 async function test(testEnv) {
 	const core = await createCore();
@@ -61,27 +64,39 @@ async function test(testEnv) {
 	// console.log(gameState.inner.attrs);
 	assert(gameState);
 
+	console.log("gameState was created");
+
 	/* Test GameState start */
 
 	gameState.start(game.players);
-	assert(Object.keys(gameState.inner.objects).length == 5);
+	console.log(gameState.inner.objects);
+	// assert(Object.keys(gameState.inner.objects).length == 5);
+	console.log("gameState was launched");
 
 	/* Test Apply Command */
 
 	console.log("game attrs", gameState.inner.attrs);
 
+	// do nothing button
 	let rightButtonClick = {
-		commandId: 9, playerIndex: 0,
+		commandId: 9, 
 		scopeVars: { object_id: 1 }
 	}
+	// get one point button
 	let leftButtonClick = {
-		commandId: 9, playerIndex: 0,
-		scopeVars: { object_id: 5 }
+		commandId: 9, 
+		scopeVars: { object_id: 4 }
 	}
 
+	let command = rightButtonClick;
 	while(!gameState.inner.checkOutcome()) {
-		gameState.applyCommand(rightButtonClick);
-		gameState.applyCommand(leftButtonClick);
+		if (getRandomInt(2) == 0) {
+			command = rightButtonClick;
+		} else {
+			command = leftButtonClick;
+		}
+		command.scopeVars.player_index = gameState.inner.attrs.current_player + 1;
+		gameState.applyCommand(command);
 
 		console.log("game attrs", gameState.inner.attrs);
 		console.log("outcome", gameState.inner.checkOutcome());

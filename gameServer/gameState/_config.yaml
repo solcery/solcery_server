@@ -1,0 +1,8 @@
+moduleName: 'gameServer/gameState'
+dwellers: 
+  GameState: true
+mixins:
+  GameState: 
+    gameState: true
+tests:
+  testGameState: true

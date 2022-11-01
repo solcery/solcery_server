@@ -1,8 +1,9 @@
 const Master = {};
+const { ObjectId } = require('mongodb');
 
 Master.onCreate = function(data) {
     this.gameId = data.gameId;
-    this.gameVersions = data.gameVersions ?? {};
+    this.gameVersions = {};
     this.create(Mongo, {
         id: 'main',
         db: data.db,
@@ -14,23 +15,26 @@ Master.onCreate = function(data) {
     });
 }
 
+Master.onMongoReady = function(mongo) {
+    if (mongo.id !== 'main') return;
+    this.getGameVersion(); 
+}
+
 Master.getGameVersion = async function(version) {
-    let version = params.version;
+    let mongo = this.get(Mongo, 'main');
+    version = version ?? this.latestVersion;
     if (!version) {
-        version = await gameServer.get(Mongo, 'main').versions.count();
+        version = await mongo.versions.count();
+        var latest = true;
     }
     if (!this.gameVersions[version]) {
-        let gameVersion = await gameServer.get(Mongo, 'main').versions.findOne({ version });
-        let unityBuildId = objget(gameVersion, 'content', 'meta', 'gameSettings', 'build');
-        let solceryMongo = this.core.get(Mongo, 'solcery');
-        assert(solceryMongo);
-        let unityBuild = await solceryMongo.objects.findOne({ _id: ObjectId(unityBuildId) });
-
-        this.gameVersions[versions] = {
-            version: gameVersion.version,
-            content: gameVersion.content,
-            unityBuild: unityBuild.fields,
-        };
+        let ver = await mongo.versions.findOne({ version });
+        if (!ver) return;
+        this.gameVersions[version] = ver;
+        if (latest) {
+            this.latestVersion = ver;
+            this.execAllMixins('onGameVersionLoaded', ver);
+        }
     }
     return this.gameVersions[version]
 }

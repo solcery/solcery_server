@@ -1,13 +1,12 @@
 const Master = {}
 
-Master.onMongoReady = async function(mongo) {
-	if (mongo.id !== 'main') return;
-	let matchmakerData = { id: 'main' };
-	let gameInfo = await this.get(Mongo, 'main').gameInfo.findOne({});
-	if (!gameInfo) return;
-	let matchmakerSettings = Object.assign({ id: 'main' }, gameInfo.matchmakerSettings ?? {} );
-	this.matchmaker = this.create(Matchmaker, matchmakerSettings);
-	this.ready = true;
+Master.onGameVersionLoaded = function(gameVersion) {
+	let matchmakerContent = objget(gameVersion, 'content', 'matchmaker');
+	if (!matchmakerContent) return;
+	this.matchmaker = this.create(Matchmaker, {
+		id: 'matchmaker',
+		gameVersion,
+	})
 }
 
 Master.createBot = function() {

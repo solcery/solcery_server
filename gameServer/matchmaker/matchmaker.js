@@ -1,10 +1,16 @@
 const Master = {}
 
 Master.onCreate = function(data) {
-	this.playerQuantity = data.playerQuantity;
-	this.botFillTimeout = data.botFillTimeout;
+	this.gameVersion = data.gameVersion;
+	let content = objget(data.gameVersion, 'content', 'matchmaker');
+	this.playerQuantity = Object.keys(content.players).length;
+	this.botFillTimeout = objget(content, 'matchmaker', 'botFillTimeout');
+	this.tickPeriod = objget(content, 'matchmaker', 'tickPeriod');
+	let supportedCollections = objget(data.gameVersion, 'content', 'matchmaker', 'collections');
+	if (supportedCollections) {
+		this.collections = Object.values(supportedCollections).map(c => c.collection);
+	}
 	this.queue = [];
-	this.tickPeriod = data.tickPeriod ?? 1000;
 	setInterval( () => { this.execAllMixins('onTick') }, this.tickPeriod);
 }
 
@@ -13,14 +19,12 @@ Master.onTick = function() {
 }
 
 Master.createGame = function() {
-	const game = this.parent.createGame();
+	const game = this.parent.createGame(this.gameVersion.version);
 	let selectedPlayers = this.queue.splice(0, this.playerQuantity);
-	for (let { playerId } of selectedPlayers) {
-		let player = this.parent.get(Player, playerId);
-		assert(player, `Matchmaking: Error creating game - no player '${playerId}'!`);
-		game.addPlayer(player);
+	for (let queuePlayer of selectedPlayers) {
+		game.addPlayer(queuePlayer);
 	}
-	game.start(); // TODO: move to game?
+	game.start();
 }
 
 Master.checkQueue = function() {
@@ -37,6 +41,7 @@ Master.checkQueue = function() {
 			this.queue.push({
 				playerId: bot.id,
 				time: Date.now(),
+				bot: true,
 			})
 		}
 		this.createGame();
@@ -51,9 +56,13 @@ Master.onDelete = function() {
 }
 
 Master.onPlayerQueued = function(player) {
+	if (player.nfts && this.collections) {
+		var nfts = player.nfts.filter(nft => this.collections.includes(nft.collection));
+	}
 	this.queue.push({
 		playerId: player.id,
 		time: Date.now(),
+		nfts,
 	})
 	player.setStatus('queued', { time: Date.now() })
 	this.checkQueue();

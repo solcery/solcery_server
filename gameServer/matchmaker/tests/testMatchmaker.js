@@ -21,11 +21,6 @@ async function test(testEnv) {
 	core.create(GameServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
-		matchmaker: {
-			playerQuantity: 2,
-			botFillTimeout: 50,
-			tickPeriod: 10,
-		},
 		db: { 
 			gameInfo: [
 				{
@@ -34,6 +29,27 @@ async function test(testEnv) {
 						botFillTimeout: 50,
 						tickPeriod: 10,
 					},
+				}
+			],
+			versions: [
+				{
+					version: 1,
+					targets: {
+						matchmaker: {
+							players: [
+								{
+									id: 1,
+								},
+								{
+									id: 2,
+								},
+							],
+							matchmaker: {
+								tickPeriod: 10,
+								botFillTimeout: 40,
+							}
+						}
+					}
 				}
 			]
 		}

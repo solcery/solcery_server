@@ -23,7 +23,7 @@ Master.api['engine.template.setSchema'] = async function(params) {
 			buildTargets: schema.buildTargets,
 			fields: schema.fields,
 			menuOrder: schema.menuOrder,
-			singleton: schema.singletons,
+			singleton: schema.singleton,
 		},
 	};
 	await engine.content.templates.updateOne({ code: template.code }, values);

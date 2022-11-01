@@ -1,7 +1,10 @@
 const Master = {}
 
-Master.createGame = function(data = {}) {
-	return this.create(Game, Object.assign({ id: uuid() }, data ));
+Master.createGame = function(version) {
+	return this.create(Game, {
+		id: uuid(), 
+		version 
+	});
 }
 
 Master.loadGame = function (data) {
@@ -16,9 +19,6 @@ Master.onMongoReady = function(mongo) {
 		for (let game of games) {
 			this.loadGame(game);
 		}
-	});
-	mongo.versions.count().then(res => {
-		this.latestVersion = res
 	});
 }
 

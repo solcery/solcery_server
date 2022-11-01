@@ -1,6 +1,7 @@
 const Master = {}
 
 Master.onCreate = function(data) {
+	// console.log(this.gameVersion.content.meta);
 	this.actionLog = data.actionLog ?? [];
 	this.players = data.players ?? [];
 	this.started = data.started;
@@ -49,11 +50,14 @@ Master.save = function() {
 	mongo.games.replaceOne(filter, saveData);
 }
 
-Master.addPlayer = function(player) {
+Master.addPlayer = function(data) {
+	let player = this.parent.get(Player, data.playerId);
+	assert(player, `Game: Error adding player '${data.playerId}'!`);
 	this.players.push({
 		index: this.players.length + 1,
-		id: player.id,
-		nfts: player.nfts,
+		id: data.playerId,
+		nfts: data.nfts,
+		bot: data.bot,
 	})
 	this.save();
 	player.execAllMixins('onGameJoined', this);

@@ -78,17 +78,9 @@ api:
         release:
           description: 'Releases new version of the game to gameServer'
           params:
-            contentWeb:
+            content:
               type: 'json'
-              description: 'Compiled content for web brick runtime'
-              required: true
-            contentUnity:
-              type: 'json'
-              description: 'Compiled content for thin Unity client'
-              required: true
-            contentMeta:
-              type: 'json'
-              description: 'Compiled content for game page'
+              description: 'Compiled content'
               required: true
 
 tests:

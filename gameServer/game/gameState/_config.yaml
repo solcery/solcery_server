@@ -6,3 +6,4 @@ mixins:
     gameState: true
 tests:
   testGameState: true
+  testGameStatePolygon: true

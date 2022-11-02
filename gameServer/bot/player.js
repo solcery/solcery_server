@@ -33,9 +33,11 @@ Master.tryToAct = function(data) {
 		if (gameState.checkOutcome() !== undefined) return;
 
 		let possibleCommands = this.possibleCommands(gameState, myPlayerIndex);
+
 		let n = possibleCommands.length;
 		if (n > 0) {
 			let command = possibleCommands[getRandomInt(n)];
+			if (command.logMessage) console.log(command.logMessage);
 			this.execAllMixins('onWSRequestAction',  { action: command } );
 		}
 	}

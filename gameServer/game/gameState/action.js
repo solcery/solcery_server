@@ -192,8 +192,8 @@ const basicActions = [
 		name: 'Pause',
 		params: [{ code: 'duration', name: 'Duration', type: 'SBrick<value>' }],
 		exec: (runtime, params, ctx) => {
-			let duration = runtime.execBrick(params.duration, ctx);
-			ctx.game.pause(duration);
+			// let duration = runtime.execBrick(params.duration, ctx);
+			// ctx.game.pause(duration);
 		},
 	},
 	{
@@ -298,7 +298,7 @@ const basicActions = [
 		name: 'Play sound',
 		params: [{ code: 'sound_id', name: 'Sound', type: 'SLink<sounds>' }],
 		exec: (runtime, params, ctx) => {
-			ctx.game.playSound(params.sound_id);
+			// ctx.game.playSound(params.sound_id);
 		},
 	},
 	{

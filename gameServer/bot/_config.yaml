@@ -9,5 +9,6 @@ tests:
   testBotRepeatFakeGame: true
   testBotRepeatLightmorGame: true
   testBotRandom: true
+  testBotRandomPolygon: true
   # testViewPolygon: true 
   # testBot: true

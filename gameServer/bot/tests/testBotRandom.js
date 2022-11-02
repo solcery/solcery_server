@@ -38,7 +38,7 @@ async function test(testEnv) {
     let version = await mongo.versions.count();
 	let gameVersion = await mongo.versions.findOne({ version });
 	let content = gameVersion.content.web;
-	// console.log(content);
+	console.log(content);
 
 	let rightButtonClick = {
 		commandId: 9, 
@@ -77,9 +77,11 @@ async function test(testEnv) {
 	let gameState = game.create(GameState, {content: content, seed: 0 });
     game.gameState = gameState;
 
+
 	await game.addPlayer(botPlayerOne);
 	await game.addPlayer(botPlayerTwo);
 	await game.start();
+	console.log(gameState.inner.objects);
 
     // console.log(game.actionLog);
     let outcome = gameState.checkOutcome();

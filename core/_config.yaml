@@ -7,13 +7,14 @@ requiredModules:
   websocket: true
   unityBuilds: true
   forge: true
+
 dwellers:
-  Core: true
-mixins:
   Core:
-    core: true
+    mixins:
+      core/core: true
   Api:
-    api: true
+    mixins:
+      core/api: true
 
 api:
   paths:

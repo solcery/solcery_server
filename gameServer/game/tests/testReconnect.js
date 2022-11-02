@@ -6,17 +6,19 @@ const clientPlayer = {
 const mixins = [
 	{
 		dweller: Player,
-		mixin: {
-			_name: 'Test player message receiver',
-			onWSMessage: function(type, data) {
-				if (type === 'playerStatus') {
-					clientPlayer.status = data;
-				}
-				if (type === 'gameAction') {
-					clientPlayer.gameMessages.push(data)
-				}
-				if (type === 'gameStart') {
-					clientPlayer.gameMessages.push(data)
+		mixinConfig: {
+			master: {
+				_name: 'Test player message receiver',
+				onWSMessage: function(type, data) {
+					if (type === 'playerStatus') {
+						clientPlayer.status = data;
+					}
+					if (type === 'gameAction') {
+						clientPlayer.gameMessages.push(data)
+					}
+					if (type === 'gameStart') {
+						clientPlayer.gameMessages.push(data)
+					}
 				}
 			}
 		}

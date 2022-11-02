@@ -34,7 +34,7 @@ async function test(testEnv) {
 			versions: [
 				{
 					version: 1,
-					targets: {
+					content: {
 						matchmaker: {
 							players: [
 								{

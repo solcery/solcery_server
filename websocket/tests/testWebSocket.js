@@ -4,14 +4,16 @@
 const mixins = [
 	{
 		dweller: WSConnection,
-		mixin: {
-			_name: 'Test socket responder',
-			onSocketMessage: function(message) {
-				if (message.type !== 'testHello') return;
-				this.webSocket.emit('message', {
-					type: 'response',
-					data: message.data + '!',
-				});
+		mixinConfig: {
+			master: {
+				_name: 'Test socket responder',
+				onSocketMessage: function(message) {
+					if (message.type !== 'testHello') return;
+					this.webSocket.emit('message', {
+						type: 'response',
+						data: message.data + '!',
+					});
+				}
 			}
 		}
 	}

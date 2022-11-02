@@ -2,16 +2,18 @@ moduleName: 'gameServer/game'
 requiredModules:
   websocket: true
   gameServer/player: true
+
 dwellers:
   Game: 
     id: 'string'
-mixins:
-  Game:
-    game: true
+    mixins:
+      gameServer/game/game: true
   Player:
-    player: true
+    mixins:
+      gameServer/game/player: true
   GameServer:
-    gameServer: true
+    mixins:
+      gameServer/game/gameServer: true
 
 tests:
   testGame: true

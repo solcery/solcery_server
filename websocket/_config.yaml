@@ -1,13 +1,15 @@
 moduleName: 'websocket'
 requiredModules:
   http: true
+
 dwellers:
   WSConnection: 
     id: 'string'
-mixins:
+    mixins:
+      websocket/wsConnection: true
   Core:
-    core: true
-  WSConnection: 
-    wsConnection: true
+    mixins:
+      websocket/core: true
+
 tests:
   testWebSocket: true

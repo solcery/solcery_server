@@ -21,8 +21,10 @@ Master.onTick = function() {
 Master.createGame = function() {
 	const game = this.parent.createGame(this.gameVersion.version);
 	let selectedPlayers = this.queue.splice(0, this.playerQuantity);
-	for (let queuePlayer of selectedPlayers) {
-		game.addPlayer(queuePlayer);
+	for (let queueEntry of selectedPlayers) {
+		game.addPlayer(queueEntry.player, {
+			nfts: queueEntry.nfts,
+		});
 	}
 	game.start();
 }
@@ -37,11 +39,10 @@ Master.checkQueue = function() {
 	if (Date.now() - this.queue[0].time >= this.botFillTimeout) {
 		let botsQuantity = this.playerQuantity - this.queue.length;
 		for (let i = 0; i < botsQuantity; i++) {
-			let bot = this.parent.createBot();
+			let player = this.parent.createBot();
 			this.queue.push({
-				playerId: bot.id,
+				player,
 				time: Date.now(),
-				bot: true,
 			})
 		}
 		this.createGame();
@@ -60,7 +61,7 @@ Master.onPlayerQueued = function(player) {
 		var nfts = player.nfts.filter(nft => this.collections.includes(nft.collection));
 	}
 	this.queue.push({
-		playerId: player.id,
+		player,
 		time: Date.now(),
 		nfts,
 	})

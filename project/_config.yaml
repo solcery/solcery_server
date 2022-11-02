@@ -1,0 +1,6 @@
+moduleName: 'project'
+
+dwellers:
+  Project: 
+    mixins:
+      project/project: true

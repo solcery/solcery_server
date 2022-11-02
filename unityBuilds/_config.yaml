@@ -1,9 +1,12 @@
 moduleName: 'unityBuilds'
 requiredModules:
   api: true
-mixins:
+
+dwellers:
   Api:
-    api: true
+    mixins:
+      unityBuilds/api: true
+      
 api:
   paths:
     system:

@@ -50,14 +50,11 @@ Master.save = function() {
 	mongo.games.replaceOne(filter, saveData);
 }
 
-Master.addPlayer = function(data) {
-	let player = this.parent.get(Player, data.playerId);
-	assert(player, `Game: Error adding player '${data.playerId}'!`);
+Master.addPlayer = function(player, data = {}) {
 	this.players.push({
 		index: this.players.length + 1,
-		id: data.playerId,
+		id: player.id,
 		nfts: data.nfts,
-		bot: data.bot,
 	})
 	this.save();
 	player.execAllMixins('onGameJoined', this);

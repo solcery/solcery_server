@@ -1,5 +1,9 @@
 const Master = {}
 
+Master.onCreate = function(data) {
+    this.bot = data.bot; // TODO: move to bot module
+}
+
 Master.onWSRequestLeaveQueue = function(data) {
     if (objget(this, 'status', 'code') !== 'queued') return;
     assert(this.parent.matchmaker);

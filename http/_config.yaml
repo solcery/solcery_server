@@ -1,4 +1,5 @@
 moduleName: 'http'
-mixins: 
+dwellers: 
   Core:
-    core: true
+    mixins:
+      http/core: true

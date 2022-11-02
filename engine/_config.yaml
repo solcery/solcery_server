@@ -3,16 +3,18 @@ requiredModules:
   engine/object: true
   engine/template: true
   engine/user: true
-mixins:
-  Engine:
-    engine: true
-  Api:
-    api: true
-  Core:
-    core: true
+  
 dwellers:
-  Engine: true
-
+  Engine:
+    id: 'string'
+    mixins:
+      engine/engine: true
+  Api:
+    mixins:
+      engine/api: true
+  Core:
+    mixins:
+      engine/core: true
 
 api:
   paths:

@@ -1,7 +1,9 @@
 moduleName: 'engine/user'
-mixins:
+
+dwellers:
   Api:
-    api: true
+    mixins:
+      engine/user/api: true
 
 api:
   paths:

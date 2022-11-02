@@ -4,15 +4,19 @@ requiredModules:
   gameServer/player: true
   gameServer/game: true
   gameServer/matchmaker: true
+
 dwellers:
-  GameServer: true
-mixins:
   GameServer:
-    gameServer: true
+    id: 'string'
+    mixins:
+      gameServer/gameServer: true
   Core:
-    core: true
+    mixins:
+      gameServer/core: true
   Api:
-    api: true
+    mixins:
+      gameServer/api: true
+      
 api:
   paths:
     core:

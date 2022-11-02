@@ -9,7 +9,7 @@ Master.onGameVersionLoaded = function(gameVersion) {
 	})
 }
 
-Master.createBot = function() {
+Master.createBot = function() { // TODO: move to bot module
 	return this.create(Player, { id: uuid(), bot: true })
 }
 

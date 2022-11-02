@@ -1,30 +1,39 @@
 const Dweller = {};
 
-function addMixin(base, mixin) {
-    assert(base)
+function addMixin(dweller, mixinConfig) {
+    assert(dweller);
+    assert(mixinConfig);
+    if (mixinConfig.requiredMixins) {
+        for (let requiredMixinConfig of mixinConfig.requiredMixins) {
+            addMixin(dweller, requiredMixinConfig);
+        }
+    }
+    let mixin = mixinConfig.master;
+    if (dweller.mixins[mixin._name]) return;
     assert(mixin._name, 'Attempt to apply unnamed mixin!')
     for (let propName in mixin) {
         if (propName === '_name') continue;
         let prop = mixin[propName];
         if (propName === 'api') {
-            base.api = base.api ?? {};
+            dweller.api = dweller.api ?? {};
             for (let [ apiCommand, apiFunc] of Object.entries(prop)) {
-                assert(!base.api.apiCommand);
-                base.api[apiCommand] = apiFunc;
+                assert(!dweller.api.apiCommand);
+                dweller.api[apiCommand] = apiFunc;
             }
             continue;
         }
         if (typeof prop === 'function' && propName.substring(0, 2) === 'on') {
-            objset(base, prop, 'callbacks', propName, mixin._name);
+            objset(dweller, prop, 'callbacks', propName, mixin._name);
         } else {
-            assert(!base[propName], `Error applying mixin '${mixin._name}' to '${base.classname}'! Name conflicted property '${propName}'`)
-            base[propName] = mixin[propName];
+            assert(!dweller[propName], `Error applying mixin '${mixin._name}' to '${dweller.classname}'! Name conflicted property '${propName}'`)
+            dweller[propName] = mixin[propName];
         }
     }
 }
 
-function removeMixin(base, mixin) {
+function removeMixin(base, mixinConfig) { // TODO: check dependencies
     assert(base)
+    let mixin = mixinConfig.master;
     assert(mixin._name)
     for (let propName in mixin) {
         if (propName === '_name') continue;

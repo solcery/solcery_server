@@ -2,17 +2,21 @@ moduleName: 'forge'
 requiredModules:
   api: true
   gameServer/player: true
+  
 dwellers: 
-  Forge: true
-mixins:
+  Forge: 
+    mixins:
+      forge/forge: true
   Core:
-    core: true
+    mixins:
+      forge/core: true
   Api:
-    api: true
-  Forge:
-    forge: true
+    mixins:
+      forge/api: true
   Player:
-    player: true
+    mixins:
+      forge/player: true
+
 api:
   paths:
     forge:

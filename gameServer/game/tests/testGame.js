@@ -3,13 +3,15 @@ const playerMessages = {}
 const mixins = [
 	{
 		dweller: Player,
-		mixin: {
-			_name: 'Test player message receiver',
-			onGameAction: function(data) {
-				objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
-			},
-			onGameStart: function(data) {
-				objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
+		mixinConfig: {
+			master: {
+				_name: 'Test player message receiver',
+				onGameAction: function(data) {
+					objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
+				},
+				onGameStart: function(data) {
+					objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
+				}
 			}
 		}
 	}
@@ -29,8 +31,8 @@ async function test(testEnv) {
 	});
 	let gameServer = core.get(GameServer, SERVER_NAME);
 	assert(gameServer);
-	let player1 = await gameServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
-	let player2 = await gameServer.create(Player, { id: PUBKEY2, pubkey: PUBKEY2 });
+	let player1 = gameServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
+	let player2 = gameServer.create(Player, { id: PUBKEY2, pubkey: PUBKEY2 });
 	let game = await gameServer.createGame();
 
 	await game.addPlayer(player1);

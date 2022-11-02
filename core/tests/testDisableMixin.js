@@ -1,10 +1,11 @@
-const TestMixin = {
-	_name: 'testMixin'
-}
-
 const signal = {
 	core1: false,
 	core2: false
+}
+
+// Mixin
+const TestMixin = { 
+	_name: 'testMixin' 
 }
 
 TestMixin.onCreate = function(data) {
@@ -16,12 +17,14 @@ TestMixin.onCreate = function(data) {
 TestMixin.onTestCallback = function(data) {
 	signal[this.id] = true;
 }
-
+//
 
 const mixins = [
 	{
 		dweller: Core,
-		mixin: TestMixin,
+		mixinConfig: {
+			master: TestMixin
+		}
 	}
 ]
 

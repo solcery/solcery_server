@@ -2,9 +2,11 @@ moduleName: 'bot'
 requiredModules:
   gameServer/player: true
   gameServer/game: true
-mixins:
+
+dwellers:
   Player:
-    player: true
+    mixins:
+      gameServer/bot/player: true
 
 tests:
   testBot: true

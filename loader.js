@@ -2,51 +2,89 @@ const YAML = require('yaml');
 const fs = require('fs');
 const { addMixin, removeMixin } = require('./dweller.js');
 require('./utils');
+require('./env');
 require("dotenv").config({ path: "./config.env" });
 
-const loadedModules = {}
+const loadedModules = {};
+const registeredMixins = {};
+const registeredDwellers = {};
+const registeredTests = [];
 
-function loadModule(modulePath, test) {
+function loadMixin(name, config) { // TODO: check circular requirements
+	if (!registeredMixins[name]) {
+		let master = require(`./${name}`);
+		master._name = name;
+		registeredMixins[name] = {
+			master,
+			requiredMixins: [],
+		}
+	}
+	if (typeof config !== 'object') return;
+	let mixin = registeredMixins[name];
+	if (config.requiredMixins) {
+		for (let mixinName of Object.keys(config.requiredMixins)) {
+			let requiredMixin = registeredMixins[mixinName];
+			assert(requiredMixin);
+			registeredMixins[name].requiredMixins.push(requiredMixin);
+		}
+	}
+}
+
+function loadModule(modulePath) {
 	if (loadedModules[modulePath]) return; // Do not load modules twice
-	console.log(`Loading module '${modulePath}'`)
+	env.log(`Loading module '${modulePath}'`)
 	let config = parseConfig(`./${modulePath}/_config.yaml`);
-	let { dwellers, requiredModules, mixins, api } = config;
-	if (dwellers) {
-		for (let [ dwellerName, dwellerConfig ] of Object.entries(dwellers)) {
-			assert(!global.dwellerName, `Error parsing config for module ${modulePath}. Dweller ${dwellerName} already exists.`);
-			global[dwellerName] = Object.create(Dweller);
-			global[dwellerName].classname = dwellerName;
-			global[dwellerName].callbacks = {};
+	if (config.requiredModules) {
+		for (let [ modulePath, _ ] of Object.entries(config.requiredModules)) {
+			loadModule(modulePath);
 		}
 	}
-	if (requiredModules) {
-		for (let [ modulePath, _ ] of Object.entries(requiredModules)) {
-			loadModule(modulePath, test);
-		}
-	}
-	if (mixins) {
-		for (let [ dwellerName, mixinList ] of Object.entries(mixins)) {
-			for (let [mixinLocalPath, mixinProps] of Object.entries(mixinList)) {
-				let mixinName = `${modulePath}/${mixinLocalPath}`
-				let mixin = require(`./${mixinName}`);
-				mixin._name = mixinName;
-				assert(global[dwellerName], `Error loading mixin ${mixinName}: No dweller '${dwellerName}'!`)
-				// console.log(`Dweller ${dwellerName}: adding mixin '${mixinName}'`);
-				addMixin(global[dwellerName], mixin)
+	if (config.dwellers) {
+		for (let [ dwellerName, dwellerConfig ] of Object.entries(config.dwellers)) {
+			if (!registeredDwellers[dwellerName]) {
+				registeredDwellers[dwellerName] = {
+					mixins: [],
+				}
+			};
+			let dweller = registeredDwellers[dwellerName];
+			dweller.id = dwellerConfig.id ?? dweller.id;
+			if (dwellerConfig.mixins) {
+				for (let [ mixinName, mixinConfig ] of Object.entries(dwellerConfig.mixins)) {
+					loadMixin(mixinName, mixinConfig);
+					dweller.mixins.push(mixinName)
+				}
 			}
+
+		}
+	}
+	if (config.mixins) {
+		for (let [ mixinName, mixinConfig ] of Object.entries(config.mixins)) {
+			loadMixin(mixinName, mixinConfig);
 		}
 	}
 	loadedModules[modulePath] = { 
 		modulePath,
 		config,
 	};
-	if (test && config.tests) {
-		let tests = {}
+	if (config.tests) {
 		for (let testName of Object.keys(config.tests)) {
 			let testPath = `${modulePath}/tests/${testName}`;
-			tests[testPath] = require(`./${testPath}`);;
+			registeredTests.push(testPath);
 		}
-		loadedModules[modulePath].tests = tests;
+	}
+}
+
+function loadDwellers() {
+	for (let [ dwellerName, dwellerConfig ] of Object.entries(registeredDwellers)) {
+		let dweller = Object.create(Dweller);
+		dweller.classname = dwellerName;
+		dweller.mixins = {};
+		for (let mixinName of dwellerConfig.mixins) {
+			let mixinConfig = registeredMixins[mixinName];
+			assert(mixinConfig);
+			addMixin(dweller, mixinConfig);
+		}
+		global[dwellerName] = dweller;
 	}
 }
 
@@ -57,25 +95,25 @@ function parseConfig(configPath) {
 }
 
 async function runTests(tests, mask) {
-	console.log('==================== TESTING ====================');
-	process.env.TEST = true;
+	env.log('==================== TESTING ====================');
 	const testEnv = require('./testEnv');
 	let total = 0;
 	let failed = 0;
-	for (let [ testName, { test, mixins } ] of Object.entries(tests)) {
+	for (let testName of tests) {
+		let { test, mixins } = require(`./${testName}`);
 		if (mask && !testName.toLowerCase().includes(mask.toLowerCase())) continue;
 		total++;
-		console.log(`Running test: ${testName}`)
+		env.log(`Running test: ${testName}`)
 		if (mixins) {
 			for (let testMixin of mixins) {
-				addMixin(testMixin.dweller, testMixin.mixin)
+				addMixin(testMixin.dweller, testMixin.mixinConfig)
 			}
 		}
 		try {
 			await test(testEnv);
 		} catch(e) {
 			failed++;
-			console.error(e);
+			env.error(e);
 		}
 		for (let core of cores) {
 			core.delete();
@@ -83,20 +121,20 @@ async function runTests(tests, mask) {
 		}
 		if (mixins) {
 			for (let testMixin of mixins) {
-				removeMixin(testMixin.dweller, testMixin.mixin)
+				removeMixin(testMixin.dweller, testMixin.mixinConfig)
 			}
 		}
 	}
 	if (total === 0) {
-		console.log('No tests found!');
+		env.log('No tests found!');
 		return;
 	}
 
-	console.log(`${total - failed} of ${total} tests passed`)
+	env.log(`${total - failed} of ${total} tests passed`)
 	if (failed === 0) {
-		console.log('Tests passed!')
+		env.log('Tests passed!')
 	} else {
-		console.error('Test failed!')
+		env.error('Test failed!')
 	}
 	process.exit()
 }
@@ -116,24 +154,22 @@ global.createCore = (data = {}) => {
 
 let testArg = process.argv.indexOf('--test');
 if (testArg > -1) {
-	var test = true;
+	env.test = true;
 	var testMask = process.argv[testArg + 1]
 }
 
-loadModule('core', test); // Loading core module
-console.log('All modules loaded');
+loadModule('core'); // Loading core module
+loadDwellers();
+env.log('All modules loaded');
 
-if (test) {
-	let tests = {}
-	for (let loadedModule of Object.values(loadedModules)) {
-		if (loadedModule.tests) {
-			Object.assign(tests, loadedModule.tests)
-		}
-	}
-	runTests(tests, testMask)
+if (env.test) {
+	runTests(registeredTests, testMask)
 } else {
-	createCore({
-		forge: true,
-		db: 'solcery',
-	});
+	env.log(registeredMixins);
+	env.log(registeredDwellers);
+	env.log(WSConnection);
+	// createCore({
+	// 	forge: true,
+	// 	db: 'solcery',
+	// });
 }

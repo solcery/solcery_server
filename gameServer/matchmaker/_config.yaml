@@ -1,14 +1,18 @@
 moduleName: 'matchmaker'
+
 dwellers:
   Matchmaker: 
     id: 'string'
-mixins:
-  Matchmaker:
-    matchmaker: true
+    mixins: 
+      gameServer/matchmaker/matchmaker: true
   GameServer:
-    gameServer: true
+    mixins:
+      gameServer/matchmaker/gameServer: true
   Player:
-    player: true
+    mixins:
+      gameServer/matchmaker/player: true
+
+
 tests:
   testMatchmaker: true
     

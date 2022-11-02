@@ -1,6 +1,6 @@
 const YAML = require('yaml');
 const fs = require('fs');
-const { addMixin, removeMixin } = require('./dweller.js');
+const { addMixin, removeMixin } = require('./mixin');
 require('./utils');
 require('./env');
 require("dotenv").config({ path: "./config.env" });
@@ -43,7 +43,7 @@ function loadModule(modulePath) {
 		for (let [ dwellerName, dwellerConfig ] of Object.entries(config.dwellers)) {
 			if (!registeredDwellers[dwellerName]) {
 				registeredDwellers[dwellerName] = {
-					mixins: [],
+					mixins: [ 'dweller' ],
 				}
 			};
 			let dweller = registeredDwellers[dwellerName];
@@ -76,9 +76,10 @@ function loadModule(modulePath) {
 
 function loadDwellers() {
 	for (let [ dwellerName, dwellerConfig ] of Object.entries(registeredDwellers)) {
-		let dweller = Object.create(Dweller);
-		dweller.classname = dwellerName;
-		dweller.mixins = {};
+		let dweller = {
+			classname: dwellerName,
+			mixins: {}
+		};
 		for (let mixinName of dwellerConfig.mixins) {
 			let mixinConfig = registeredMixins[mixinName];
 			assert(mixinConfig);
@@ -158,6 +159,7 @@ if (testArg > -1) {
 	var testMask = process.argv[testArg + 1]
 }
 
+loadMixin('dweller'); // basic mixin
 loadModule('core'); // Loading core module
 loadDwellers();
 env.log('All modules loaded');

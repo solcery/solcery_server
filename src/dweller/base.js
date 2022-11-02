@@ -23,6 +23,7 @@ Master.init = function(data) {
     this.core = data.core;
     this.parent = data.parent;
     this.disabledMixins = {};
+    this._children = {};
     this.lastTickTime = time;
     this.creationTime = time;
 }
@@ -34,7 +35,7 @@ Master.create = function(classObject, data) {
     data.parent = this;
     data.core = this.core;
     obj.init(data);
-    objset(this, obj, 'objects', classObject.classname, data.id)
+    objset(this, obj, '_children', classObject.classname, data.id)
     obj.execAllMixins('onCreate', data);
     return obj;
 }
@@ -43,17 +44,17 @@ Master.delete = function() {
     this.deleting = true;
     this.execAllMixins('onDelete');
     if (this.parent) {
-        delete this.parent.objects[this.classname][this.id]
+        delete this.parent._children[this.classname][this.id]
     }
 }
 
 Master.get = function(classObject, id) {
-    return objget(this, 'objects', classObject.classname, id);
+    return objget(this, '_children', classObject.classname, id);
 }
 
 Master.getAll = function(classObject) {
     let result = [];
-    let classObjects = objget(this, 'objects', classObject.classname);
+    let classObjects = objget(this, '_children', classObject.classname);
     if (!classObjects) return result;
     for (let object of Object.values(classObjects)) {
         result.push(object)
@@ -79,12 +80,12 @@ Master.process = function(time) {
 
 Master.tick = function(time) {
     time = time ?? this.time();
-    let delta = time - self.lastTickTime;
+    let delta = time - this.lastTickTime;
     this.execAllMixins('onTick', time, delta);
     if (this.processTime && (this.processTime <= time)) {
         this.process(time)
     }
-    for (let classObjects in Object.values(this.objects)) {
+    for (let classObjects of Object.values(this._children)) {
         for (let object of Object.values(classObjects)) {
             object.tick(time);
         }

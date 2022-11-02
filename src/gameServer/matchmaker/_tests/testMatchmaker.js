@@ -45,7 +45,6 @@ async function test(testEnv) {
 								},
 							],
 							matchmaker: {
-								tickPeriod: 10,
 								botFillTimeout: 40,
 							}
 						}
@@ -82,9 +81,16 @@ async function test(testEnv) {
 
 	assert(gameServer.getAll(Game).length === 0);
 	player3.execAllMixins('onWSRequestJoinQueue');
-	await sleep(10);
+
+	env.skip(10);
+	core.tick();
+
 	assert(matchmaker.queue.length === 1);
-	await sleep(50);
+
+
+	env.skip(50)
+	core.tick();
+
 	assert(matchmaker.queue.length === 0);
 	game = gameServer.getAll(Game)[0];
 	assert(game);

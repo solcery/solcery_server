@@ -5,17 +5,15 @@ Master.onCreate = function(data) {
 	let content = objget(data.gameVersion, 'content', 'matchmaker');
 	this.playerQuantity = Object.keys(content.players).length;
 	this.botFillTimeout = objget(content, 'matchmaker', 'botFillTimeout');
-	this.tickPeriod = objget(content, 'matchmaker', 'tickPeriod');
 	let supportedCollections = objget(data.gameVersion, 'content', 'matchmaker', 'collections');
 	if (supportedCollections) {
 		this.collections = Object.values(supportedCollections).map(c => c.collection);
 	}
 	this.queue = [];
-	setInterval( () => { this.execAllMixins('onTick') }, this.tickPeriod);
 }
 
-Master.onTick = function() {
-	this.checkQueue();
+Master.onTick = function(time) {
+	this.checkQueue(time);
 }
 
 Master.createGame = function() {
@@ -29,20 +27,20 @@ Master.createGame = function() {
 	game.start();
 }
 
-Master.checkQueue = function() {
+Master.checkQueue = function(time) {
 	if (this.queue.length === 0) return;
 	if (this.queue.length >= this.playerQuantity) {
 		this.createGame();
 		return;
 	}
 	if (!this.botFillTimeout) return;
-	if (Date.now() - this.queue[0].time >= this.botFillTimeout) {
+	if (time - this.queue[0].time >= this.botFillTimeout) {
 		let botsQuantity = this.playerQuantity - this.queue.length;
 		for (let i = 0; i < botsQuantity; i++) {
 			let player = this.parent.createBot();
 			this.queue.push({
 				player,
-				time: Date.now(),
+				time,
 			})
 		}
 		this.createGame();
@@ -60,13 +58,14 @@ Master.onPlayerQueued = function(player) {
 	if (player.nfts && this.collections) {
 		var nfts = player.nfts.filter(nft => this.collections.includes(nft.collection));
 	}
+	let time = this.time();
 	this.queue.push({
 		player,
-		time: Date.now(),
+		time,
 		nfts,
 	})
-	player.setStatus('queued', { time: Date.now() })
-	this.checkQueue();
+	player.setStatus('queued', { time })
+	this.checkQueue(this.time());
 }
 
 Master.onPlayerLeft = function(player) {

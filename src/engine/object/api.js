@@ -34,7 +34,8 @@ Master.api['engine.template.object.clone'] = async function(params) {
 	let engine = this.engine(params);
 	let object = await this.object(params);
 	let newObject = { ...object }
-	objset(newObject, now(), 'fields', 'creationTime');
+	let time = Math.floor(this.time() / 1000);
+	objset(newObject, time, 'fields', 'creationTime');
 	delete newObject._id;
 	let res = await engine.content.objects.insertOne(newObject);
 	if (!res.insertedId) throw new Error(`Cloning object '${params.objectId}' failed with MongoDB error`);
@@ -54,7 +55,7 @@ Master.api['engine.template.createObject'] = async function(params) {
 	let newObject = {
 		template: params.templateCode,
 		fields: {
-			creationTime: now(),
+			creationTime: Math.floor(this.time() / 1000),
 		}
 	}
 	let res = await engine.content.objects.insertOne(newObject);

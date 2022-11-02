@@ -1,10 +1,9 @@
 const Master = {}
 
-Master.onCreate = function(data) {
-  if (!data.db) return;
+Master.onCreate = function(data) { // TODO: move to loader mixin?
   this.create(Mongo, {
       id: 'solcery',
-      db: data.db,
+      db: 'solcery',
       collections: [
         'objects',
       ],

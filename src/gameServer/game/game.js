@@ -11,7 +11,7 @@ Master.onCreate = function(data) {
 }
 
 Master.start = function(data) {
-	this.started = now();
+	this.started = this.time();
 	this.actionLog.push({ 
 		type: 'init',
 	});
@@ -20,7 +20,7 @@ Master.start = function(data) {
 }
 
 Master.end = function(data) {
-	this.finished = now();
+	this.finished = this.time();
 	this.save();
 	this.delete();
 }

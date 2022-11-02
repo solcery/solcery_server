@@ -89,7 +89,6 @@ function loadDwellers() {
 			mixins: {}
 		};
 		for (let mixinName of dwellerConfig.mixins) {
-			console.log(dwellerName, mixinName)
 			let mixinConfig = registeredMixins[mixinName];
 			assert(mixinConfig);
 			addMixin(dweller, mixinConfig);
@@ -175,11 +174,10 @@ env.log('All modules loaded');
 if (env.test) {
 	runTests(registeredTests, testMask)
 } else {
-	env.log(registeredMixins);
-	env.log(registeredDwellers);
-	env.log(WSConnection);
-	// createCore({
-	// 	forge: true,
-	// 	db: 'solcery',
-	// });
+	let core = createCore({
+		forge: true,
+		httpServer: true,
+		db: 'solcery',
+	});
+	setInterval(() => core.tick(env.time()), 1000); // TODO: add try-catch
 }

@@ -4,7 +4,7 @@ Master.onGameVersionLoaded = function(gameVersion) {
 	let matchmakerContent = objget(gameVersion, 'content', 'matchmaker');
 	if (!matchmakerContent) return;
 	this.matchmaker = this.create(Matchmaker, {
-		id: 'matchmaker',
+		id: `matchmaker.${this.id}`,
 		gameVersion,
 	})
 }

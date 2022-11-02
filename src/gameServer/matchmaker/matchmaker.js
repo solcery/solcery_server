@@ -69,7 +69,7 @@ Master.onPlayerQueued = function(player) {
 }
 
 Master.onPlayerLeft = function(player) {
-	let index = this.queue.findIndex(queueEntry => queueEntry.playerId === player.id);
+	let index = this.queue.findIndex(queueEntry => queueEntry.player.id === player.id);
 	if (index > -1) {
 		this.queue.splice(index, 1);
 	}

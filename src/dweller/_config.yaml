@@ -1,0 +1,7 @@
+moduleName: 'dweller'
+
+mixins:
+  dweller/base: true
+
+tests:
+  testDisableMixin: true

@@ -1,0 +1,40 @@
+moduleName: 'gameServer'
+requiredModules:
+  api: true
+  mongo: true
+  gameServer/player: true
+  gameServer/game: true
+  gameServer/matchmaker: true
+
+dwellers:
+  GameServer:
+    id: 'string'
+    mixins:
+      gameServer/gameServer: true
+  Core:
+    mixins:
+      gameServer/core: true
+  Api:
+    mixins:
+      gameServer/api: true
+      
+api:
+  paths:
+    core:
+      commands:
+        reloadGameServers: true
+    game:
+      params: 
+        gameId:
+          type: 'string'
+          required: true
+      commands:
+        getGameInfo:
+          description: 'Returns game info'
+        getGameVersion:
+          description: 'Return content version'
+          params: 
+            version:
+              type: 'string'
+              description: 'Game version'
+              

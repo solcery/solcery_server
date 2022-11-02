@@ -1,0 +1,8 @@
+requiredModules:
+  dweller: true
+  admin: true
+  api: true
+  gameServer: true
+  engine: true
+  unityBuilds: true
+  forge: true

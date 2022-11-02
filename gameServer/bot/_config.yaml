@@ -5,6 +5,9 @@ requiredModules:
 mixins:
   Player:
     player: true
-
 tests:
-  testBot: true
+  testBotRepeatFakeGame: true
+  testBotRepeatLightmorGame: true
+  testBotRandom: true
+  # testViewPolygon: true 
+  # testBot: true

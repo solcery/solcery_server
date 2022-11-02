@@ -4,6 +4,7 @@ requiredModules:
   gameServer/player: true
   gameServer/game: true
   gameServer/matchmaker: true
+  gameServer/bot: true
 dwellers:
   GameServer: true
 mixins:

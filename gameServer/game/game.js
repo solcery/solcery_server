@@ -93,6 +93,10 @@ Master.onPlayerAction = function(player, action) {
 }
 
 Master.execAllPlayers = function(callbackName, data) {
+	if (this.gameState) {
+		this.gameState.execAllMixins(callbackName, data);
+	}
+
 	for (let playerData of this.players) {
 		if (playerData.outcome !== undefined) continue;
 		let player = this.parent.get(Player, playerData.id);

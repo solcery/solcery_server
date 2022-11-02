@@ -202,4 +202,21 @@ Master.applyCommand = function(data) {
 	this.inner.applyCommand(commandId, scopeVars);
 }
 
+Master.checkOutcome = function() {
+	return this.inner.checkOutcome();
+}
+
+Master.onGameStart = function(data) {
+	this.start(data.players);
+}
+
+Master.onGameAction = function(data) {
+	let lastAction = data.actionLog.slice(-1).pop();
+	let command = lastAction.action;
+	let scopeVars = command.scopeVars;
+	let context = lastAction.ctx;
+	command.scopeVars = { ...scopeVars, ...context };
+	this.applyCommand(command);
+}
+
 module.exports = Master

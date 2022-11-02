@@ -31,14 +31,14 @@ async function test(testEnv) {
 		if (mongo.versions) {
 			break;
 		}
-		console.log("retry getting game from mongo db");
+		// console.log("retry getting game from mongo db");
 		await sleep(1000);
 		mongo = await gameServer.get(Mongo, 'main');
 	} 
 	assert(mongo.versions, "failed to get a game from mongo db")
     let version = await mongo.versions.count();
 	let gameVersion = await mongo.versions.findOne({ version });
-    console.log("game version", version);
+    // console.log("game version", version);
 
 
 	let playerOne = await gameServer.create(Player, { 
@@ -58,24 +58,24 @@ async function test(testEnv) {
 	/* Test GameState creation */
 
 	let content = gameVersion.content.web;
-	console.log(content);
+	// console.log(content);
 	let gameState = game.create(GameState, {content: content, seed: 0 });
 
 	// console.log(gameState.inner.attrs);
 	assert(gameState);
 
-	console.log("gameState was created");
+	// console.log("gameState was created");
 
 	/* Test GameState start */
 
 	gameState.start(game.players);
-	console.log(gameState.inner.objects);
+	// console.log(gameState.inner.objects);
 	// assert(Object.keys(gameState.inner.objects).length == 5);
-	console.log("gameState was launched");
+	// console.log("gameState was launched");
 
 	/* Test Apply Command */
 
-	console.log("game attrs", gameState.inner.attrs);
+	// console.log("game attrs", gameState.inner.attrs);
 
 	// do nothing button
 	let rightButtonClick = {
@@ -98,11 +98,11 @@ async function test(testEnv) {
 		command.scopeVars.player_index = gameState.inner.attrs.current_player + 1;
 		gameState.applyCommand(command);
 
-		console.log("game attrs", gameState.inner.attrs);
-		console.log("outcome", gameState.inner.checkOutcome());
+		// console.log("game attrs", gameState.inner.attrs);
+		// console.log("outcome", gameState.checkOutcome());
 	}
 
-	console.log("game attrs", gameState.inner.attrs);
+	// console.log("game attrs", gameState.inner.attrs);
 }
 
 module.exports = { test }

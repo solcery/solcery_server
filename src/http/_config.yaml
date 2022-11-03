@@ -1,5 +1,0 @@
-moduleName: 'http'
-dwellers: 
-  Core:
-    mixins:
-      http/core: true

@@ -39,13 +39,13 @@ async function test(testEnv) {
 	await game.addPlayer(player2);
 	await game.start();
 
-	await player1.execAllMixins('onWSRequestAction', { type: 'rightClick' });
-	await player2.execAllMixins('onWSRequestAction', { type: 'leftClick' });
-	await player2.execAllMixins('onWSRequestAction', { type: 'rightClick' });
+	await player1.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
+	await player2.execAllMixins('onSocketRequestAction', { type: 'leftClick' });
+	await player2.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
 
-	await player1.execAllMixins('onWSRequestLeaveGame', { outcome: 1 });
+	await player1.execAllMixins('onSocketRequestLeaveGame', { outcome: 1 });
 	assert(gameServer.get(Game, game.id));
-	await player2.execAllMixins('onWSRequestLeaveGame', { outcome: -1 });
+	await player2.execAllMixins('onSocketRequestLeaveGame', { outcome: -1 });
 	assert(!gameServer.get(Game, game.id));
 
 	assert(game.actionLog[5].player === 2 && game.actionLog[5].action.outcome === -1);

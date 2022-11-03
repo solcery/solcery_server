@@ -3,13 +3,13 @@
 
 const mixins = [
 	{
-		dweller: WSConnection,
+		dweller: Socket,
 		mixinConfig: {
 			master: {
 				_name: 'Test socket responder',
 				onSocketMessage: function(message) {
 					if (message.type !== 'testHello') return;
-					this.webSocket.emit('message', {
+					this.socket.emit('message', {
 						type: 'response',
 						data: message.data + '!',
 					});
@@ -26,11 +26,11 @@ async function test(testEnv) {
 
 	let client1 = await testEnv.createClientSocket();
 	assert(client1);
-	assert(core.getAll(WSConnection).length === 1);
+	assert(core.getAll(Socket).length === 1);
 
 	let client2 = await testEnv.createClientSocket();
 	assert(client2);
-	assert(core.getAll(WSConnection).length === 2);
+	assert(core.getAll(Socket).length === 2);
 
 	await client1.emit('message', {
 		type: 'testHello',
@@ -48,11 +48,11 @@ async function test(testEnv) {
 
 	client1.disconnect();
 	await sleep(SOCKET_PING);
-	assert(core.getAll(WSConnection).length === 1);
+	assert(core.getAll(Socket).length === 1);
 
 	client2.disconnect();
 	await sleep(SOCKET_PING);
-	assert(core.getAll(WSConnection).length === 0);
+	assert(core.getAll(Socket).length === 0);
 }
 
 module.exports = { test, mixins }

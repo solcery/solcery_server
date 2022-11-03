@@ -1,6 +1,6 @@
 moduleName: 'gameServer/game'
 requiredModules:
-  websocket: true
+  web/socket: true
   gameServer/player: true
 
 dwellers:

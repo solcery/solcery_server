@@ -14,15 +14,15 @@ Master.onHttpServerCreated = function(httpServer) {
             this.connectWebSocket(socket)
         } catch (e) {
             // webSocket.send(`Error: ${e.message}`);
-            webSocket.close();
+            socket.close();
         }
     });
 }
 
-Master.connectWebSocket = function(webSocket) {
-    this.create(WSConnection, { 
+Master.connectWebSocket = function(socket) {
+    this.create(Socket, { 
         id: uuid(), 
-        webSocket, 
+        socket, 
         timeout: this.webSocketTimeout,
     });
 }

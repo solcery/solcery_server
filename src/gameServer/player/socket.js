@@ -9,12 +9,12 @@ Master.onChallenge = function(data, result) {
 
 Master.onConfirmed = function(data) {
 	let server = this.core.get(GameServer, data.server);
-	server.execAllMixins('onPlayerWSConnected', data.pubkey, this);
+	server.execAllMixins('onPlayerSocketConnected', data.pubkey, this);
 }
 
 Master.onSocketMessage = function(message) {
 	if (!this.player) return;
-	let callbackName = 'onWSRequest' + message.type.charAt(0).toUpperCase() + message.type.slice(1);
+	let callbackName = 'onSocketRequest' + message.type.charAt(0).toUpperCase() + message.type.slice(1);
 	this.player.execAllMixins(callbackName, message.data);
 }
 

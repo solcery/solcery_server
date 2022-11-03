@@ -11,7 +11,7 @@ Master.onCreate = function(data) {
     }
 }
 
-Master.onWSConnected = function(wsConnection) {
+Master.onSocketConnected = function(wsConnection) {
     if (!this.game) return;
     this.execAllMixins('onGameStart', this.game.getSaveData());
 }
@@ -26,22 +26,22 @@ Master.onGameLeft = function(game) {
     this.setStatus('online')
 }
 
-Master.onWSRequestAction = function(data) {
+Master.onSocketRequestAction = function(data) {
     if (!this.game) return;
     this.game.execAllMixins('onPlayerAction', this, data);
 }
 
-Master.onWSRequestLeaveGame = function(data) {
+Master.onSocketRequestLeaveGame = function(data) {
     if (!this.game) return;
     this.game.removePlayer(this, data.outcome);
 }
 
 Master.onGameStart = function(data) {
-    this.wsMessage('gameStart', data)
+    this.socketMessage('gameStart', data)
 }
 
 Master.onGameAction = function(data) {
-    this.wsMessage('gameAction', data)
+    this.socketMessage('gameAction', data)
 }
 
 module.exports = Master

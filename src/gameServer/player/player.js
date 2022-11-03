@@ -1,17 +1,17 @@
 const Master = {};
 
-Master.wsMessage = function(type, data) {
-	this.execAllMixins('onWSMessage', type, data);
-	if (!this.wsConnection) return;
-	this.wsConnection.send({ type, data });
+Master.socketMessage = function(type, data) {
+	this.execAllMixins('onSocketMessage', type, data);
+	if (!this.socket) return;
+	this.socket.send({ type, data });
 }
 
-Master.onWSConnected = function(wsConnection) {
-	this.wsConnection = wsConnection;
-	if (wsConnection) {
-		wsConnection.player = this; // TODO
+Master.onSocketConnected = function(socket) {
+	this.socket = socket;
+	if (socket) {
+		socket.player = this; // TODO
 	}
-	this.wsMessage('playerStatus', this.status); 
+	this.socketMessage('playerStatus', this.status); 
 }
 
 Master.onCreate = function(data) {
@@ -24,7 +24,7 @@ Master.setStatus = function (code, data) {
 		data
 	};
 	this.execAllMixins('onStatusChanged')
-	this.wsMessage('playerStatus', this.status);
+	this.socketMessage('playerStatus', this.status);
 }
 
 module.exports = Master

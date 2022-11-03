@@ -1,6 +1,6 @@
 const Master = {};
 
-Master.onPlayerWSConnected = function(pubkey, wsConnection) {
+Master.onPlayerSocketConnected = function(pubkey, wsConnection) {
 	let player = this.get(Player, pubkey);
 	if (!player) {
 		player = this.create(Player, {
@@ -11,7 +11,7 @@ Master.onPlayerWSConnected = function(pubkey, wsConnection) {
 			player.setStatus('online');
 		}
 	}
-	player.execAllMixins('onWSConnected', wsConnection);
+	player.execAllMixins('onSocketConnected', wsConnection);
 }
 
 module.exports = Master

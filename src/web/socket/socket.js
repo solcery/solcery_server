@@ -1,13 +1,12 @@
 const Master = {};
 
 Master.onCreate = function(data) {
-    this.webSocket = data.webSocket;
-    assert(this.webSocket);
-    this.webSocket.on('message', (message, callback) => {
+    this.socket = data.socket;
+    this.socket.on('message', (message, callback) => {
         try {
             this.execAllMixins('onSocketMessage', message)
         } catch (err) {
-            this.webSocket.emit('message', {
+            this.socket.emit('message', {
                 type: 'error',
                 data: err.message,
             })
@@ -18,7 +17,7 @@ Master.onCreate = function(data) {
             });
         }
     });
-    this.webSocket.on('disconnect', () => this.execAllMixins('onDisconnect'));
+    this.socket.on('disconnect', () => this.execAllMixins('onDisconnect'));
     sleep(data.timeout).then(() => {
         if (!this.confirmed) this.disconnect();
     });
@@ -39,7 +38,7 @@ Master.challenge = function (data) {
     try {
         this.execAllMixins('onChallenge', data);
     } catch (e) {
-        this.webSocket.emit('exception', e.message);
+        this.socket.emit('exception', e.message);
         this.disconnect();
         return;
     }
@@ -50,11 +49,11 @@ Master.challenge = function (data) {
 }
 
 Master.send = function (message) {
-    this.webSocket.emit('message', message)
+    this.socket.emit('message', message)
 }
 
 Master.disconnect = function (message) {
-    this.webSocket.disconnect();
+    this.socket.disconnect();
 }
 
 Master.onDisconnect = function (data) {

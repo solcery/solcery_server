@@ -1,15 +1,15 @@
 moduleName: 'gameServer/player'
 requiredModules:
-  websocket: true
+  web/socket: true
 
 dwellers: 
   Player: 
     id: 'string'
     mixins:
       gameServer/player/player: true
-  WSConnection:
+  Socket:
     mixins:
-      gameServer/player/wsConnection: true
+      gameServer/player/socket: true
   GameServer:
     mixins:
       gameServer/player/gameServer: true

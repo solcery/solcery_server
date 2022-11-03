@@ -1,6 +1,6 @@
 moduleName: 'api'
 requiredModules:
-  http: true
+  web/http: true
   
 dwellers:
   Api:

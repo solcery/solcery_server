@@ -1,14 +1,3 @@
-const mixins = [
-	// {
-	// 	dweller: Player,
-	// 	mixin: {
-	// 		_name: 'Test player message receiver',
-	// 		onGameUpdate: function(data) {
-	// 			objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
-	// 		}
-	// 	}
-	// }
-]
 
 async function test(testEnv) {
 	const core = createCore();
@@ -59,9 +48,9 @@ async function test(testEnv) {
 	let matchmaker = gameServer.matchmaker;
 	assert(matchmaker)
 
-	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY1);
-	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY2);
-	gameServer.execAllMixins('onPlayerWSConnected', PUBKEY3);
+	gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY1);
+	gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY2);
+	gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY3);
 
 	let player1 = gameServer.get(Player, PUBKEY1);
 	let player2 = gameServer.get(Player, PUBKEY2);
@@ -70,17 +59,17 @@ async function test(testEnv) {
 
 	assert(gameServer.getAll(Game).length === 0)
 
-	player1.execAllMixins('onWSRequestJoinQueue');
+	player1.execAllMixins('onSocketRequestJoinQueue');
 	assert(matchmaker.queue.length === 1);
 
-	player2.execAllMixins('onWSRequestJoinQueue');
+	player2.execAllMixins('onSocketRequestJoinQueue');
 	let game = gameServer.getAll(Game)[0];
 	assert(game);
 	assert(game.players.length === 2 && game.players[0].id === PUBKEY1 && game.players[1].id === PUBKEY2);
 	game.delete();
 
 	assert(gameServer.getAll(Game).length === 0);
-	player3.execAllMixins('onWSRequestJoinQueue');
+	player3.execAllMixins('onSocketRequestJoinQueue');
 
 	env.skip(10);
 	core.tick();

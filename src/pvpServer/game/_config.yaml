@@ -1,19 +1,19 @@
-moduleName: 'gameServer/game'
+moduleName: 'pvpServer/game'
 requiredModules:
   web/socket: true
-  gameServer/player: true
+  pvpServer/player: true
 
 dwellers:
   Game: 
     id: 'string'
     mixins:
-      gameServer/game/game: true
+      pvpServer/game/game: true
   Player:
     mixins:
-      gameServer/game/player: true
-  GameServer:
+      pvpServer/game/player: true
+  PvpServer:
     mixins:
-      gameServer/game/gameServer: true
+      pvpServer/game/pvpServer: true
 
 tests:
   testGame: true

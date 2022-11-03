@@ -24,16 +24,16 @@ async function test(testEnv) {
 	const PUBKEY1 = 'pubkey1';
 	const PUBKEY2 = 'pubkey2';
 
-	await core.create(GameServer, { 
+	await core.create(PvpServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
 		db: {}, 
 	});
-	let gameServer = core.get(GameServer, SERVER_NAME);
-	assert(gameServer);
-	let player1 = gameServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
-	let player2 = gameServer.create(Player, { id: PUBKEY2, pubkey: PUBKEY2 });
-	let game = await gameServer.createGame();
+	let pvpServer = core.get(PvpServer, SERVER_NAME);
+	assert(pvpServer);
+	let player1 = pvpServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
+	let player2 = pvpServer.create(Player, { id: PUBKEY2, pubkey: PUBKEY2 });
+	let game = await pvpServer.createGame();
 
 	await game.addPlayer(player1);
 	await game.addPlayer(player2);
@@ -44,9 +44,9 @@ async function test(testEnv) {
 	await player2.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
 
 	await player1.execAllMixins('onSocketRequestLeaveGame', { outcome: 1 });
-	assert(gameServer.get(Game, game.id));
+	assert(pvpServer.get(Game, game.id));
 	await player2.execAllMixins('onSocketRequestLeaveGame', { outcome: -1 });
-	assert(!gameServer.get(Game, game.id));
+	assert(!pvpServer.get(Game, game.id));
 
 	assert(game.actionLog[5].player === 2 && game.actionLog[5].action.outcome === -1);
 	assert(playerMessages[PUBKEY1] && playerMessages[PUBKEY1].length === 4);

@@ -79,7 +79,7 @@ api:
         sync:
           description: 'Synchronizes game content with source project'
         release:
-          description: 'Releases new version of the game to gameServer'
+          description: 'Releases new version of the game to pvpServer'
           params:
             content:
               type: 'json'

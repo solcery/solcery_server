@@ -101,9 +101,9 @@ Master.api['engine.release'] = async function(params) {
       let config = await engine.getConfig();
       let gameId = config.releaseProjectId;
       assert(gameId, 'Release API error: This project is not connected to game server. Check confiig')
-      let gameServer = engine.core.get(GameServer, gameId);
-      assert(gameServer, `Release API error: No game server with for game '${gameId}'`);
-      let gameMongo = gameServer.get(Mongo, 'main');
+      let pvpServer = engine.core.get(PvpServer, gameId);
+      assert(pvpServer, `Release API error: No game server with for game '${gameId}'`);
+      let gameMongo = pvpServer.get(Mongo, 'main');
       assert(gameMongo, 'No mongo connection!'); // TODO
       let currentLatest = await gameMongo.versions.count();
       let dist = {

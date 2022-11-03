@@ -1,0 +1,18 @@
+moduleName: 'pvpServer/matchmaker'
+
+dwellers:
+  Matchmaker: 
+    id: 'string'
+    mixins: 
+      pvpServer/matchmaker/matchmaker: true
+  PvpServer:
+    mixins:
+      pvpServer/matchmaker/pvpServer: true
+  Player:
+    mixins:
+      pvpServer/matchmaker/player: true
+
+
+tests:
+  testMatchmaker: true
+    

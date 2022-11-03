@@ -1,28 +1,28 @@
-moduleName: 'gameServer'
+moduleName: 'pvpServer'
 requiredModules:
   api: true
   mongo: true
-  gameServer/player: true
-  gameServer/game: true
-  gameServer/matchmaker: true
+  pvpServer/player: true
+  pvpServer/game: true
+  pvpServer/matchmaker: true
 
 dwellers:
-  GameServer:
+  PvpServer:
     id: 'string'
     mixins:
-      gameServer/gameServer: true
+      pvpServer/pvpServer: true
   Core:
     mixins:
-      gameServer/core: true
+      pvpServer/core: true
   Api:
     mixins:
-      gameServer/api: true
+      pvpServer/api: true
       
 api:
   paths:
     core:
       commands:
-        reloadGameServers: true
+        reloadPvpServers: true
     game:
       params: 
         gameId:

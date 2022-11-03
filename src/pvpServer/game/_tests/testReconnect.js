@@ -31,17 +31,17 @@ async function test(testEnv) {
 	const SERVER_NAME = 'testGameSrv';
 	const PUBKEY = 'pubkey';
 
-	await core.create(GameServer, { 
+	await core.create(PvpServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
 		db: {}, 
 	});
-	let gameServer = core.get(GameServer, SERVER_NAME);
+	let pvpServer = core.get(PvpServer, SERVER_NAME);
 
-	await gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY)
-	let player = await gameServer.get(Player, PUBKEY);
+	await pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY)
+	let player = await pvpServer.get(Player, PUBKEY);
 	assert(clientPlayer.status.code === 'online');
-	let game = await gameServer.createGame();
+	let game = await pvpServer.createGame();
 	await game.addPlayer(player);
 	game.start();
 	assert(clientPlayer.status.code === 'ingame' && clientPlayer.status.data.gameId === game.id);
@@ -55,7 +55,7 @@ async function test(testEnv) {
 	// player reconnects on their side
 
 	delete clientPlayer.status;
-	await gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
+	await pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
 	assert(clientPlayer.status.code === 'ingame' && clientPlayer.status.data.gameId === game.id);
 	assert(clientPlayer.gameMessages.length === 1);
 	clientPlayer.gameMessages = [];
@@ -63,7 +63,7 @@ async function test(testEnv) {
 	// deleting player on server then reconnecting
 	delete clientPlayer.status;
 	await player.delete();
-	await gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
+	await pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
 	assert(clientPlayer.status.code === 'ingame' && clientPlayer.status.data.gameId === game.id);
 	assert(clientPlayer.gameMessages.length === 1);
 

@@ -6,36 +6,36 @@ async function test(testEnv) {
 	const SERVER_NAME = 'testGameSrv';
 	const PUBKEY = 'pubkey';
 
-	core.create(GameServer, { 
+	core.create(PvpServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
 		db, 
 	});
-	let gameServer = core.get(GameServer, SERVER_NAME);
+	let pvpServer = core.get(PvpServer, SERVER_NAME);
 
-	gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
-	let game = gameServer.createGame();
+	pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
+	let game = pvpServer.createGame();
 	let gameId = game.id;
-	let player1 = gameServer.get(Player, PUBKEY);
+	let player1 = pvpServer.get(Player, PUBKEY);
 	game.addPlayer(player1);
 	game.start();
 	let started = game.started;
 	player1.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
-	gameServer.delete();
+	pvpServer.delete();
 
 	core.delete();
 
 	core = createCore();
-	gameServer = core.create(GameServer, { 
+	pvpServer = core.create(PvpServer, { 
 		id: SERVER_NAME, 
 		gameId: SERVER_NAME, 
 		db, 
 	});
 
- 	gameServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
-	player1 = gameServer.get(Player, PUBKEY);
+ 	pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
+	player1 = pvpServer.get(Player, PUBKEY);
 	player1.execAllMixins('onSocketRequestAction', { type: 'leftClick' });
-	game = gameServer.get(Game, gameId)
+	game = pvpServer.get(Game, gameId)
 	assert(player1);
 	assert(game);
 	assert(game.actionLog.length = 2);

@@ -1,12 +1,12 @@
 moduleName: 'bot'
 requiredModules:
-  gameServer/player: true
-  gameServer/game: true
+  pvpServer/player: true
+  pvpServer/game: true
 
 dwellers:
   Player:
     mixins:
-      gameServer/bot/player: true
+      pvpServer/bot/player: true
 
 tests:
   testBot: true

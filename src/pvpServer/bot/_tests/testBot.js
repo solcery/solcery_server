@@ -11,13 +11,13 @@ async function test(testEnv) {
 
 	let real_game = true;
 	if (real_game) {
-		await core.create(GameServer, { 
+		await core.create(PvpServer, { 
 			id: SERVER_NAME, 
 			gameId: GAME_NAME,
 		});
 		console.log("lets try to get a game from mongo db");
 	} else {
-		core.create(GameServer, { 
+		core.create(PvpServer, { 
 			id: SERVER_NAME, 
 			gameId: SERVER_NAME, 
 			matchmaker: {
@@ -38,11 +38,11 @@ async function test(testEnv) {
 		console.log("use virtual db");
 	}
 
-	let gameServer = core.get(GameServer, SERVER_NAME);
-	assert(gameServer);
+	let pvpServer = core.get(PvpServer, SERVER_NAME);
+	assert(pvpServer);
 
 	await sleep(1000); 	
-	let mongo = await gameServer.get(Mongo, 'main');
+	let mongo = await pvpServer.get(Mongo, 'main');
 
 	const max_attempts = 20; // one sec is not enough, sometimes even 10 secs are not enough :(
 	for (let attempts = 0; attempts < max_attempts; attempts++) {
@@ -51,7 +51,7 @@ async function test(testEnv) {
 		}
 		console.log("retry getting game from mongo db");
 		await sleep(1000);
-		mongo = await gameServer.get(Mongo, 'main');
+		mongo = await pvpServer.get(Mongo, 'main');
 	} 
 	assert(mongo.versions, "failed to get a game from mongo db")
 
@@ -66,10 +66,10 @@ async function test(testEnv) {
 	// console.log("gameVersion", gameVersion);
     // console.log("web", gameVersion.content.web);
 
-	assert(gameServer);
-	let player = await gameServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
-	let bot = await gameServer.create(Player, { id: PUBKEY2, bot: true, behaviour: 'repeatLastAction' });
-	let game = await gameServer.createGame();
+	assert(pvpServer);
+	let player = await pvpServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
+	let bot = await pvpServer.create(Player, { id: PUBKEY2, bot: true, behaviour: 'repeatLastAction' });
+	let game = await pvpServer.createGame();
 
 	await game.addPlayer(player);
 	await game.addPlayer(bot);

@@ -1,7 +1,7 @@
 moduleName: 'forge'
 requiredModules:
   api: true
-  gameServer/player: true
+  pvpServer/player: true
   
 dwellers: 
   Forge: 

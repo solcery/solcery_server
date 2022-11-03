@@ -7,9 +7,9 @@ async function test(testEnv) {
 	const PLAYER_PUBKEY = 'stuff';
 
 	core.webSocketTimeout = 100;
-	core.create(GameServer, { id: SERVER_NAME, gameId: SERVER_NAME, db: {} });
-	let gameServer = core.get(GameServer, SERVER_NAME);
-	assert(gameServer)
+	core.create(PvpServer, { id: SERVER_NAME, gameId: SERVER_NAME, db: {} });
+	let pvpServer = core.get(PvpServer, SERVER_NAME);
+	assert(pvpServer)
 
 	let challenge = {
 		type: 'challenge',
@@ -27,7 +27,7 @@ async function test(testEnv) {
 
 	let res = await client1.emit('message', challenge);
 	assert(!client1.socket.disconnected && client1.socket.connected);
-	assert(gameServer.get(Player, PLAYER_PUBKEY))
+	assert(pvpServer.get(Player, PLAYER_PUBKEY))
 	core.webSocketTimeout = 30;
 
 	let client2 = await testEnv.createClientSocket();

@@ -7,6 +7,7 @@ Master.onCreate = function(data) {
 	}
 	this.bot = data.bot;
 	this.algorithm = data.algorithm;
+	this.log = data.log;
 	this.possibleCommands = data.possibleCommands;
 	// console.log('start a bot that', data.algorithm);
 }
@@ -37,7 +38,7 @@ Master.tryToAct = function(data) {
 		let n = possibleCommands.length;
 		if (n > 0) {
 			let command = possibleCommands[getRandomInt(n)];
-			if (command.logMessage) console.log(command.logMessage);
+			if (command.logMessage && this.log) console.log(command.logMessage);
 			this.execAllMixins('onWSRequestAction',  { 
 				type: 'gameCommand',
 				...command,

@@ -239,7 +239,8 @@ const basicActions = [
 		name: 'Delete entity',
 		params: [],
 		exec: (runtime, params, ctx) => {
-			ctx.obj.deleted = true;
+			// console.log(ctx);
+			ctx.object.deleted = true;
 		},
 	},
 	{

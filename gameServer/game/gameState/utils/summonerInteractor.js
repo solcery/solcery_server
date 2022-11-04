@@ -12,7 +12,7 @@ function shuffleArray(array) {
 }
 
 
-const LEFT_CLICK = 418;
+const LEFT_CLICK = 417;
 
 const MENU_CARDS_P1 = [51, 52, 53];
 const MENU_CARDS_P2 = [71, 72, 73];
@@ -72,6 +72,7 @@ class SummonerInteractor {
 
 	click(player, object) {
 		if (this.gameFinished()) return;
+		console.log(this.getClickCommand(object));
 		player.execAllMixins('onWSRequestAction', { 
 			type: 'gameCommand',
 			...this.getClickCommand(object), 
@@ -108,8 +109,13 @@ class SummonerInteractor {
 		} else {
 			card = menuCards[getRandomInt(3)];
 		}
+		// console.log(card);
 		this.click(player, card);
+		console.log("press card", this.gameAttrs);
+		console.log("press card", this.gameState.inner.attrs);
 		this.click(player, menuConfirm);
+		console.log("press end confirm", this.gameAttrs);
+		console.log(this.game.actionLog);
 	}
 
 	endTurn(player) {
@@ -122,10 +128,9 @@ class SummonerInteractor {
 		let endTurnConfirmButton = this.getEntity(END_TURN_CONFIRM_BUTTON);
 
 		this.click(player, endTurnButton);
-		if (this.gameAttrs.show_notif === 1) {
+		if (this.gameAttrs.show_confirm > 0) {
 			this.click(player, endTurnConfirmButton);
 		}
-
 		assert(this.gameAttrs.current_player != playerIndex);
 	}
 
@@ -298,6 +303,19 @@ class SummonerExtractor {
 		}
 	}
 
+	isNftChosen(player_index) {
+		let menuPlaces = MENU_CARDS_P1;
+		if (player_index === 2) {
+			menuPlaces = MENU_CARDS_P2;
+		}
+		let highlightIndicator = 0;
+		for (let place of menuPlaces) {
+			let entity = this.getEntity(place);
+			highlightIndicator += entity.attrs.anim_highlight;
+		}
+		return highlightIndicator > 0;
+	}
+
 	/* get list of shop cards that player can buy */
 	getShopCards(player_index) {
 		let cards = [];
@@ -330,18 +348,31 @@ class SummonerExtractor {
 		let msgConfirm = "player " + player_index + " ready"
 
 		if (gameAttrs.game_mode === 0) {
-			console.log(gameState.inner.attrs);
+			/* code that require correct behaviouf of nfts_ready_to_lay attribute */
+			// if (gameAttrs.show_nfts_screen === 3 || gameAttrs.show_nfts_screen === player_index) {
+			// 	if (gameAttrs.nfts_ready_to_lay === player_index) {
+			// 		let menuConfirm = summonerExtractor.getMenuComfirmButton(player_index); 
+			// 		commands.push(summonerExtractor.getClickCommand(menuConfirm, msgConfirm))
+			// 	} else {
+			// 		let cards = summonerExtractor.getMenuCards(player_index);
+			// 		for (let card of cards) {
+			// 			commands.push(summonerExtractor.getClickCommand(card, msgChoose));
+			// 		}
+			// 	}
+			// } 
+
+			/* ad-hoc */
 			if (gameAttrs.show_nfts_screen === 3 || gameAttrs.show_nfts_screen === player_index) {
-				if (gameAttrs.nfts_ready_to_lay === player_index) {
+				if (summonerExtractor.isNftChosen(player_index)) {
 					let menuConfirm = summonerExtractor.getMenuComfirmButton(player_index); 
 					commands.push(summonerExtractor.getClickCommand(menuConfirm, msgConfirm))
 				} else {
-					let cards = summonerExtractor.getMenuCards(player_index);
-					for (let card of cards) {
-						commands.push(summonerExtractor.getClickCommand(card, msgChoose));
-					}
+						let cards = summonerExtractor.getMenuCards(player_index);
+						for (let card of cards) {
+							commands.push(summonerExtractor.getClickCommand(card, msgChoose));
+						}
 				}
-			} 
+			}
 		}
 
 		/* GAME */

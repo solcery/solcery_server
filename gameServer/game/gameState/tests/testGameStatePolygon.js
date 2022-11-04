@@ -1,5 +1,6 @@
 const { SummonerInteractor } = require('../utils/summonerInteractor');
 
+const MENU_CARDS_P1 = [51, 52, 53];
 
 async function test(testEnv) {
 	const core = await createCore();
@@ -34,19 +35,6 @@ async function test(testEnv) {
 	let gameVersion = await mongo.versions.findOne({ version });
 	let content = gameVersion.content.web;
 
-	// const data = JSON.stringify(content, null, 4);
-	// console.log(data);
-	// let fs = require('fs');
-	// await fs.writeFileSync('polygon_content.json', data,
-	// 	err => {
-	// 	if (err) {
-	// 	  throw err
-	// 	}
-	// 	console.log('JSON data is saved.')
-	//   }
-	// );
-	// return;
-	// console.log(content);
 
 	let playerOne = await gameServer.create(Player, { 
 		id: PUBKEY1, 
@@ -61,6 +49,9 @@ async function test(testEnv) {
 	let gameState = game.create(GameState, {content: content, seed: 0 });
     game.gameState = gameState;
 
+	// console.log(content);
+	// return;
+
 	await game.addPlayer(playerOne);
 	await game.addPlayer(playerTwo);
 	await game.start();
@@ -71,8 +62,13 @@ async function test(testEnv) {
 
 	let gameAttrs = gameState.inner.attrs;
 
+	// console.log(gameAttrs);
+
 	summonerInteractor.chooseHero(playerOne);
 	summonerInteractor.chooseHero(playerTwo);
+
+	// console.log(gameAttrs);
+	// return;
 
 	assert(gameAttrs.game_mode === 1);
 
@@ -94,7 +90,7 @@ async function test(testEnv) {
 		summonerInteractor.endTurn(player);
 	}
 
-	console.log(game.actionLog);
+	// console.log(game.actionLog);
 }
 
 module.exports = { test }

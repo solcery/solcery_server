@@ -33,6 +33,19 @@ async function test(testEnv) {
     let version = await mongo.versions.count();
 	let gameVersion = await mongo.versions.findOne({ version });
 	let content = gameVersion.content.web;
+
+	// const data = JSON.stringify(content, null, 4);
+	// console.log(data);
+	// let fs = require('fs');
+	// await fs.writeFileSync('polygon_content.json', data,
+	// 	err => {
+	// 	if (err) {
+	// 	  throw err
+	// 	}
+	// 	console.log('JSON data is saved.')
+	//   }
+	// );
+	// return;
 	// console.log(content);
 
 	let playerOne = await gameServer.create(Player, { 

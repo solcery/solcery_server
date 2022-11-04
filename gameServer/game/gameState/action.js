@@ -263,8 +263,8 @@ const basicActions = [
 		name: 'Start Timer',
 		params: [{ code: 'duration', name: 'Duration', type: 'SBrick<value>' }],
 		exec: (runtime, params, ctx) => {
-			let duration = runtime.execBrick(params.duration, ctx);
-			ctx.game.startTimer(ctx.object, duration);
+			// let duration = runtime.execBrick(params.duration, ctx);
+			// ctx.game.startTimer(ctx.object, duration);
 		},
 	},
 	{
@@ -275,7 +275,7 @@ const basicActions = [
 		name: 'Stop Timer',
 		params: [],
 		exec: (runtime, params, ctx) => {
-			ctx.game.stopTimer(ctx.object);
+			// ctx.game.stopTimer(ctx.object);
 		},
 	},
 	{

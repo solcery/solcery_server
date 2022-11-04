@@ -42,11 +42,11 @@ async function test(testEnv) {
 
 	let rightButtonClick = {
 		commandId: 9, 
-		scopeVars: { object_id: 1 }
+		ctx: { object_id: 1 }
 	}
 	let leftButtonClick = {
 		commandId: 9, 
-		scopeVars: { object_id: 4 }
+		ctx: { object_id: 4 }
 	}
     let commands = [rightButtonClick, leftButtonClick];
 

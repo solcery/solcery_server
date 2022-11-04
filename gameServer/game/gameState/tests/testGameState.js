@@ -80,12 +80,12 @@ async function test(testEnv) {
 	// do nothing button
 	let rightButtonClick = {
 		commandId: 9, 
-		scopeVars: { object_id: 1 }
+		ctx: { object_id: 1 }
 	}
 	// get one point button
 	let leftButtonClick = {
 		commandId: 9, 
-		scopeVars: { object_id: 4 }
+		ctx: { object_id: 4 }
 	}
 
 	let command = rightButtonClick;
@@ -95,7 +95,7 @@ async function test(testEnv) {
 		} else {
 			command = leftButtonClick;
 		}
-		command.scopeVars.player_index = gameState.inner.attrs.current_player + 1;
+		command.ctx.player_index = gameState.inner.attrs.current_player + 1;
 		gameState.applyCommand(command);
 
 		// console.log("game attrs", gameState.inner.attrs);

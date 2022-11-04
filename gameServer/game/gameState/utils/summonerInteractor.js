@@ -44,7 +44,7 @@ class SummonerInteractor {
 	getClickCommand(entity) {
 		return {
 			commandId: LEFT_CLICK, 
-			scopeVars: { object_id: entity.id }
+			ctx: { object_id: entity.id }
 		}
 	}
 
@@ -69,7 +69,8 @@ class SummonerInteractor {
 	click(player, object) {
 		if (this.gameFinished()) return;
 		player.execAllMixins('onWSRequestAction', { 
-			action: this.getClickCommand(object), 
+			type: 'gameCommand',
+			...this.getClickCommand(object), 
 		});
 	}
 

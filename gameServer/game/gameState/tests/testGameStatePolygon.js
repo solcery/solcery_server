@@ -80,6 +80,8 @@ async function test(testEnv) {
 		summonerInteractor.useShop(player);
 		summonerInteractor.endTurn(player);
 	}
+
+	console.log(game.actionLog);
 }
 
 module.exports = { test }

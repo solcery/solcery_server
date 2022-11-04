@@ -45,7 +45,7 @@ class SummonerInteractor {
 	getClickCommand(entity, logMessage = undefined) {
 		return {
 			commandId: LEFT_CLICK, 
-			scopeVars: { object_id: entity.id },
+			ctx: { object_id: entity.id },
 			logMessage: logMessage,
 		}
 	}

@@ -38,7 +38,10 @@ Master.tryToAct = function(data) {
 		if (n > 0) {
 			let command = possibleCommands[getRandomInt(n)];
 			if (command.logMessage) console.log(command.logMessage);
-			this.execAllMixins('onWSRequestAction',  { action: command } );
+			this.execAllMixins('onWSRequestAction',  { 
+				type: 'gameCommand',
+				...command,
+			});
 		}
 	}
 }

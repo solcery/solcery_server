@@ -30,8 +30,8 @@ class Entity {
 class GameState {
 	objects = {};
 	attrs = {};
-	diff = undefined;
-	diffLog = undefined;
+	// diff = undefined;
+	// diffLog = undefined;
 
 	constructor(data) {
 		this.seed = data.seed ?? 0;
@@ -197,7 +197,7 @@ Master.start = function(players) {
 Master.applyCommand = function(data) {
 	let commandId = data.commandId;
 	assert(commandId);
-	let scopeVars = data.scopeVars;
+	let scopeVars = data.ctx;
 	assert(scopeVars);
 	this.inner.applyCommand(commandId, scopeVars);
 }
@@ -211,12 +211,30 @@ Master.onGameStart = function(data) {
 }
 
 Master.onGameAction = function(data) {
-	let lastAction = data.actionLog.slice(-1).pop();
-	let command = lastAction.action;
-	let scopeVars = command.scopeVars;
-	let context = lastAction.ctx;
-	command.scopeVars = { ...scopeVars, ...context };
-	this.applyCommand(command);
+	/*
+		action template as in web
+		{
+			type: 'init' | 'gameCommand',
+			player: 'PlayerName',
+			commandId: ...,
+			ctx: ...,
+		}
+	*/
+
+	let action = data.actionLog.slice(-1).pop();
+
+	if (action.type === 'init') {
+		this.start(data.players);
+	} else if (action.type === 'gameCommand') {
+		let command = {
+			commandId: action.commandId,
+			ctx: action.ctx
+		}
+		// do i need to create a new scope here?
+		this.applyCommand(command);
+	} else {
+		throw("unknown action type");
+	}
 }
 
 module.exports = Master

@@ -12,15 +12,14 @@ dwellers:
       admin/api: true
 
 api:
-  paths:
-    admin:
-      params:
-        userId:
-          type: 'pubkey'
-          required: true
-      commands:
-        eval:
-          params:
-            code:
-              type: 'javascript'
-              required: true
+  admin:
+    .params:
+      userId:
+        type: 'pubkey'
+        required: true
+    .commands:
+      eval:
+        params:
+          code:
+            type: 'javascript'
+            required: true

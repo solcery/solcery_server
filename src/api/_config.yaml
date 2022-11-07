@@ -3,23 +3,24 @@ requiredModules:
   web/http: true
   
 dwellers:
+  Core:
+    mixins:
+      api/core: true
   Api:
     id: 'string'
     mixins:
       api/api: true
-  Core:
-    mixins:
-      api/core: true
-
+      api/commands: true
 api:
-  commands:
-    help:
-      description: 'Shows Help'
-      params: 
-        paths:
-          description: 'Shows API paths'
-          type: 'boolean'
+  api:
+    .commands:
+      help:
+        description: 'Shows Help'
+        params: 
+          paths:
+            description: 'Shows API paths'
+            type: 'boolean'
 
 tests:
-  testApi: true
+  testHelp: true
   # testNestedCommand: true

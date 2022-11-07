@@ -18,19 +18,18 @@ dwellers:
       forge/player: true
 
 api:
-  paths:
-    forge:
-      commands:
-        getPlayerNfts:
-          params: 
-            pubkey:
-              type: 'pubkey'
-              required: true
-        getNfts:
-          params:
-            mintPubkeys:
-              type: 'array(pubkey)'
-              required: true
+  forge:
+    .commands:
+      getPlayerNfts:
+        params: 
+          pubkey:
+            type: 'pubkey'
+            required: true
+      getNfts:
+        params:
+          mintPubkeys:
+            type: 'array(pubkey)'
+            required: true
 tests:
   testForge: true
               

@@ -4,7 +4,9 @@ dwellers:
   Matchmaker: 
     id: 'string'
     mixins: 
-      pvpServer/matchmaker/matchmaker: true
+      pvpServer/matchmaker/matchmaker: 
+        requiredMixins: 
+          pvpServer/matchmaker/pvpServer: true
   PvpServer:
     mixins:
       pvpServer/matchmaker/pvpServer: true

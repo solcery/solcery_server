@@ -5,29 +5,18 @@ require('./utils');
 require('./env');
 require("dotenv").config({ path: "./.env" });
 
-const loadedModules = {};
-const registeredMixins = {};
-const registeredDwellers = {};
-const registeredTests = [];
+const config = {};
+const loadedModules = {}; // Stack of loaded modules to prevent recursive dependencies
+const loadedMixins = {};
 
-function loadMixin(name, config) { // TODO: check circular requirements
-	if (!registeredMixins[name]) {
-		let master = require(`./${name}`);
-		master._name = name;
-		registeredMixins[name] = {
-			master,
-			requiredMixins: [],
-		}
+function getMixin(name) { // TODO: check circular requirements
+	if (!loadedMixins[name]) {
+		let mixin = require(`./${name}`);
+		mixin._name = name;
+		loadedMixins[name] = mixin;
 	}
-	if (typeof config !== 'object') return;
-	let mixin = registeredMixins[name];
-	if (config.requiredMixins) {
-		for (let mixinName of Object.keys(config.requiredMixins)) {
-			let requiredMixin = registeredMixins[mixinName];
-			assert(requiredMixin);
-			registeredMixins[name].requiredMixins.push(requiredMixin);
-		}
-	}
+	return loadedMixins[name];
+
 }
 
 function getModuleConfig(modulePath) {
@@ -37,63 +26,47 @@ function getModuleConfig(modulePath) {
 	return config;
 }
 
-function loadModule(config) {
-	let modulePath = config.moduleName;
+function loadModule(moduleConfig) {
+	let modulePath = moduleConfig.moduleName;
 	if (loadedModules[modulePath]) return; // Do not load modules twice
-	env.log(`Loading module '${modulePath}'`)
-	if (config.requiredModules) {
+	loadedModules[modulePath] = {
+		tests: []
+	};
+	objmerge(config, moduleConfig);
+	env.log(`Loading module '${modulePath}'...`)
+	if (config.requiredModules) { // TODO: check that all mixin requiredMixins entries are imported by required modules
 		for (let requiredModulePath of Object.keys(config.requiredModules)) {
-			requiredModuleConfig = getModuleConfig(requiredModulePath)
+			requiredModuleConfig = getModuleConfig(requiredModulePath);
 			loadModule(requiredModuleConfig);
 		}
 	}
-	if (config.dwellers) {
-		for (let [ dwellerName, dwellerConfig ] of Object.entries(config.dwellers)) {
-			if (!registeredDwellers[dwellerName]) {
-				registeredDwellers[dwellerName] = {
-					mixins: [ 'dweller/base' ],
-				}
-			};
-			let dweller = registeredDwellers[dwellerName];
-			dweller.id = dwellerConfig.id ?? dweller.id;
-			if (dwellerConfig.mixins) {
-				for (let [ mixinName, mixinConfig ] of Object.entries(dwellerConfig.mixins)) {
-					loadMixin(mixinName, mixinConfig);
-					dweller.mixins.push(mixinName)
-				}
-			}
-
-		}
-	}
-	if (config.mixins) {
-		for (let [ mixinName, mixinConfig ] of Object.entries(config.mixins)) {
-			loadMixin(mixinName, mixinConfig);
-		}
-	}
-	loadedModules[modulePath] = { 
-		modulePath,
-		config,
-	};
-	if (config.tests) {
-		for (let testName of Object.keys(config.tests)) {
-			let testPath = `${modulePath}/_tests/${testName}`;
-			registeredTests.push(testPath);
+	if (moduleConfig.tests) {
+		for (let testName of Object.keys(moduleConfig.tests)) {
+			loadedModules[modulePath].tests.push(`./${modulePath}/_tests/${testName}`);
 		}
 	}
 }
 
-function loadDwellers() {
-	for (let [ dwellerName, dwellerConfig ] of Object.entries(registeredDwellers)) {
-		let dweller = {
-			classname: dwellerName,
-			mixins: {}
-		};
-		for (let mixinName of dwellerConfig.mixins) {
-			let mixinConfig = registeredMixins[mixinName];
-			assert(mixinConfig);
-			addMixin(dweller, mixinConfig);
+function initClasses() {
+	if (config.dwellers) {
+		for (let [ dwellerName, dwellerConfig ] of Object.entries(config.dwellers)) {
+			let dweller = {
+				classname: dwellerName,
+				mixins: {},
+			};
+			addMixin(dweller, getMixin('dweller/base')); // TODO: to config
+			if (dwellerConfig.mixins) {
+				for (let [ mixinName, mixinConfig ] of Object.entries(dwellerConfig.mixins)) {
+					if (mixinConfig.requiredMixins) {
+						for (let requiredMixinName of Object.keys(mixinConfig.requiredMixins)) {
+							addMixin(dweller, getMixin(requiredMixinName));
+						}
+					}
+					addMixin(dweller, getMixin(mixinName));
+				}
+			}
+			global[dwellerName] = dweller;
 		}
-		global[dwellerName] = dweller;
 	}
 }
 
@@ -115,7 +88,7 @@ async function runTests(tests, mask) {
 		env.log(`Running test: ${testName}`)
 		if (mixins) {
 			for (let testMixin of mixins) {
-				addMixin(testMixin.dweller, testMixin.mixinConfig)
+				addMixin(testMixin.dweller, testMixin.mixinConfig.master)
 			}
 		}
 		try {
@@ -126,7 +99,7 @@ async function runTests(tests, mask) {
 		}
 		if (mixins) {
 			for (let testMixin of mixins) {
-				removeMixin(testMixin.dweller, testMixin.mixinConfig)
+				removeMixin(testMixin.dweller, testMixin.mixinConfig.master)
 			}
 		}
 		for (let core of cores) {
@@ -166,13 +139,21 @@ if (testArg > -1) {
 }
 process.chdir('./src');
 
-let config = parseConfig('./config.yaml');
-loadModule(config); // Loading modules from config
-loadDwellers();
+let mainConfig = parseConfig('./config.yaml');
+loadModule(mainConfig); // Loading modules from config
+env.config = config;
+// console.log(require('util').inspect(config, { colors: true, depth: 5 }));
+initClasses();
 env.log('All modules loaded');
 
 if (env.test) {
-	runTests(registeredTests, testMask)
+	let tests = [];
+	for (let loadedModule of Object.values(loadedModules)) {
+		for (let testPath of loadedModule.tests) {
+			tests.push(testPath);
+		}
+	}
+	runTests(tests, testMask)
 } else {
 	let core = createCore({
 		forge: true,

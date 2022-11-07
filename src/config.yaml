@@ -1,3 +1,4 @@
+moduleName: 'main'
 requiredModules:
   dweller: true
   admin: true

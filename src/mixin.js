@@ -1,22 +1,26 @@
-function addMixin(dweller, mixinConfig) {
-    assert(dweller);
-    assert(mixinConfig);
-    if (mixinConfig.requiredMixins) {
-        for (let requiredMixinConfig of mixinConfig.requiredMixins) {
-            addMixin(dweller, requiredMixinConfig);
+function addMixin(dweller, mixin) {
+    assert(mixin._name, 'Attempt to apply unnamed mixin!');
+    let mixinName = mixin._name;
+    let requiredMixins = objget(env.config, 'mixins', mixinName, 'requiredMixins');
+    if (requiredMixins) {
+        for (let requiredMixinName of Object.keys(requiredMixins)) {
+            addMixin(dweller, requiredMixinName);
         }
     }
-    let mixin = mixinConfig.master;
-    if (dweller.mixins[mixin._name]) return;
-    assert(mixin._name, 'Attempt to apply unnamed mixin!')
-    for (let propName in mixin) {
+    if (dweller.mixins[mixinName]) return; // Do not apply mixins twice to the same dweller
+    dweller.mixins[mixinName] = mixin;
+    for (let propName in mixin) { // TODO: to objmerge?
         if (propName === '_name') continue;
         let prop = mixin[propName];
-        if (propName === 'api') {
-            dweller.api = dweller.api ?? {};
-            for (let [ apiCommand, apiFunc] of Object.entries(prop)) {
-                assert(!dweller.api.apiCommand);
-                dweller.api[apiCommand] = apiFunc;
+        if (propName === 'callbacks') {
+            // TODO:
+            continue;
+        }
+        if (typeof prop === 'object') { // Object props are merged
+            dweller[propName] = dweller[propName] ?? {};
+            for (let key of Object.keys(prop)) {
+                assert(!dweller[propName][key], `Error merging dweller ${dweller.classname}: Duplicate key '${key}' in prop '${propName}'`);
+                dweller[propName][key] = prop[key];
             }
             continue;
         }
@@ -29,9 +33,8 @@ function addMixin(dweller, mixinConfig) {
     }
 }
 
-function removeMixin(base, mixinConfig) { // TODO: check dependencies
-    assert(base)
-    let mixin = mixinConfig.master;
+function removeMixin(base, mixin) { // TODO: check dependencies
+    assert(base.mixins[mixin._name]);
     assert(mixin._name)
     for (let propName in mixin) {
         if (propName === '_name') continue;
@@ -44,6 +47,7 @@ function removeMixin(base, mixinConfig) { // TODO: check dependencies
             }
         } 
     }
+    delete base.mixins[mixin._name]
 }
 
 module.exports = { addMixin, removeMixin }

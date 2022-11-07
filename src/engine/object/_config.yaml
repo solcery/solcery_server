@@ -3,39 +3,37 @@ requiredModules:
   api: true
 
 dwellers:
-  Api:
+  Engine:
     mixins:
-      engine/object/api: true
+      engine/object/commands: true
+      engine/object/entrypoints: true
 
 api:
-  paths:
-    engine:
-      paths:
-        template:
-          commands:
-            createObject:
-              description: 'Creates new empty object, returns its ID'
-          paths:
-            object:
-              params:
-                objectId:
-                  description: 'Object Id'
-                  type: 'string'
-                  required: true
-              commands:
-                get:
-                  description: 'Returns object data'
-                update:
-                  description: 'Updates object fields'
-                  params: 
-                    fields:
-                      description: 'JSON payload with new object fields'
-                      type: 'json'
-                      required: true
-                clone:
-                  description: 'Clones object'
-                delete:
-                  description: 'Deletes object'
+  engine:
+    template:
+      .commands:
+        createObject:
+          description: 'Creates new empty object, returns its ID'
+      object:
+        .params:
+          objectId:
+            description: 'Object Id'
+            type: 'string'
+            required: true
+        .commands:
+          get:
+            description: 'Returns object data'
+          update:
+            description: 'Updates object fields'
+            params: 
+              fields:
+                description: 'JSON payload with new object fields'
+                type: 'json'
+                required: true
+          clone:
+            description: 'Clones object'
+          delete:
+            description: 'Deletes object'
 
 tests:
   testObjectApi: true

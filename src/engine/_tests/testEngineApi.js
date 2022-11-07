@@ -85,7 +85,7 @@ async function test(testEnv) {
 	// Shooting fisrt getContent
 	let content = await apiCall({
 		command: 'engine.getContent',
-		gameId: 'project1',
+		projectId: 'project1',
 		templates: true,
 		objects: true,
 	});
@@ -94,30 +94,32 @@ async function test(testEnv) {
 	let failed = false;
 	await apiCall({
 		command: 'engine.sync',
-		gameId: 'project1',
+		projectId: 'project1',
 	}).catch(e => failed = true);
 	assert(failed)
 
 	let config = await apiCall({
 		command: 'engine.getConfig',
-		gameId: 'project1'
+		projectId: 'project1'
 	});
 
 	config.sync.isLocked = false;
 	await apiCall({
 		command: 'engine.setConfig',
-		gameId: 'project1',
+		projectId: 'project1',
+		pubkey: 'some',
 		fields: config,
 	});
 	
 	await apiCall({
 		command: 'engine.sync',
-		gameId: 'project1',
+		projectId: 'project1',
+		pubkey: 'some',
 	})
 
 	content = await apiCall({
 		command: 'engine.getContent',
-		gameId: 'project1',
+		projectId: 'project1',
 		templates: true,
 		objects: true,
 	});
@@ -164,12 +166,14 @@ async function test(testEnv) {
 
 	await apiCall(Object.assign({
 		command: 'engine.migrate',
-		gameId: 'project1',
+		projectId: 'project1',
+		pubkey: 'some',
 	}, migrationPayload));
 
 	content = await apiCall({
 		command: 'engine.getContent',
-		gameId: 'project1',
+		projectId: 'project1',
+		pubkey: 'some',
 		templates: true,
 		objects: true,
 	});

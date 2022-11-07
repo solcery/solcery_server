@@ -1,5 +1,6 @@
 const Master = {
     _name: 'dweller',
+    _objects: {},
 };
 
 Master.disableMixinCallbacks = function(mixin) {
@@ -35,6 +36,7 @@ Master.create = function(classObject, data) {
     data.parent = this;
     data.core = this.core;
     obj.init(data);
+    classObject._objects[obj.id] = obj;
     objset(this, obj, '_children', classObject.classname, data.id)
     obj.execAllMixins('onCreate', data);
     return obj;
@@ -46,6 +48,8 @@ Master.delete = function() {
     if (this.parent) {
         delete this.parent._children[this.classname][this.id]
     }
+    let classObject = Object.getPrototypeOf(this);
+    delete classObject._objects[this.id];
 }
 
 Master.get = function(classObject, id) {

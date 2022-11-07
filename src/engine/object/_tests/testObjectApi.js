@@ -20,6 +20,9 @@ const db = {
 };
 
 async function test(testEnv) {
+
+	const pubkey = 'some_pubkey'
+
 	const core = createCore({ 
 		id: 'core',
 		httpServer: true,
@@ -27,7 +30,7 @@ async function test(testEnv) {
 	core.create(Engine, { 
 		id: 'test',
 		db,
-		gameId: 'test',
+		projectId: 'test',
 	});
 
 	const engine = core.get(Engine, 'test')
@@ -40,43 +43,52 @@ async function test(testEnv) {
 
 	let objectId = db.objects[0]._id.toString();
 
+	// cloning object
 	let newObjId = await apiCall({
 		command: 'engine.template.object.clone',
 		templateCode: 'testTemplate',
-		gameId: 'test',
+		projectId: 'test',
+		pubkey,
 		objectId,
 	})
+	env.log('CLONED: ', db.objects)
 
 	assert(newObjId);
 
 	await apiCall({
 		command: 'engine.template.object.update',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
 		objectId: newObjId,
+		pubkey,
 		fields: {
 			name: 'new Object',
 			number: null,
 		}
 	})
+	env.log('UPDATED: ', db.objects)
 
 	await apiCall({
 		command: 'engine.template.object.delete',
 		templateCode: 'testTemplate',
-		gameId: 'test',
+		projectId: 'test',
 		objectId,
+		pubkey,
 	})
+	env.log('DELETED: ', db.objects)
 	
 	assert(db.objects.length === 1);
 	let newObj = db.objects[0];
 	assert(newObj._id.toString() === newObjId);
+	console.log(newObj.fields)
 	assert(!newObj.fields.number);
 	assert(newObj.fields.name === 'new Object');
 
 	newObjId = await apiCall({
 		command: 'engine.template.createObject',
 		templateCode: 'testTemplate',
-		gameId: 'test',
+		projectId: 'test',
+		pubkey,
 	})
 
 	assert(db.objects.length === 2);

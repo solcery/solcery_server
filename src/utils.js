@@ -47,7 +47,7 @@ global.objinsert = (obj, value, ...path) => {
 	}, obj);
 }
 
-global.objmerge = (target, source) => {
+global.objmerge = (target, source, noCollisions) => {
 	const isObject = (obj) => obj && typeof obj === 'object';
 
 	if (!isObject(target) || !isObject(source)) {
@@ -59,10 +59,11 @@ global.objmerge = (target, source) => {
 		const sourceValue = source[key];
 
 		if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-			target[key] = targetValue.concat(sourceValue);
+			target[key] = targetValue.concat(sourceValue); // check collisions?
 		} else if (isObject(targetValue) && isObject(sourceValue)) {
 			target[key] = objmerge(Object.assign({}, targetValue), sourceValue);
 		} else {
+			assert(!noCollisions || sourceValue === undefined, `Object merge collision at key '${key}'`);
 			target[key] = sourceValue;
 		}
 	});

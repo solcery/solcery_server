@@ -3,17 +3,13 @@ requiredModules:
   api: true
 
 dwellers:
-  Engine:
+  Api:
     mixins:
-      engine/object/commands: true
-      engine/object/entrypoints: true
+      engine/object/api: true
 
 api:
   engine:
     template:
-      .commands:
-        createObject:
-          description: 'Creates new empty object, returns its ID'
       object:
         .params:
           objectId:

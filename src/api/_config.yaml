@@ -10,16 +10,14 @@ dwellers:
     id: 'string'
     mixins:
       api/api: true
-      api/commands: true
 api:
-  api:
-    .commands:
-      help:
-        description: 'Shows Help'
-        params: 
-          paths:
-            description: 'Shows API paths'
-            type: 'boolean'
+  .commands:
+    help:
+      description: 'Shows Help'
+      params: 
+        paths:
+          description: 'Shows API paths'
+          type: 'boolean'
 
 tests:
   testHelp: true

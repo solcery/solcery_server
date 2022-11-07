@@ -1,10 +1,9 @@
 moduleName: 'engine/user'
 
 dwellers:
-  Engine:
+  Api:
     mixins:
-      engine/user/entrypoints: true
-      engine/user/commands: true
+      engine/user/api: true
 
 api:
   engine:

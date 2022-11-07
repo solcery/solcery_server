@@ -18,10 +18,7 @@ function addMixin(dweller, mixin) {
         }
         if (typeof prop === 'object') { // Object props are merged
             dweller[propName] = dweller[propName] ?? {};
-            for (let key of Object.keys(prop)) {
-                assert(!dweller[propName][key], `Error merging dweller ${dweller.classname}: Duplicate key '${key}' in prop '${propName}'`);
-                dweller[propName][key] = prop[key];
-            }
+            objmerge(dweller[propName], prop);
             continue;
         }
         if (typeof prop === 'function' && propName.substring(0, 2) === 'on') {

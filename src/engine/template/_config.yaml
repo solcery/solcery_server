@@ -2,10 +2,9 @@ moduleName: 'engine/template'
 requiredModules:
   api: true
 dwellers:
-  Engine:
+  Api:
     mixins:
-      engine/template/commands: true
-      engine/template/entrypoints: true
+      engine/template/api: true
 
 api:
   engine:
@@ -16,6 +15,8 @@ api:
           type: 'string'
           required: true
       .commands:
+        createObject:
+          description: 'Creates new empty object, returns its ID'
         getObjects:
           public: true
           description: 'Returns all objects'

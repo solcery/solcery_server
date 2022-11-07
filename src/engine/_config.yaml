@@ -16,7 +16,6 @@ dwellers:
     id: 'string'
     mixins:
       engine/engine: true
-      engine/commands: true
 api:
   engine:
     .access:

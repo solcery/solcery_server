@@ -1,4 +1,4 @@
-const Master = {};
+const Master = { api: {} };
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -109,7 +109,6 @@ Master.apiCall = async function(queryParams, response) {
     let status = false;
     let result;
     try {
-        console.log(fullCommand, queryParams)
         assert(fullCommand, 'API error: No command specified in request');
         let commandConfig = this.apiCommands[fullCommand];
         assert(commandConfig, `API error: Unknown command '${fullCommand}'`);
@@ -128,14 +127,14 @@ Master.apiCall = async function(queryParams, response) {
             }
         }
         let commandPath = fullCommand.split('.');
-
+        let commandName = commandPath.pop();
         let ctx = {};
-        env.log('Executing path:', commandPath);
+        let current = this.api;
         for (let apiNode of commandPath) {
-            await current.entrypoints[apiNode].call(current, params, ctx);
+            current = current[apiNode];
+            await current.ctx.call(this, params, ctx)
         }
-        env.log('Executing command:', fullCommand);
-        result = await current.commands[commandName].call(current, params, ctx);
+        result = current[commandName].call(this, params, ctx);
         status = true;
     } catch (error) {
         result = process.env.TEST ? error : error.message;
@@ -153,5 +152,11 @@ Master.apiCall = async function(queryParams, response) {
         response.send(JSON.stringify(result, null, 2));
     } 
 }
+
+Master.api.help = function(params) {
+    if (params.paths) return this.apiData;
+    return this.apiCommands;
+}
+
 
 module.exports = Master

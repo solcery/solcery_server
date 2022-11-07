@@ -20,7 +20,6 @@ async function test(testEnv) {
 	core.create(Engine, { 
 		id: 'test',
 		db,
-		gameId: 'test',
 	});
 
 	const engine = core.get(Engine, 'test')
@@ -33,14 +32,14 @@ async function test(testEnv) {
 
 	let user = await apiCall({
 		command: 'engine.user.get',
-		gameId: 'test',
+		projectId: 'test',
 		pubkey: 'some_pubkey'
 	});
 	assert(user);
 
 	await apiCall({
 		command: 'engine.user.update',
-		gameId: 'test',
+		projectId: 'test',
 		pubkey: 'some_pubkey',
 		fields: {
 			name: 'New name',
@@ -50,7 +49,7 @@ async function test(testEnv) {
 
 	user = await apiCall({
 		command: 'engine.user.get',
-		gameId: 'test',
+		projectId: 'test',
 		pubkey: 'some_pubkey'
 	});
 	assert(user.fields.css === 'some CSS');

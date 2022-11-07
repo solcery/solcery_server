@@ -1,25 +1,24 @@
 const { ObjectId } = require('mongodb');
-const Master = { api: {} }
+const Master = { api: { game: {} } }
 
-Master.pvpServer = function(params) {
+Master.api.game.ctx = function(params) {
       let pvpServer = this.core.get(PvpServer, params.gameId);
       assert(pvpServer, `API Error: No game with id '${params.gameId}'`);
       return pvpServer;
 }
 
-Master.api['game.getGameInfo'] = async function(params) {
+Master.api.game.getGameInfo = async function(params) {
     let pvpServer = this.pvpServer(params);
     return await pvpServer.get(Mongo, 'main').gameInfo.findOne({});
 }
 
-Master.api['game.getGameVersion'] = async function (params) {
+Master.api.game.getGameVersion = async function (params) {
     let pvpServer = this.pvpServer(params);
     return await pvpServer.getGameVersion(params.version);; 
 }
 
-Master.api['core.reloadPvpServers'] = async function(params) {
-      await this.core.loadPvpServers();
-      return 'Game servers reloaded, current number of servers: ' + this.core.getAll(PvpServer).length;
+Master.api.game.reloadServer = async function(params) {
+    // TODO:
 }
 
 

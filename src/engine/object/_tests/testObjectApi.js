@@ -51,7 +51,6 @@ async function test(testEnv) {
 		pubkey,
 		objectId,
 	})
-	env.log('CLONED: ', db.objects)
 
 	assert(newObjId);
 
@@ -66,7 +65,6 @@ async function test(testEnv) {
 			number: null,
 		}
 	})
-	env.log('UPDATED: ', db.objects)
 
 	await apiCall({
 		command: 'engine.template.object.delete',
@@ -75,12 +73,10 @@ async function test(testEnv) {
 		objectId,
 		pubkey,
 	})
-	env.log('DELETED: ', db.objects)
 	
 	assert(db.objects.length === 1);
 	let newObj = db.objects[0];
 	assert(newObj._id.toString() === newObjId);
-	console.log(newObj.fields)
 	assert(!newObj.fields.number);
 	assert(newObj.fields.name === 'new Object');
 

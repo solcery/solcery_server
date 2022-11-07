@@ -11,9 +11,9 @@ async function test(testEnv) {
 	let apiCall = testEnv.createClientApi(api);
 
 	let result = await apiCall({
-		command: 'api.help'
+		command: 'help'
 	})
-	assert(result['api.help'])
+	assert(result['help'])
 }
 
 module.exports = { test }

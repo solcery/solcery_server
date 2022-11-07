@@ -42,6 +42,10 @@ const db = {
 };
 
 async function test(testEnv) {
+
+	const projectId = 'test';
+	const pubkey = 'some_pubkey';
+
 	const core = createCore({
 		id: 'core',
 		httpServer: true,
@@ -60,8 +64,9 @@ async function test(testEnv) {
 
 	let schema = await apiCall({
 		command: 'engine.template.getSchema',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
+		pubkey,
 	})
 	let revision = schema.revision
 	assert(schema.fields[0].name === 'Name');
@@ -72,35 +77,40 @@ async function test(testEnv) {
 	})
 	await apiCall({
 		command: 'engine.template.setSchema',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
 		schema,
+		pubkey,
 	})
 	schema = await apiCall({
 		command: 'engine.template.getSchema',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
+		pubkey,
 	})
 	assert(schema.fields.length === 3);
 	assert(schema.revision === revision + 1);
 
 	let objects = await apiCall({
 		command: 'engine.template.getObjects',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
+		pubkey,
 	})
 	assert(objects && objects.length === 2);
 	assert(objects[0].fields.name === 'Object 1' && objects[1].fields.name === 'Object 2');
 
 	let newObjId = await apiCall({
 		command: 'engine.template.createObject',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
+		pubkey,
 	})
 	objects = await apiCall({
 		command: 'engine.template.getObjects',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
+		pubkey,
 	})
 	assert(objects && objects.length === 3);
 	objects[0].fields.name = 'New Object 1';
@@ -109,14 +119,16 @@ async function test(testEnv) {
 	objects[2].fields.newField = 200;
 	await apiCall({
 		command: 'engine.template.updateObjects',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
 		objects,
+		pubkey,
 	})
 	objects = await apiCall({
 		command: 'engine.template.getObjects',
-		gameId: 'test',
+		projectId: 'test',
 		templateCode: 'testTemplate',
+		pubkey,
 	})
 	assert(objects && objects.length === 3);
 	assert(objects[0].fields.name === 'New Object 1' && objects[0].fields.number === 19);

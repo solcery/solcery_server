@@ -10,13 +10,13 @@ Master.loadGame = function (data) {
 
 Master.onMongoReady = function(mongo) {
 	if (mongo.id !== 'main') return;
-	let games = mongo.games
-	.find({ finished: null })
-	.toArray().then(games => {
-		for (let game of games) {
-			this.loadGame(game);
-		}
-	});
+	// let games = mongo.games
+	// .find({ finished: null })
+	// .toArray().then(games => {
+	// 	for (let game of games) {
+	// 		this.loadGame(game);
+	// 	}
+	// });
 	mongo.versions.count().then(res => {
 		this.latestVersion = res
 	});

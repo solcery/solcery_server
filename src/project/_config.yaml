@@ -1,5 +1,8 @@
 moduleName: 'project'
-
+requiredModules:
+  project/engine: true
+  project/pvpServer: true
+    
 dwellers:
   Project: 
     mixins:

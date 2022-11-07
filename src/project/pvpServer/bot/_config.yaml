@@ -1,0 +1,12 @@
+moduleName: 'project/pvpServer/bot'
+requiredModules:
+  project/pvpServer/player: true
+  projectpvpServer/game: true
+
+dwellers:
+  Player:
+    mixins:
+      project/pvpServer/bot/player: true
+
+tests:
+  testBot: true

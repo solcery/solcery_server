@@ -1,0 +1,41 @@
+moduleName: 'project/engine/template'
+requiredModules:
+  api: true
+dwellers:
+  Api:
+    mixins:
+      project/engine/template/api: true
+
+api:
+  engine:
+    template:
+      .params:
+        templateCode:
+          description: 'Snake-case code of the template'
+          type: 'string'
+          required: true
+      .commands:
+        createObject:
+          description: 'Creates new empty object, returns its ID'
+        getObjects:
+          public: true
+          description: 'Returns all objects'
+        getSchema:
+          description: 'Returns template schema'
+        setSchema:
+          description: 'Sets template schema'
+          params: 
+            schema:
+              description: 'JSON-serialized schema'
+              type: 'json'
+              required: true
+        updateObjects:
+          description: 'Updates many objects'
+          params: 
+            objects:
+              description: 'JSON array with new object fields'
+              type: 'json'
+              required: true
+
+tests:
+  testTemplateApi: true

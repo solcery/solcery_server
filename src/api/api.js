@@ -137,7 +137,7 @@ Master.apiCall = async function(queryParams, response) {
         result = current[commandName].call(this, params, ctx);
         status = true;
     } catch (error) {
-        result = process.env.TEST ? error : error.message;
+        result = env.test ? error : error.message;
     }
     result = {
         status, 
@@ -149,6 +149,7 @@ Master.apiCall = async function(queryParams, response) {
     }
     if (queryParams.format === 'prettyJson') {
         response.header("Content-Type",'application/json');
+        console.log(result)
         response.send(JSON.stringify(result, null, 2));
     } 
 }

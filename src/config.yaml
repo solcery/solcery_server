@@ -3,8 +3,7 @@ requiredModules:
   dweller: true
   admin: true
   api: true
-  pvpServer: true
-  engine: true
+  project: true
   unityBuilds: true
   forge: true
 

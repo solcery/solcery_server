@@ -1,0 +1,18 @@
+moduleName: 'project/pvpServer/player'
+requiredModules:
+  web/socket: true
+
+dwellers: 
+  Player: 
+    id: 'string'
+    mixins:
+      project/pvpServer/player/player: true
+  Socket:
+    mixins:
+      project/pvpServer/player/socket: true
+  Project:
+    mixins:
+      project/pvpServer/player/project: true
+      
+tests:
+  testChallenge: true

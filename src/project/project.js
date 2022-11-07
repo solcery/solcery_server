@@ -1,8 +1,8 @@
 const Master = {}
 
 Master.onCreate = function(data) {
-	assert(data.database)
-	this.database = data.database;
+	assert(data.db)
+	this.db = data.db;
 }
 
 module.exports = Master;

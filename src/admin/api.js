@@ -6,7 +6,7 @@ Master.api['core.reloadServers'] = async function(params) {
     for (engine of core.getAll(Engine)) {
         engine.delete();
     }
-    for (pvpServer of core.getAll(PvpServer)) {
+    for (pvpServer of core.getAll(Project)) {
         pvpServer.delete();
     }
 }

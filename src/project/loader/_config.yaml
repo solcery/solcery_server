@@ -5,7 +5,9 @@ requiredModules:
 dwellers:
   Core: 
     mixins:
-      project/loader/core: true
+      project/loader/core:
+        requiredMixins:
+          mongo/core: true
 
 tests:
   testLoader: true

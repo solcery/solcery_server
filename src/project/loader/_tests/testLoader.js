@@ -1,56 +1,56 @@
 const { ObjectId } = require('mongodb');
 
-const project1db = {
-	gameInfo: [
-		{
-			gameBuildVersion: 1
-		}
-	],
-	gameBuilds: [
-		{
-			version: 1,
-			content: {}
-		}
-	]
-}
+const virtualDb = {
+	dbs: {
+		solcery: {
+				objects: [
+				{
+					_id: ObjectId(),
+					template: 'projects',
+					fields: {
+						name: 'prj1',
+						db: 'project1db',
+						pvpServer: {},
+					}
+				},
+				{
+					_id: ObjectId(),
+					template: 'projects',
+					fields: {
+						name: 'prj2',
+						db: 'project2db',
+						engine: {},
+					}
+				}
 
-const project2db = {
-	objects: [
-	],
-	templates: [
-	]
-}
-
-const solceryDb = {
-	objects: [
-		{
-			_id: ObjectId(),
-			template: 'projects',
-			fields: {
-				name: 'prj1',
-				db: project1db,
-				pvpServer: {},
-			}
+			],
 		},
-		{
-			_id: ObjectId(),
-			template: 'projects',
-			fields: {
-				name: 'prj2',
-				db: project2db,
-				engine: {},
-			}
+		project1db: {
+			gameInfo: [
+				{
+					gameBuildVersion: 1
+				}
+			],
+			gameBuilds: [
+				{
+					version: 1,
+					content: {}
+				}
+			]
+		},
+		project2db: {
+			objects: [],
+			templates: []
 		}
-
-	],
-};
+	}
+}
 
 async function test(testEnv) {
 	// Init
 	const core = createCore({ 
 		id: 'core',
-		solceryDb,
-		loader: true,
+		solceryDb: 'solcery',
+		virtualDb,
 	});
 	await sleep(1)
 	let projects = core.getAll(Project)

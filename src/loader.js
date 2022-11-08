@@ -125,6 +125,9 @@ global.createCore = (data = {}) => {
 	const core = Object.create(Core); //Creating core
 	data.id = data.id ?? 'core';
 	data.core = core;
+	if (env.test && !data.virtualDb) {
+		data.virtualDb = {};
+	}
 	core.inCreation = true;
 	core.init(data);
 	core.loadedModules = loadedModules;

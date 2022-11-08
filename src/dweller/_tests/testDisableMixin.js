@@ -29,8 +29,13 @@ const mixins = [
 ]
 
 function test() {
-	const core1 = createCore({ id: 'core1', disableTestMixin: true });
-	const core2 = createCore({ id: 'core2' });
+	const core1 = createCore({ 
+		id: 'core1', 
+		disableTestMixin: true, 
+	});
+	const core2 = createCore({ 
+		id: 'core2', 
+	});
 	core1.execAllMixins('onTestCallback');
 	core2.execAllMixins('onTestCallback');
 	assert(!signal.core1)

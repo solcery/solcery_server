@@ -13,7 +13,11 @@ Master.onCreate = function(data) {
 }
 
 Master.onGameInfoLoaded = function(gameInfo) {
-    assert(gameInfo, 'Server has no game info!');
+    if (!gameInfo) {
+        env.error(`Project ${this.id} has no gameInfo, pvp server won't start`);
+        this.disableMixinCallbacks(Master)
+        return;
+    }
     this.gameInfo = gameInfo;
     let gameBuildVersion = gameInfo.gameBuildVersion;
     if (!gameBuildVersion) return;

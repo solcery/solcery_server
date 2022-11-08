@@ -97,11 +97,11 @@ forgeNft = async function ({ nft, collection }, publicKey, dirName) {
 }
 
 Master.onCreate = function(data) {
-	this.mongo = this.create(Mongo, {
-		id: 'main',
-		db: 'nfts',
-		collections: [ 'objects' ],
-	})
+	// this.mongo = this.create(Mongo, {
+	// 	id: 'main',
+	// 	db: 'nfts',
+	// 	collections: [ 'objects' ],
+	// })
 }
 
 Master.getNfts = async function(mintPubkeys) {

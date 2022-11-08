@@ -15,7 +15,7 @@ Master.createProjects = async function() {
 		let projectConfig = project.fields;
 		env.log('Creating project with config ', projectConfig)
 		this.create(Project, { 
-			id: `project.${projectConfig.name}`,
+			id: projectConfig.name,
 			...projectConfig,
 		})
 	}

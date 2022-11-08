@@ -14,10 +14,9 @@ Master.mongoRequest = function(dbName, collection, func, params) {
 }
 
 Master.createMongo = function(dbName, collections) {
-    let mongo = this.mongoDbProvider;
     assert(dbName)
-    const db = mongo.client.db(dbName);
     assert(collections)
+    const db = this.mongoDbProvider.client.db(dbName);
     let res = {};
     for (let collectionName of collections) {
         res[collectionName] = db.collection(collectionName)

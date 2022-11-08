@@ -134,7 +134,7 @@ Master.apiCall = async function(queryParams, response) {
             current = current[apiNode];
             await current.ctx.call(this, params, ctx)
         }
-        result = current[commandName].call(this, params, ctx);
+        result = await current[commandName].call(this, params, ctx);
         status = true;
     } catch (error) {
         result = env.test ? error : error.message;
@@ -154,7 +154,7 @@ Master.apiCall = async function(queryParams, response) {
 }
 
 Master.api.help = function(params) {
-    if (params.paths) return this.apiData;
+    if (params.paths) return env.config.api;
     return this.apiCommands;
 }
 

@@ -3,7 +3,6 @@ const Master = { api: { engine: {} } };
 
 Master.api.engine.ctx = function(params, ctx) {
       ctx.project = this.core.get(Project, params.projectId);
-      // console.log('ctx engine', ctx.project)
       assert(ctx.project, `API Error: No project with projectId id '${params.projectId}'`);
 }
 

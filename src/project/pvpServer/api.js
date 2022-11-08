@@ -1,25 +1,19 @@
 const { ObjectId } = require('mongodb');
-const Master = { api: { game: {} } }
+const Master = { api: { game: {} } };
 
-Master.api.game.ctx = function(params) {
-      let pvpServer = this.core.get(Project, params.gameId);
-      assert(pvpServer, `API Error: No game with id '${params.gameId}'`);
-      return pvpServer;
+Master.api.game.ctx = function(params, ctx) {
+    ctx.game = this.core.get(Project, params.gameId);
+    assert(ctx.game, `API Error: No game with id '${params.gameId}'`);
 }
 
-Master.api.game.getGameInfo = async function(params) {
-    let pvpServer = this.pvpServer(params);
-    return await pvpServer.get(Mongo, 'main').gameInfo.findOne({});
+Master.api.game.getGameInfo = async function(params, ctx) {
+    return ctx.game.gameInfo;
 }
 
-Master.api.game.getGameVersion = async function (params) {
-    let pvpServer = this.pvpServer(params);
-    return await pvpServer.getGameVersion(params.version);; 
+Master.api.game.getGameBuild = async function(params, ctx) {
+     let res = ctx.game.gameBuilds[params.version];
+     assert(res, `No game build with version ${params.version} found`)
+     return res;
 }
-
-Master.api.game.reloadServer = async function(params) {
-    // TODO:
-}
-
 
 module.exports = Master;

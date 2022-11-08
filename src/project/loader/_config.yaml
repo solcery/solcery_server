@@ -1,0 +1,9 @@
+moduleName: 'project/loader'
+
+dwellers:
+  Core: 
+    mixins:
+      project/loader/core: true
+
+tests:
+  testLoader: true

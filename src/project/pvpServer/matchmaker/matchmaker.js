@@ -1,14 +1,10 @@
 const Master = {}
 
 Master.onCreate = function(data) {
-	this.gameVersion = data.gameVersion;
-	let content = objget(data.gameVersion, 'content', 'matchmaker');
+	let content = data.matchmakerContent;
+	this.version = data.version;
 	this.playerQuantity = Object.keys(content.players).length;
 	this.botFillTimeout = objget(content, 'matchmaker', 'botFillTimeout');
-	let supportedCollections = objget(data.gameVersion, 'content', 'matchmaker', 'collections');
-	if (supportedCollections) {
-		this.collections = Object.values(supportedCollections).map(c => c.collection);
-	}
 	this.queue = [];
 }
 
@@ -16,21 +12,21 @@ Master.onTick = function(time) {
 	this.checkQueue(time);
 }
 
-Master.createGame = function() {
-	const game = this.parent.createGame(this.gameVersion.version);
+Master.createMatch = function() {
+	const match = this.parent.createMatch(this.version);
 	let selectedPlayers = this.queue.splice(0, this.playerQuantity);
 	for (let queueEntry of selectedPlayers) {
-		game.addPlayer(queueEntry.player, {
+		match.addPlayer(queueEntry.player, {
 			nfts: queueEntry.nfts,
 		});
 	}
-	game.start();
+	match.start(); //TODO: move somewhere
 }
 
 Master.checkQueue = function(time) {
 	if (this.queue.length === 0) return;
 	if (this.queue.length >= this.playerQuantity) {
-		this.createGame();
+		this.createMatch();
 		return;
 	}
 	if (!this.botFillTimeout) return;
@@ -43,7 +39,7 @@ Master.checkQueue = function(time) {
 				time,
 			})
 		}
-		this.createGame();
+		this.createMatch();
 	}
 }
 
@@ -55,14 +51,11 @@ Master.onDelete = function() {
 }
 
 Master.onPlayerQueued = function(player) {
-	if (player.nfts && this.collections) {
-		var nfts = player.nfts.filter(nft => this.collections.includes(nft.collection));
-	}
 	let time = this.time();
 	this.queue.push({
 		player,
 		time,
-		nfts,
+		nfts: player.nfts,
 	})
 	player.setStatus('queued', { time })
 	this.checkQueue(this.time());

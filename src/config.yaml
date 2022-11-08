@@ -1,6 +1,7 @@
 moduleName: 'main'
 requiredModules:
   dweller: true
+  core: true
   admin: true
   api: true
   project: true

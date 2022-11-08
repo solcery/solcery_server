@@ -3,7 +3,7 @@ requiredModules:
   api: true
   mongo: true
   project/pvpServer/player: true
-  project/pvpServer/game: true
+  project/pvpServer/match: true
   project/pvpServer/matchmaker: true
 
 dwellers:
@@ -25,10 +25,10 @@ api:
     .commands:
       getGameInfo:
         description: 'Returns game info'
-      getGameVersion:
+      getGameBuild:
         description: 'Return content version'
         params: 
           version:
             type: 'string'
-            description: 'Game version'
+            description: 'Version number. Latest if not specified'
                     

@@ -1,7 +1,7 @@
 moduleName: 'project/pvpServer/bot'
 requiredModules:
   project/pvpServer/player: true
-  projectpvpServer/game: true
+  project/pvpServer/match: true
 
 dwellers:
   Player:

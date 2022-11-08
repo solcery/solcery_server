@@ -1,12 +1,12 @@
 const Master = {}
 
 Master.onCreate = function(data) {
-	// console.log(this.gameVersion.content.meta);
 	this.actionLog = data.actionLog ?? [];
 	this.players = data.players ?? [];
 	this.started = data.started;
 	this.finished = data.finished;
 	this.version = data.version;
+	this.gameBuild = data.gameBuild;
 	this.seed = data.seed ?? Math.floor(Math.random() * 256);
 }
 
@@ -15,7 +15,7 @@ Master.start = function(data) {
 	this.actionLog.push({ 
 		type: 'init',
 	});
-	this.execAllPlayers('onGameStart', this.getSaveData());
+	this.execAllPlayers('onMatchStart', this.getSaveData());
 	this.save();
 }
 
@@ -42,12 +42,12 @@ Master.getSaveData = function(fields) {
 	return res;
 }
 
-Master.save = function() {
+Master.save = function() { // TODO: ??
 	let mongo = this.parent.get(Mongo, 'main');
 	if (!mongo) return;
 	let filter = { id: this.id };
 	let saveData = this.getSaveData();
-	mongo.games.replaceOne(filter, saveData);
+	mongo.matches.replaceOne(filter, saveData);
 }
 
 Master.addPlayer = function(player, data = {}) {
@@ -57,7 +57,7 @@ Master.addPlayer = function(player, data = {}) {
 		nfts: data.nfts,
 	})
 	this.save();
-	player.execAllMixins('onGameJoined', this);
+	player.execAllMixins('onJoinMatch', this);
 }
 
 Master.removePlayer = function(player, outcome) {
@@ -72,10 +72,10 @@ Master.removePlayer = function(player, outcome) {
 	})
 	this.save()
 	playerData.outcome = outcome; //Player who sent the outcome means they won't impact the game anymore
-	player.execAllMixins('onGameLeft');
+	player.execAllMixins('onLeaveMatch');
 	for (let participant of this.players) {
 		if (participant.outcome === undefined) {
-			this.execAllPlayers('onGameAction', this.getSaveData(['actionLog']));
+			this.execAllPlayers('onMatchAction', this.getSaveData(['actionLog']));
 			return;
 		};
 	}
@@ -91,7 +91,7 @@ Master.onPlayerAction = function(player, action) {
 		...action,
 	})
 	this.save();
-	this.execAllPlayers('onGameAction', this.getSaveData([ 'actionLog' ]));
+	this.execAllPlayers('onMatchAction', this.getSaveData([ 'actionLog' ]));
 }
 
 Master.execAllPlayers = function(callbackName, data) {

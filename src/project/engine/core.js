@@ -17,7 +17,6 @@ Master.loadEngines = async function() {
 
 Master.onMongoReady = function(mongo) {
     if (mongo.id !== 'solcery') return;
-    this.loadEngines();
 }
 
 

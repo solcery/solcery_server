@@ -6,6 +6,7 @@ Master.onCreate = function(data) {
 		this.disableMixinCallbacks(Master);
 		return;
 	}
+	this.engine = data.engine;
 	this.content = this.create(Mongo, {
 		id: 'content',
 		db: data.db,

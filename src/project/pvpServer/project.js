@@ -2,41 +2,43 @@ const Master = {};
 const { ObjectId } = require('mongodb');
 
 Master.onCreate = function(data) {
-    this.gameId = data.gameId;
-    this.gameVersions = {};
-    this.create(Mongo, {
+    if (!data.pvpServer) {
+        this.disableMixinCallbacks(Master);
+        return;
+    }
+    this.pvpServer = data.pvpServer;
+    this.mongo = this.create(Mongo, {
         id: 'main',
         db: data.db,
         collections: [
-            'games',
-            'versions',
+            'matches',
+            'gameBuilds',
             'gameInfo'
         ]
     });
+    this.gameBuilds = {};
+    this.mongo.gameInfo.findOne({}).then(gameInfo => this.execAllMixins('onGameInfoLoaded', gameInfo));
 }
 
-Master.onMongoReady = function(mongo) {
-    if (mongo.id !== 'main') return;
-    this.getGameVersion(); 
+Master.onGameInfoLoaded = function(gameInfo) {
+    assert(gameInfo, 'Server has no game info!');
+    this.gameInfo = gameInfo;
+    let gameBuildVersion = gameInfo.gameBuildVersion;
+    if (!gameBuildVersion) return;
+    this.loadGameBuild(gameBuildVersion);
 }
 
-Master.getGameVersion = async function(version) {
-    let mongo = this.get(Mongo, 'main');
-    version = version ?? this.latestVersion;
-    if (!version) {
-        version = await mongo.versions.count();
-        var latest = true;
-    }
-    if (!this.gameVersions[version]) {
-        let ver = await mongo.versions.findOne({ version });
-        if (!ver) return;
-        this.gameVersions[version] = ver;
-        if (latest) {
-            this.latestVersion = ver;
-            this.execAllMixins('onGameVersionLoaded', ver);
-        }
-    }
-    return this.gameVersions[version]
+Master.getGameBuild = function(version) {
+    return this.gameBuilds[version];
+}
+
+Master.loadGameBuild = async function(version) {
+    assert(version)
+    if (this.gameBuilds[version]) return;
+    let build = await this.mongo.gameBuilds.findOne({ version });
+    assert(build, `No game build with version ${version} found`);
+    this.gameBuilds[version] = build;
+    this.execAllMixins('onGameBuildLoaded', build);
 }
 
 module.exports = Master

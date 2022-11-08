@@ -149,7 +149,6 @@ Master.apiCall = async function(queryParams, response) {
     }
     if (queryParams.format === 'prettyJson') {
         response.header("Content-Type",'application/json');
-        console.log(result)
         response.send(JSON.stringify(result, null, 2));
     } 
 }

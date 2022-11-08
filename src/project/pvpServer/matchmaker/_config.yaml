@@ -1,5 +1,6 @@
 moduleName: 'project/pvpServer/matchmaker'
-
+requiredModules:
+  project/pvpServer/match: true
 dwellers:
   Matchmaker: 
     id: 'string'

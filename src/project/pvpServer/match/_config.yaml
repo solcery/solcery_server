@@ -1,0 +1,34 @@
+moduleName: 'project/pvpServer/match'
+requiredModules:
+  web/socket: true
+  project/pvpServer/player: true
+
+dwellers:
+  Match: 
+    id: 'string'
+    mixins:
+      project/pvpServer/match/match: true
+  Player:
+    mixins:
+      project/pvpServer/match/player: true
+  Project:
+    mixins:
+      project/pvpServer/match/project: 
+        requiredMixins:
+          project/pvpServer/project: true
+
+api:
+  game:
+    .commands:
+      getGameBuild:
+        description: 'Return content version'
+        params: 
+          version:
+            type: 'string'
+            description: 'Version number. Latest if not specified'
+
+tests:
+  testMatch: true
+  testSaveLoad: true
+  testReconnect: true
+    

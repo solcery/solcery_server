@@ -1,0 +1,6 @@
+moduleName: 'core'
+
+dwellers:
+  Core: 
+    mixins:
+      core/core: true

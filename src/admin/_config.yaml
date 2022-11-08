@@ -4,9 +4,6 @@ requiredModules:
   mongo: true
 
 dwellers:
-  Core:
-    mixins:
-      admin/core: true
   Api:
     mixins:
       admin/api: true

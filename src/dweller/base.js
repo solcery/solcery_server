@@ -36,9 +36,11 @@ Master.create = function(classObject, data) {
     data.parent = this;
     data.core = this.core;
     obj.init(data);
+    obj.inCreation = true;
     classObject._objects[obj.id] = obj;
-    objset(this, obj, '_children', classObject.classname, data.id)
+    objset(this, obj, '_children', classObject.classname, data.id);
     obj.execAllMixins('onCreate', data);
+    obj.inCreation = false;
     return obj;
 }
 

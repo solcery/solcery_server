@@ -97,7 +97,13 @@ class VirtualCollection {
         if (config) {
             if (config.upsert) throw ('Not supported!');
         }
-        let obj = this.findOne(query);
+        let obj;
+        for (let doc of this.source) {
+            if (checkQuery(query, doc)) {
+                obj = doc;
+                break;
+            }
+        }
         if (!obj) return {
             acknowledged: true,
             matchedCount: 0,
@@ -121,18 +127,22 @@ class VirtualCollection {
             modifiedCount: 1,
         }
     }
+
     dump() {
         return this.source;
     }
+
     count() {
         return Promise.resolve(this.source.length);
     }
+
     findOne(query) {
         for (let doc of this.source) {
             if (checkQuery(query, doc)) {
-                return doc;
+                return Promise.resolve(doc);
             }
         }
+        return Promise.resolve(undefined);
     }
     find(query) {
         let res = [];
@@ -143,14 +153,7 @@ class VirtualCollection {
         }
         return new Response(res)
     }
-    
-    findOne(query) {
-        for (let doc of this.source) {
-            if (checkQuery(query, doc)) {
-                return doc;
-            }
-        }
-    }
+
 
     replaceOne(query, replacement) {
         let index = this.source.findIndex(doc => checkQuery(query, doc));

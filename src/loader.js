@@ -125,9 +125,11 @@ global.createCore = (data = {}) => {
 	const core = Object.create(Core); //Creating core
 	data.id = data.id ?? 'core';
 	data.core = core;
+	core.inCreation = true;
 	core.init(data);
 	core.loadedModules = loadedModules;
 	core.execAllMixins('onCreate', data);
+	core.inCreation = false;
 	cores.push(core);
 	return core;
 }
@@ -158,7 +160,8 @@ if (env.test) {
 	let core = createCore({
 		forge: true,
 		httpServer: true,
-		db: 'solcery',
+		loader: true,
+		solceryDb: 'solcery',
 	});
 	setInterval(() => core.tick(env.time()), 1000); // TODO: add try-catch
 }

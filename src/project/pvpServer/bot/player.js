@@ -10,7 +10,7 @@ Master.onCreate = function(data) {
 	console.log('start a bot that', data.behaviour);
 }
 
-Master.onGameAction = function(data) {
+Master.onMatchAction = function(data) {
 	let lastAction = data.actionLog.slice(-1).pop();
 	if (!lastAction.playerIndex) { return; }
 

@@ -1,3 +1,31 @@
+const db = { 
+	gameInfo: [
+		{
+			gameBuildVersion: 1,
+		}
+	],
+	gameBuilds: [
+		{
+			version: 1,
+			content: {
+				matchmaker: {
+					players: [
+						{
+							id: 1,
+						},
+						{
+							id: 2,
+						},
+					],
+					matchmaker: {
+						botFillTimeout: 40,
+					}
+				}
+			}
+		}
+	]
+}
+
 
 async function test(testEnv) {
 	const core = createCore();
@@ -9,42 +37,12 @@ async function test(testEnv) {
 
 	core.create(Project, { 
 		id: SERVER_NAME, 
-		gameId: SERVER_NAME, 
-		db: { 
-			gameInfo: [
-				{
-					matchmakerSettings: {
-						playerQuantity: 2,
-						botFillTimeout: 50,
-						tickPeriod: 10,
-					},
-				}
-			],
-			versions: [
-				{
-					version: 1,
-					content: {
-						matchmaker: {
-							players: [
-								{
-									id: 1,
-								},
-								{
-									id: 2,
-								},
-							],
-							matchmaker: {
-								botFillTimeout: 40,
-							}
-						}
-					}
-				}
-			]
-		}
+		pvpServer: true,
+		db,
 	});
 	let pvpServer = core.get(Project, SERVER_NAME);
 	assert(pvpServer);
-	await sleep(1);
+	await sleep(100);
 	let matchmaker = pvpServer.matchmaker;
 	assert(matchmaker)
 
@@ -57,18 +55,18 @@ async function test(testEnv) {
 	let player3 = pvpServer.get(Player, PUBKEY3);
 	assert(player1 && player2 && player3);
 
-	assert(pvpServer.getAll(Game).length === 0)
+	assert(pvpServer.getAll(Match).length === 0)
 
 	player1.execAllMixins('onSocketRequestJoinQueue');
 	assert(matchmaker.queue.length === 1);
 
 	player2.execAllMixins('onSocketRequestJoinQueue');
-	let game = pvpServer.getAll(Game)[0];
-	assert(game);
-	assert(game.players.length === 2 && game.players[0].id === PUBKEY1 && game.players[1].id === PUBKEY2);
-	game.delete();
+	let match = pvpServer.getAll(Match)[0];
+	assert(match);
+	assert(match.players.length === 2 && match.players[0].id === PUBKEY1 && match.players[1].id === PUBKEY2);
+	match.delete();
 
-	assert(pvpServer.getAll(Game).length === 0);
+	assert(pvpServer.getAll(Match).length === 0);
 	player3.execAllMixins('onSocketRequestJoinQueue');
 
 	env.skip(10);
@@ -81,10 +79,10 @@ async function test(testEnv) {
 	core.tick();
 
 	assert(matchmaker.queue.length === 0);
-	game = pvpServer.getAll(Game)[0];
-	assert(game);
-	assert(game.players.length === 2);
-	let botId = game.players[1].id;
+	match = pvpServer.getAll(Match)[0];
+	assert(match);
+	assert(match.players.length === 2);
+	let botId = match.players[1].id;
 	let bot = pvpServer.get(Player, botId)
 	assert(bot);
 

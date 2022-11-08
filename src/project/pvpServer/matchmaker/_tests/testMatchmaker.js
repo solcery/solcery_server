@@ -1,34 +1,37 @@
-const db = { 
-	gameInfo: [
-		{
-			gameBuildVersion: 1,
-		}
-	],
-	gameBuilds: [
-		{
-			version: 1,
-			content: {
-				matchmaker: {
-					players: [
-						{
-							id: 1,
-						},
-						{
-							id: 2,
-						},
-					],
-					matchmaker: {
-						botFillTimeout: 40,
+const virtualDb = {
+	dbs: {
+		testDb: { 
+			gameInfo: [
+				{
+					gameBuildVersion: 1,
+				}
+			],
+			gameBuilds: [
+				{
+					version: 1,
+					content: {
+						matchmaker: {
+							players: [
+								{
+									id: 1,
+								},
+								{
+									id: 2,
+								},
+							],
+							matchmaker: {
+								botFillTimeout: 40,
+							}
+						}
 					}
 				}
-			}
+			]
 		}
-	]
+	}
 }
 
-
 async function test(testEnv) {
-	const core = createCore();
+	const core = createCore({ virtualDb });
 
 	const SERVER_NAME = 'testGameSrv';
 	const PUBKEY1 = 'pubkey1';
@@ -38,11 +41,11 @@ async function test(testEnv) {
 	core.create(Project, { 
 		id: SERVER_NAME, 
 		pvpServer: true,
-		db,
+		db: 'testDb',
 	});
 	let pvpServer = core.get(Project, SERVER_NAME);
 	assert(pvpServer);
-	await sleep(100);
+	await sleep(1);
 	let matchmaker = pvpServer.matchmaker;
 	assert(matchmaker)
 
@@ -73,7 +76,6 @@ async function test(testEnv) {
 	core.tick();
 
 	assert(matchmaker.queue.length === 1);
-
 
 	env.skip(50)
 	core.tick();

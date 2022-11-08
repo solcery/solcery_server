@@ -1,79 +1,83 @@
 const { ObjectId } = require('mongodb');
-const projectDb1 = {
-	config: [
-		{
-			_id: ObjectId(),
-			fields: {
-				sync: {
-					sourceProjectId: 'project2',
-					isLocked: true,
-				}
-			}
-		}
-	],
-	objects: [
-		{
-			_id:  ObjectId(),
-			template: 'oldTemplate',
-			fields: {},
-		}
-	],
-	templates: [
-		{
-			_id: ObjectId(),
-			code: 'oldTemplate',
-		}
-	],
-};
 
-const projectDb2 = {
-	objects: [
-		{
-			_id:  ObjectId(),
-			template: 'newTemplate',
-			fields: {
-				number: 1,
-			}
-		},
-		{
-			_id:  ObjectId(),
-			template: 'newTemplate',
-			fields: {
-				number: 2,
-			}
-		}
-	],
-	templates: [
-		{
-			_id: ObjectId(),
-			code: 'newTemplate',
-			fields: [
+const virtualDb = {
+	dbs: {
+		project1db: {
+			config: [
 				{
-					code: 'number',
-					type: 'SInt'
+					_id: ObjectId(),
+					fields: {
+						sync: {
+							sourceProjectId: 'project2',
+							isLocked: true,
+						}
+					}
 				}
-			]
+			],
+			objects: [
+				{
+					_id:  ObjectId(),
+					template: 'oldTemplate',
+					fields: {},
+				}
+			],
+			templates: [
+				{
+					_id: ObjectId(),
+					code: 'oldTemplate',
+				}
+			],
+		},
+		project2db: {
+			objects: [
+				{
+					_id:  ObjectId(),
+					template: 'newTemplate',
+					fields: {
+						number: 1,
+					}
+				},
+				{
+					_id:  ObjectId(),
+					template: 'newTemplate',
+					fields: {
+						number: 2,
+					}
+				}
+			],
+			templates: [
+				{
+					_id: ObjectId(),
+					code: 'newTemplate',
+					fields: [
+						{
+							code: 'number',
+							type: 'SInt'
+						}
+					]
+				}
+			],
 		}
-	],
-};
+	}
+}
+
 
 async function test(testEnv) {
 	// Init
 	const core = createCore({ 
 		id: 'core',
 		httpServer: true,
+		virtualDb,
 	});
 	core.create(Project, { 
 		id: 'project1',
-		db: projectDb1,
-		gameId: 'project1',
 		engine: true,
+		db: 'project1db'
 	});
 	core.create(Project, { 
 		id: 'project2',
-		db: projectDb2,
-		gameId: 'project2',
 		engine: true,
+		db: 'project2db'
 	});
 
 	const api = core.get(Api, 'api');

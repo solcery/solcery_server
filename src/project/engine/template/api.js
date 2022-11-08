@@ -1,12 +1,12 @@
 const Master = { api: { engine: { template: {} } } }
 
 Master.api.engine.template.ctx = async function(params, ctx) {
-	ctx.template = await ctx.engine.content.templates.findOne({ code: params.templateCode })
+	ctx.template = await ctx.project.contentDb.templates.findOne({ code: params.templateCode });
 	assert(ctx.template, `No template with id '${params.templateCode}' found!`);
 }
 
 Master.api.engine.template.getObjects = async function(params, ctx) {
-	return await ctx.engine.content.objects.find({ template: params.templateCode }).toArray();
+	return await ctx.project.contentDb.objects.find({ template: params.templateCode }).toArray();
 }
 
 Master.api.engine.template.setSchema = async function(params, ctx) {
@@ -22,7 +22,7 @@ Master.api.engine.template.setSchema = async function(params, ctx) {
 			singleton: schema.singleton,
 		},
 	};
-	await ctx.engine.content.templates.updateOne({ code: template.code }, values);
+	await ctx.project.contentDb.templates.updateOne({ code: template.code }, values);
 }
 
 Master.api.engine.template.getSchema = async function(params, ctx) {
@@ -48,7 +48,7 @@ Master.api.engine.template.updateObjects = async function(params, ctx) {
 			}
 		})
 	}
-	await ctx.engine.content.objects.bulkWrite(bulkWrite);
+	await ctx.project.contentDb.objects.bulkWrite(bulkWrite);
 }
 
 Master.api.engine.template.createObject = async function(params, ctx) {
@@ -58,7 +58,7 @@ Master.api.engine.template.createObject = async function(params, ctx) {
 			creationTime: this.time(),
 		}
 	}
-	let res = await ctx.engine.content.objects.insertOne(newObject);
+	let res = await ctx.project.contentDb.objects.insertOne(newObject);
 	if (!res.insertedId) throw new Error(`Creating new object for template '${params.templateCode}' failed with MongoDB error`);
 	return res.insertedId;
 }

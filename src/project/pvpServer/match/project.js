@@ -21,15 +21,14 @@ Master.createMatch = function(version) {
 
 Master.onGameBuildLoaded = async function(gameBuild) {
 	let version = gameBuild.version;
-	let matches = await this.mongo.matches.find({ finished: null, version }).toArray();
+	let matches = await this.mainDb.matches.find({ finished: null, version }).toArray();
 	for (let match of matches) {
 		this.create(Match, match);
 	}
 }
 
-
 Master.getRequiredGameBuilds = async function() {
-	let matches = await this.mongo.matches.find({ finished: null }).toArray();
+	let matches = await this.mainDb.matches.find({ finished: null }).toArray();
 	let gameBuildVersions = {}
 	for (let match of matches) {
 		gameBuildVersions[match.version] = true;

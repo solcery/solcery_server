@@ -2,7 +2,7 @@ const { ObjectId } = require('mongodb');
 const Master = { api: { engine: { user: {} } } }
 
 Master.api.engine.user.ctx = async function(params, ctx) {
-	ctx.user = await ctx.engine.system.users.findOne({ pubkey: params.pubkey });
+	ctx.user = await ctx.project.systemDb.users.findOne({ pubkey: params.pubkey });
 	assert(ctx.user, `No user with id '${params.pubkey}' found!`);
 }
 
@@ -23,7 +23,7 @@ Master.api.engine.user.update = async function(params, ctx) {
 			objset(update, null, '$unset', `fields.${field}`);
 		}
 	}
-	await ctx.engine.system.users.updateOne({ pubkey: params.pubkey }, update);
+	await ctx.project.systemDb.users.updateOne({ pubkey: params.pubkey }, update);
 }
 
 module.exports = Master;

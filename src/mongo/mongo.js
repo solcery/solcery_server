@@ -1,37 +1,23 @@
-const VirtualMongoDB = require('./virtualMongo');
+const VirtualMongoClient = require('./virtualMongo');
 const { MongoClient } = require("mongodb");
 const databaseUri = process.env.ATLAS_URI;
 
 const Master = {};
 
 Master.onCreate = function(data) {
-    if (!data.db || !data.collections) return; // TODO
-    if (typeof data.db === 'object') {
-        this.db = new VirtualMongoDB(data.id, data.db);
-        for (let collection of data.collections) {
-            this[collection] = this.db.collection(collection);
+    if (data.virtual) {
+        let src = {}
+        if (typeof data.virtual === 'object') {
+            src = data.virtual;
         }
-        this.parent.execAllMixins('onMongoReady', this)
+        this.client = new VirtualMongoClient(src)
         return;
     }
-
-    const client = new MongoClient(databaseUri, {
+    assert(!env.test, 'Attempt to use real mongo connection in test environment!');
+    this.client = new MongoClient(databaseUri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     });
-    client.connect((err, connection) => {
-        if (!connection) reject(); // TODO?
-        this.db = client.db(data.db);
-        resolve(db);
-        this.parent.execAllMixins('onMongoReady', this)
-        for (let collection of data.collections) {
-            this[collection] = this.db.collection(collection);
-        }
-    });
-}
-
-Master.request = function(collection, query) {
-
 }
 
 module.exports = Master

@@ -28,34 +28,60 @@ const checkQuery = (query, doc) => {
     return true;
 }
 
-class VirtualMongoDB {
-    constructor (name, source) {
-        if (typeof source !== 'object') {
-            source = {};
+class VirtualMongoClient {
+    ping = undefined; // TODO: Ping
+    dbs = {};
+
+    constructor (source = {}) {
+        this.source = source;
+        if (source.dbs) {
+            for (let [dbName, dbSource ] of Object.entries(source.dbs)) {
+                this.dbs[dbName] = new VirtualMongoDB(dbName, dbSource);
+            }
         }
+    }
+
+    db(dbName) {
+        if (!this.dbs[dbName]) {
+            this.source.dbs[dbName] = {};
+            this.dbs[dbName] = new VirtualMongoDB(dbName, this.source.dbs[dbName])
+        }
+        return this.dbs[dbName];
+    }
+}
+
+class VirtualMongoDB {
+    collections = {};
+
+    constructor (name, source) {
+        assert(source)
         this.name = name;
         this.source = source;
+        for (let [ collectionName, collection] of Object.entries(source)) {
+            this.collections[collectionName] = new VirtualCollection(collectionName, collection);
+        }
     }
     collection (name) {
-        if (!this.source[name]) {
-            this.source[name] = [];
+        if (!this.collections[name]) {
+            this.source[name] = []
+            this.collections[name] = new VirtualCollection(name, this.source[name]);
         }
-        return new VirtualCollection(name, this);
+        return this.collections[name]
     }
 }
 
 
 class VirtualCollection {
-    constructor (name, db) {
+    constructor (name, source) {
+        assert(source)
         this.name = name;
-        this.db = db;
-        this.source = this.db.source[this.name];
+        this.source = source;
     }
     insertOne(obj) {
         if (!obj._id) {
             obj._id = new ObjectId();
         }
-        objinsert(this.db.source, obj, this.name);
+        this.source.push(obj);
         return {
             acknowledged: true,
             insertedId: obj._id.toString(),
@@ -154,7 +180,6 @@ class VirtualCollection {
         return new Response(res)
     }
 
-
     replaceOne(query, replacement) {
         let index = this.source.findIndex(doc => checkQuery(query, doc));
         if (index > -1) {
@@ -209,4 +234,4 @@ class Response {
 
 }
 
-module.exports = VirtualMongoDB;
+module.exports = VirtualMongoClient;

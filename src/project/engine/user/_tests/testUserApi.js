@@ -1,25 +1,31 @@
 const { ObjectId } = require('mongodb');
 
-const db = {
-	users: [
-		{
-			id: ObjectId(),
-			pubkey: 'some_pubkey',
-			fields: {
-				name: 'User1',
-			}
+const virtualDb = {
+	dbs: {
+		testDb: {
+			users: [
+				{
+					id: ObjectId(),
+					pubkey: 'some_pubkey',
+					fields: {
+						name: 'User1',
+					}
+				}
+			]
 		}
-	]
-};
+	}
+}
+
 
 async function test(testEnv) {
 	const core = createCore({ 
 		id: 'core', 
 		httpServer: true,
+		virtualDb,
 	});
 	core.create(Project, { 
 		id: 'test',
-		db,
+		db: 'testDb',
 		engine: true
 	});
 

@@ -2,37 +2,37 @@ const { ObjectId } = require("mongodb");
 const Master = { api: { engine: {} } };
 
 Master.api.engine.ctx = function(params, ctx) {
-      ctx.engine = this.core.get(Project, params.projectId);
-      // console.log('ctx engine', ctx.engine)
-      assert(ctx.engine, `API Error: No project with projectId id '${params.projectId}'`);
+      ctx.project = this.core.get(Project, params.projectId);
+      // console.log('ctx engine', ctx.project)
+      assert(ctx.project, `API Error: No project with projectId id '${params.projectId}'`);
 }
 
 Master.api.engine.getContent = async function(params, ctx) {
-      return await ctx.engine.exportContent(params);
+      return await ctx.project.exportContent(params);
 }
 
 Master.api.engine.restore = async function(params, ctx) {
-      await ctx.engine.importContent(params.src);
+      await ctx.project.importContent(params.src);
 }
 
 Master.api.engine.getConfig = async function(params, ctx) {
-      return await ctx.engine.getConfig();
+      return await ctx.project.getConfig();
 }
 
 Master.api.engine.setConfig = async function(params, ctx) {
-      await ctx.engine.updateConfig(params.fields);
+      await ctx.project.updateConfig(params.fields);
 }
 
 Master.api.engine.sync = async function(params, ctx) {
-      let config = await ctx.engine.getConfig();
+      let config = await ctx.project.getConfig();
       let sync = config.sync;
       assert(sync, 'Sync API error: Project cannot be synced, see project config!');
       assert(sync.sourceProjectId, 'Sync API error: No sourceProjectId in sync config!');
       assert(!sync.isLocked, 'Sync API error: Synchronization is locked!');
-      let sourceProject = ctx.engine.core.get(Project, sync.sourceProjectId);
+      let sourceProject = ctx.project.core.get(Project, sync.sourceProjectId);
       assert(sourceProject, `Sync API error: No source project with id ${sync.sourceProjectId} found!`);
       let content = await sourceProject.exportContent({ templates: true, objects: true });
-      await ctx.engine.importContent(content);
+      await ctx.project.importContent(content);
 }
 
 Master.api.engine.migrate = async function(params, ctx) {
@@ -83,18 +83,18 @@ Master.api.engine.migrate = async function(params, ctx) {
             }
       }
       if (objectsQuery.length > 0) {
-            await ctx.engine.content.objects.bulkWrite(objectsQuery)
+            await ctx.project.contentDb.objects.bulkWrite(objectsQuery)
       }
       if (templatesQuery.length > 0) {
-            await ctx.engine.content.templates.bulkWrite(templatesQuery)
+            await ctx.project.contentDb.templates.bulkWrite(templatesQuery)
       }
 }
 
 Master.api.engine.release = async function(params, ctx) {
-      let config = await ctx.engine.getConfig();
+      let config = await ctx.project.getConfig();
       let gameId = config.releaseProjectId;
       assert(gameId, 'Release API error: This project is not connected to game server. Check confiig')
-      let pvpServer = ctx.engine.core.get(Project, gameId);
+      let pvpServer = ctx.project.core.get(Project, gameId);
       assert(pvpServer, `Release API error: No game server with for game '${gameId}'`);
       let gameMongo = pvpServer.get(Mongo, 'main');
       assert(gameMongo, 'No mongo connection!'); // TODO
@@ -107,11 +107,11 @@ Master.api.engine.release = async function(params, ctx) {
       assert(gameSettings, 'Release API error: No game settings provided in content/meta param!')
       var update = { $set: gameSettings };
 
-      let forgeMongo = ctx.engine.core.get(Mongo, 'nfts');
+      let forgeMongo = ctx.project.core.get(Mongo, 'nfts');
       let supportedCollections = objget(params, 'content', 'meta', 'collections');
       if (forgeMongo && supportedCollections) {
             supportedCollections = Object.values(supportedCollections).map(col => ObjectId(col.collection));
-            supportedCollections = await ctx.engine.forgeMongo.objects
+            supportedCollections = await ctx.project.forgeMongo.objects
                   .find({ 
                         _id: { $in: supportedCollections },
                         template: 'collections',
@@ -126,7 +126,7 @@ Master.api.engine.release = async function(params, ctx) {
       }
 
       let unityBuildId = objget(params, 'content', 'meta', 'gameSettings', 'build');
-      let solceryMongo = ctx.engine.core.get(Mongo, 'solcery');
+      let solceryMongo = ctx.project.core.get(Mongo, 'solcery');
       assert(solceryMongo, 'Release API error: No system mongo!');
       let unityBuild = await solceryMongo.objects.findOne({ _id: ObjectId(unityBuildId) });
       dist.unityBuild = unityBuild.fields;
@@ -137,8 +137,8 @@ Master.api.engine.release = async function(params, ctx) {
 }
 
 // Master.api['core.reloadEngines'] = async function(params) {
-//       await ctx.engine.core.loadEngines();
-//       return 'Engines reloaded, current number of engines: ' + ctx.engine.core.getAll(Engine).length;
+//       await ctx.project.core.loadEngines();
+//       return 'Engines reloaded, current number of engines: ' + ctx.project.core.getAll(Engine).length;
 // }
 
 module.exports = Master;

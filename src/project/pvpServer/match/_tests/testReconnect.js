@@ -1,19 +1,23 @@
 const { ObjectId } = require('mongodb');
 
-const db = {
-	gameBuilds: [
-		{
-			_id: ObjectId(),
-			version: 1,
-			content: {}
+const virtualDb = {
+	dbs: {
+		testDb: {
+			gameBuilds: [
+				{
+					_id: ObjectId(),
+					version: 1,
+					content: {}
+				}
+			],
+			gameInfo: [
+				{
+					_id: ObjectId(),
+					gameBuildVersion: 1
+				}
+			]
 		}
-	],
-	gameInfo: [
-		{
-			_id: ObjectId(),
-			gameBuildVersion: 1
-		}
-	]
+	}
 }
 
 const clientPlayer = {
@@ -44,16 +48,15 @@ const mixins = [
 ]
 
 async function test(testEnv) {
-	let core = createCore();
+	let core = createCore({ virtualDb });
 
 	const SERVER_NAME = 'testmatchSrv';
 	const PUBKEY = 'pubkey';
 
 	await core.create(Project, { 
 		id: SERVER_NAME, 
-		matchId: SERVER_NAME, 
 		pvpServer: true,
-		db, 
+		db: 'testDb', 
 	});
 	await sleep(1)
 	let pvpServer = core.get(Project, SERVER_NAME);

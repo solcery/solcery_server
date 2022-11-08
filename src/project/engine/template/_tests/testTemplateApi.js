@@ -1,44 +1,48 @@
 const { ObjectId } = require('mongodb');
 
-const db = {
-	objects: [
-		{
-			_id: ObjectId(),
-			template: 'testTemplate',
-			fields: {
-				name: 'Object 1',
-				number: 1,
-			}
-		},
-		{
-			_id: ObjectId(),
-			template: 'testTemplate',
-			fields: {
-				name: 'Object 2',
-				number: 2,
-			}
-		}
-	],
-	templates: [
-		{
-			_id: ObjectId(),
-			code: 'testTemplate',
-			name: 'Test template',
-			revision: 17,
-			fields: [
+const virtualDb = {
+	dbs: {
+		testDb: {
+			objects: [
 				{
-					code: 'name',
-					name: 'Name',
-					type: 'SString'
+					_id: ObjectId(),
+					template: 'testTemplate',
+					fields: {
+						name: 'Object 1',
+						number: 1,
+					}
 				},
 				{
-					code: 'number',
-					name: 'Number',
-					type: 'SInt'
-				},
+					_id: ObjectId(),
+					template: 'testTemplate',
+					fields: {
+						name: 'Object 2',
+						number: 2,
+					}
+				}
+			],
+			templates: [
+				{
+					_id: ObjectId(),
+					code: 'testTemplate',
+					name: 'Test template',
+					revision: 17,
+					fields: [
+						{
+							code: 'name',
+							name: 'Name',
+							type: 'SString'
+						},
+						{
+							code: 'number',
+							name: 'Number',
+							type: 'SInt'
+						},
+					]
+				}
 			]
 		}
-	]
+	}
 };
 
 async function test(testEnv) {
@@ -49,11 +53,12 @@ async function test(testEnv) {
 	const core = createCore({
 		id: 'core',
 		httpServer: true,
+		virtualDb,
 	});
 	core.create(Project, { 
 		id: 'test',
-		db,
-		engine: true,
+		db: 'testDb',
+		engine: true
 	});
 	const api = core.get(Api, 'api');
 	api.listCommands({ public: true });

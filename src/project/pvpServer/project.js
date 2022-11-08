@@ -6,18 +6,10 @@ Master.onCreate = function(data) {
         this.disableMixinCallbacks(Master);
         return;
     }
-    this.pvpServer = data.pvpServer;
-    this.mongo = this.create(Mongo, {
-        id: 'main',
-        db: data.db,
-        collections: [
-            'matches',
-            'gameBuilds',
-            'gameInfo'
-        ]
-    });
     this.gameBuilds = {};
-    this.mongo.gameInfo.findOne({}).then(gameInfo => this.execAllMixins('onGameInfoLoaded', gameInfo));
+    this.pvpServer = data.pvpServer;
+    this.mainDb = this.core.createMongo(data.db, [ 'gameInfo', 'matches', 'gameBuilds' ]);
+    this.mainDb.gameInfo.findOne({}).then(gameInfo => this.execAllMixins('onGameInfoLoaded', gameInfo));
 }
 
 Master.onGameInfoLoaded = function(gameInfo) {
@@ -35,7 +27,7 @@ Master.getGameBuild = function(version) {
 Master.loadGameBuild = async function(version) {
     assert(version)
     if (this.gameBuilds[version]) return;
-    let build = await this.mongo.gameBuilds.findOne({ version });
+    let build = await this.mainDb.gameBuilds.findOne({ version });
     assert(build, `No game build with version ${version} found`);
     this.gameBuilds[version] = build;
     this.execAllMixins('onGameBuildLoaded', build);

@@ -1,23 +1,29 @@
 const { ObjectId } = require('mongodb');
 
-const db = {
-	gameBuilds: [
-		{
-			_id: ObjectId(),
-			version: 1,
-			content: {}
+const virtualDb = {
+	dbs: {
+		testDb: {
+			gameBuilds: [
+				{
+					_id: ObjectId(),
+					version: 1,
+					content: {}
+				}
+			],
+			gameInfo: [
+				{
+					_id: ObjectId(),
+					gameBuildVersion: 1
+				}
+			]
 		}
-	],
-	gameInfo: [
-		{
-			_id: ObjectId(),
-			gameBuildVersion: 1
-		}
-	]
+	}
 }
 
+
 async function test(testEnv) {
-	let core = createCore();
+	const db = virtualDb.dbs.testDb;
+	let core = createCore({ virtualDb });
 
 	const SERVER_NAME = 'testGameSrv';
 	const PUBKEY = 'pubkey';
@@ -25,7 +31,7 @@ async function test(testEnv) {
 	let pvpServer = core.create(Project, { 
 		id: SERVER_NAME, 
 		pvpServer: true,
-		db, 
+		db: 'testDb', 
 	});
 	await sleep(1);
 
@@ -40,20 +46,23 @@ async function test(testEnv) {
 	pvpServer.delete();
 
 	core.delete();
+	
 
-	core = createCore();
+	// Reload
+	core = createCore({ virtualDb });
 	pvpServer = core.create(Project, { 
 		id: SERVER_NAME,
 		pvpServer: true,
-		db, 
+		db: 'testDb', 
 	});
 	await sleep(1)
 
  	pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
 	player1 = pvpServer.get(Player, PUBKEY);
 	player1.execAllMixins('onSocketRequestAction', { type: 'leftClick' });
-	match = pvpServer.get(Match, matchId)
 	assert(player1);
+
+	match = pvpServer.get(Match, matchId)
 	assert(match);
 	assert(match.actionLog.length = 2);
 	assert(match.actionLog[1].ctx.player_index === 1);

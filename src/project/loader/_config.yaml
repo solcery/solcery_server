@@ -1,4 +1,6 @@
 moduleName: 'project/loader'
+requiredModules:
+  mongo: true
 
 dwellers:
   Core: 

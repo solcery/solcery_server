@@ -1,20 +1,24 @@
 const playerMessages = {}
 const { ObjectId } = require('mongodb');
 
-const db = {
-	gameBuilds: [
-		{
-			_id: ObjectId(),
-			version: 1,
-			content: {}
+const virtualDb = {
+	dbs: {
+		testDb: {
+			gameBuilds: [
+				{
+					_id: ObjectId(),
+					version: 1,
+					content: {}
+				}
+			],
+			gameInfo: [
+				{
+					_id: ObjectId(),
+					gameBuildVersion: 1
+				}
+			]
 		}
-	],
-	gameInfo: [
-		{
-			_id: ObjectId(),
-			gameBuildVersion: 1
-		}
-	]
+	}
 }
 
 const mixins = [
@@ -35,7 +39,7 @@ const mixins = [
 ]
 
 async function test(testEnv) {
-	const core = await createCore();
+	const core = createCore({ virtualDb });
 
 	const SERVER_NAME = 'testGameSrv';
 	const PUBKEY1 = 'pubkey1';
@@ -44,7 +48,7 @@ async function test(testEnv) {
 	let pvpServer = core.create(Project, { 
 		id: SERVER_NAME,
 		pvpServer: true,
-		db, 
+		db: 'testDb', 
 	});
 	await sleep(1) // Dirty hack, allowing server to load everything
 	let player1 = pvpServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });

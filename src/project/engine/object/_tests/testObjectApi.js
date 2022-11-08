@@ -1,35 +1,42 @@
 const { ObjectId } = require('mongodb');
 
-const db = {
-	objects: [
-		{
-			_id: ObjectId(),
-			template: 'testTemplate',
-			fields: {
-				name: 'testObject',
-				number: 16,
-			}
+
+const virtualDb = {
+	dbs: {
+		testDb: {
+			objects: [
+				{
+					_id: ObjectId(),
+					template: 'testTemplate',
+					fields: {
+						name: 'testObject',
+						number: 16,
+					}
+				}
+			],
+			templates: [
+				{
+					_id: ObjectId(),
+					code: 'testTemplate'
+				}
+			]
 		}
-	],
-	templates: [
-		{
-			_id: ObjectId(),
-			code: 'testTemplate'
-		}
-	]
-};
+	}
+}
 
 async function test(testEnv) {
 
+	const projectDb = virtualDb.dbs.testDb;
 	const pubkey = 'some_pubkey'
 
 	const core = createCore({ 
 		id: 'core',
 		httpServer: true,
+		virtualDb,
 	});
 	core.create(Project, { 
 		id: 'test',
-		db,
+		db: 'testDb',
 		engine: true,
 	});
 
@@ -41,7 +48,7 @@ async function test(testEnv) {
 	assert(api);
 	const apiCall = testEnv.createClientApi(api);
 
-	let objectId = db.objects[0]._id.toString();
+	let objectId = projectDb.objects[0]._id.toString();
 
 	// cloning object
 	let newObjId = await apiCall({
@@ -74,8 +81,8 @@ async function test(testEnv) {
 		pubkey,
 	})
 	
-	assert(db.objects.length === 1);
-	let newObj = db.objects[0];
+	assert(projectDb.objects.length === 1);
+	let newObj = projectDb.objects[0];
 	assert(newObj._id.toString() === newObjId);
 	assert(!newObj.fields.number);
 	assert(newObj.fields.name === 'new Object');
@@ -87,8 +94,8 @@ async function test(testEnv) {
 		pubkey,
 	})
 
-	assert(db.objects.length === 2);
-	newObj = db.objects[1];
+	assert(projectDb.objects.length === 2);
+	newObj = projectDb.objects[1];
 	assert(newObj._id.toString() === newObjId);
 	assert(!newObj.fields.number);
 	assert(!newObj.fields.name);

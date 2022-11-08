@@ -5,4 +5,9 @@ dwellers:
     id: 'string'
     mixins:
       mongo/mongo: true
+  Core:
+    mixins:
+      mongo/core: true
 
+tests:
+  testMongo: true

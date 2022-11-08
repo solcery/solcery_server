@@ -1,6 +1,7 @@
 moduleName: 'project/engine'
 requiredModules: 
   api: true
+  mongo: true
   project/engine/object: true
   project/engine/template: true
   project/engine/user: true

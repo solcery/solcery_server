@@ -42,12 +42,10 @@ Master.getSaveData = function(fields) {
 	return res;
 }
 
-Master.save = function() { // TODO: ??
-	let mongo = this.parent.get(Mongo, 'main');
-	if (!mongo) return;
+Master.save = function() {
 	let filter = { id: this.id };
 	let saveData = this.getSaveData();
-	mongo.matches.replaceOne(filter, saveData);
+	this.parent.mainDb.matches.replaceOne(filter, saveData);
 }
 
 Master.addPlayer = function(player, data = {}) {

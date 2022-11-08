@@ -1,6 +1,7 @@
 moduleName: 'project/engine/template'
 requiredModules:
   api: true
+  mongo: true
 dwellers:
   Api:
     mixins:

@@ -8,10 +8,9 @@ dwellers:
       unityBuilds/api: true
       
 api:
-  system:
-    .commands:
-      getUnityBuild:
-        params: 
-          buildId:
-            type: 'string'
-            required: true
+  .commands:
+    getUnityBuild:
+      params: 
+        buildId:
+          type: 'string'
+          required: true

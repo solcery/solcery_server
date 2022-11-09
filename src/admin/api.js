@@ -1,17 +1,28 @@
-const Master = { api: {} }
+const Master = { api: { admin: {} } }
 
-Master.api['core.reloadServers'] = async function(params) {
+Master.api.admin.ctx = function(params, ctx) {
     assert(params.userId === 'TEUZkqw3bGDn4To6C7KNcckgoLiSLSZWaGJSWx8beFz');
-    let core = this.core;
-    for (engine of core.getAll(Engine)) {
-        engine.delete();
-    }
-    for (pvpServer of core.getAll(Project)) {
-        pvpServer.delete();
-    }
 }
 
-Master.api['core.eval'] = async function(params) {
+Master.api.admin.reloadProjects = async function(params, ctx) {
+    for (let project of this.core.getAll(Project)) {
+        project.delete();
+    }
+    core.createProjects();
+}
+
+Master.api.admin.reloadProject = async function(params, ctx) {
+    let project = this.core.get(Project, params.projectId);
+    assert(project, 'No project');
+    project.delete();
+    let projectConfig = await this.core.solceryDb.objects.findOne({ template: 'projects', 'fields.name': params.projectId });
+    this.core.create(Project, { 
+        id: projectConfig.fields.name,
+        ...projectConfig.fields,
+    })
+}
+
+Master.api.admin.eval = async function(params, ctx) {
     assert(params.userId === 'TEUZkqw3bGDn4To6C7KNcckgoLiSLSZWaGJSWx8beFz');
     let code = params.code;
     try {

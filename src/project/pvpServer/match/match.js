@@ -13,9 +13,6 @@ Master.onCreate = function(data) {
 
 Master.start = function(data) {
 	this.started = this.time();
-	this.actionLog.push({ 
-		type: 'init',
-	});
 	if (this.botActivationCommandId) {
 		for (let player of this.players) {
 			if (player.bot) {
@@ -29,6 +26,9 @@ Master.start = function(data) {
 			}
 		}
 	}
+	this.actionLog.push({ 
+		type: 'init',
+	});
 	this.execAllPlayers('onMatchStart', this.getSaveData());
 	this.save();
 }
@@ -63,6 +63,7 @@ Master.save = function() {
 }
 
 Master.addPlayer = function(player, data = {}) {
+	assert(!this.started);
 	this.players.push({
 		index: this.players.length + 1,
 		id: player.id,

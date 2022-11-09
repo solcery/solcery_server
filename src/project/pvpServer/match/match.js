@@ -45,7 +45,7 @@ Master.getSaveData = function(fields) {
 Master.save = function() {
 	let filter = { id: this.id };
 	let saveData = this.getSaveData();
-	this.parent.mainDb.matches.replaceOne(filter, saveData);
+	this.parent.gameDb.matches.replaceOne(filter, saveData);
 }
 
 Master.addPlayer = function(player, data = {}) {

@@ -91,53 +91,43 @@ Master.api.engine.migrate = async function(params, ctx) {
 
 Master.api.engine.release = async function(params, ctx) {
       let config = await ctx.project.getConfig();
-      let gameId = config.releaseProjectId;
-      assert(gameId, 'Release API error: This project is not connected to game server. Check confiig')
-      let pvpServer = ctx.project.core.get(Project, gameId);
-      assert(pvpServer, `Release API error: No game server with for game '${gameId}'`);
-      let gameMongo = pvpServer.get(Mongo, 'main');
-      assert(gameMongo, 'No mongo connection!'); // TODO
-      let currentLatest = await gameMongo.versions.count();
+      assert(ctx.project.pvpServer, `Release API error: Project ${ctx.project.id} has no pvp server`);
+      let currentLatestVersion = await ctx.project.gameDb.gameBuilds.count();
+      let gameBuildVersion = currentLatestVersion + 1
       let dist = {
-            version: currentLatest + 1,
+            version: gameBuildVersion,
             content: params.content
       }
       let gameSettings = objget(params, 'content', 'meta', 'gameSettings');
       assert(gameSettings, 'Release API error: No game settings provided in content/meta param!')
-      var update = { $set: gameSettings };
+      var update = { $set: { ...gameSettings, gameBuildVersion } };
 
-      let forgeMongo = ctx.project.core.get(Mongo, 'nfts');
-      let supportedCollections = objget(params, 'content', 'meta', 'collections');
-      if (forgeMongo && supportedCollections) {
-            supportedCollections = Object.values(supportedCollections).map(col => ObjectId(col.collection));
-            supportedCollections = await ctx.project.forgeMongo.objects
-                  .find({ 
-                        _id: { $in: supportedCollections },
-                        template: 'collections',
-                  })
-                  .toArray();
-            supportedCollections = supportedCollections.map(collection => ({
-                  name: collection.fields.name,
-                  image: collection.fields.logo,
-                  magicEdenUrl: collection.fields.magicEdenUrl,
-            }))
-            update['$set'].supportedCollections = supportedCollections;
-      }
+      // let forgeMongo = ctx.project.core.get(Mongo, 'nfts');
+      // let supportedCollections = objget(params, 'content', 'meta', 'collections');
+      // if (forgeMongo && supportedCollections) {
+      //       supportedCollections = Object.values(supportedCollections).map(col => ObjectId(col.collection));
+      //       supportedCollections = await ctx.project.forgeMongo.objects
+      //             .find({ 
+      //                   _id: { $in: supportedCollections },
+      //                   template: 'collections',
+      //             })
+      //             .toArray();
+      //       supportedCollections = supportedCollections.map(collection => ({
+      //             name: collection.fields.name,
+      //             image: collection.fields.logo,
+      //             magicEdenUrl: collection.fields.magicEdenUrl,
+      //       }))
+      //       update['$set'].supportedCollections = supportedCollections;
+      // }
 
       let unityBuildId = objget(params, 'content', 'meta', 'gameSettings', 'build');
-      let solceryMongo = ctx.project.core.get(Mongo, 'solcery');
-      assert(solceryMongo, 'Release API error: No system mongo!');
-      let unityBuild = await solceryMongo.objects.findOne({ _id: ObjectId(unityBuildId) });
+      let unityBuild = await this.core.solceryDb.objects.findOne({ _id: ObjectId(unityBuildId) });
       dist.unityBuild = unityBuild.fields;
 
-      await gameMongo.gameInfo.updateOne({}, update);
-      await gameMongo.versions.insertOne(dist);
-      return currentLatest + 1;
+      await ctx.project.gameDb.gameInfo.updateOne({}, update);
+      await ctx.project.gameDb.gameBuilds.insertOne(dist);
+      return gameBuildVersion;
 }
 
-// Master.api['core.reloadEngines'] = async function(params) {
-//       await ctx.project.core.loadEngines();
-//       return 'Engines reloaded, current number of engines: ' + ctx.project.core.getAll(Engine).length;
-// }
 
 module.exports = Master;

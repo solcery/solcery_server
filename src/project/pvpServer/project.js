@@ -8,8 +8,8 @@ Master.onCreate = function(data) {
     }
     this.gameBuilds = {};
     this.pvpServer = data.pvpServer;
-    this.mainDb = this.core.createMongo(data.db, [ 'gameInfo', 'matches', 'gameBuilds' ]);
-    this.mainDb.gameInfo.findOne({}).then(gameInfo => this.execAllMixins('onGameInfoLoaded', gameInfo));
+    this.gameDb = this.core.createMongo(data.db, [ 'gameInfo', 'matches', 'gameBuilds' ]);
+    this.gameDb.gameInfo.findOne({}).then(gameInfo => this.execAllMixins('onGameInfoLoaded', gameInfo));
 }
 
 Master.onGameInfoLoaded = function(gameInfo) {
@@ -31,7 +31,7 @@ Master.getGameBuild = function(version) {
 Master.loadGameBuild = async function(version) {
     assert(version)
     if (this.gameBuilds[version]) return;
-    let build = await this.mainDb.gameBuilds.findOne({ version });
+    let build = await this.gameDb.gameBuilds.findOne({ version });
     assert(build, `No game build with version ${version} found`);
     this.gameBuilds[version] = build;
     this.execAllMixins('onGameBuildLoaded', build);

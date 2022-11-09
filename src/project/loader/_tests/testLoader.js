@@ -54,8 +54,8 @@ async function test(testEnv) {
 	});
 	await sleep(1)
 	let projects = core.getAll(Project)
-	let pvpProject = core.get(Project, `project.prj1`);
-	let engineProject = core.get(Project, `project.prj2`);
+	let pvpProject = core.get(Project, `prj1`);
+	let engineProject = core.get(Project, `prj2`);
 	assert(pvpProject.pvpServer)
 	assert(engineProject.engine)
 	

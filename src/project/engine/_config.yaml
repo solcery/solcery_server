@@ -5,6 +5,7 @@ requiredModules:
   project/engine/object: true
   project/engine/template: true
   project/engine/user: true
+  project/pvpServer: true
   
 dwellers:
   Api:

@@ -1,9 +1,8 @@
 const { ObjectId } = require('mongodb');
-const Master = { api: { system: {} } }
+const Master = { api: }
 
-// API
-Master.api.system.getUnityBuild = async function(params) {
-      let res = await this.core.get(Mongo, 'solcery').objects.findOne({ _id: ObjectId(params.buildId) });
+Master.api.getUnityBuild = async function(params) {
+      let res = await this.core.solceryDb.objects.findOne({ _id: ObjectId(params.buildId) });
       return res.fields;
 }
 

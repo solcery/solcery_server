@@ -8,6 +8,7 @@ Master.onCreate = function(data) {
 	this.version = data.version;
 	this.gameBuild = data.gameBuild;
 	this.seed = data.seed ?? Math.floor(Math.random() * 256);
+	this.botActivationCommandId = objget(this.gameBuild, 'content', 'web', 'gameSettings', 'botActivationCommandId');
 }
 
 Master.start = function(data) {
@@ -15,6 +16,19 @@ Master.start = function(data) {
 	this.actionLog.push({ 
 		type: 'init',
 	});
+	if (this.botActivationCommandId) {
+		for (let player of this.players) {
+			if (player.bot) {
+				this.actionLog.push({
+					type: 'gameCommand',
+					commandId: this.botActivationCommandId,
+					ctx: {
+						player_index: player.index
+					}
+				})
+			}
+		}
+	}
 	this.execAllPlayers('onMatchStart', this.getSaveData());
 	this.save();
 }
@@ -53,6 +67,7 @@ Master.addPlayer = function(player, data = {}) {
 		index: this.players.length + 1,
 		id: player.id,
 		nfts: data.nfts,
+		bot: player.bot,
 	})
 	this.save();
 	player.execAllMixins('onJoinMatch', this);

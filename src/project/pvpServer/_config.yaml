@@ -1,0 +1,34 @@
+moduleName: 'project/pvpServer'
+requiredModules:
+  api: true
+  mongo: true
+  project/pvpServer/player: true
+  project/pvpServer/match: true
+  project/pvpServer/matchmaker: true
+
+dwellers:
+  Project:
+    mixins:
+      project/pvpServer/project: true
+  Core:
+    mixins:
+      project/pvpServer/core: true
+  Api:
+    mixins:
+      project/pvpServer/api: true
+api:
+  game: 
+    .params:
+      gameId:
+        type: 'string'
+        required: true
+    .commands:
+      getGameInfo:
+        description: 'Returns game info'
+      getGameBuild:
+        description: 'Return content version'
+        params: 
+          version:
+            type: 'string'
+            description: 'Version number. Latest if not specified'
+                    

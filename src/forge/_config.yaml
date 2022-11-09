@@ -1,0 +1,35 @@
+moduleName: 'forge'
+requiredModules:
+  api: true
+  project/pvpServer/player: true
+  
+dwellers: 
+  Forge: 
+    mixins:
+      forge/forge: true
+  Core:
+    mixins:
+      forge/core: true
+  Api:
+    mixins:
+      forge/api: true
+  Player:
+    mixins:
+      forge/player: true
+
+api:
+  forge:
+    .commands:
+      getPlayerNfts:
+        params: 
+          pubkey:
+            type: 'pubkey'
+            required: true
+      getNfts:
+        params:
+          mintPubkeys:
+            type: 'array(pubkey)'
+            required: true
+tests:
+  testForge: true
+              

@@ -1,0 +1,15 @@
+moduleName: 'web/socket'
+requiredModules:
+  web/http: true
+
+dwellers:
+  Socket: 
+    id: 'string'
+    mixins:
+      web/socket/socket: true
+  Core:
+    mixins:
+      web/socket/core: true
+
+tests:
+  testWebSocket: true

@@ -1,0 +1,13 @@
+moduleName: 'project/loader'
+requiredModules:
+  mongo: true
+
+dwellers:
+  Core: 
+    mixins:
+      project/loader/core:
+        requiredMixins:
+          mongo/core: true
+
+tests:
+  testLoader: true

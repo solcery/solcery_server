@@ -1,0 +1,29 @@
+moduleName: 'admin'
+requiredModules:
+  api: true
+  mongo: true
+
+dwellers:
+  Api:
+    mixins:
+      admin/api: true
+
+api:
+  admin:
+    .params:
+      userId:
+        type: 'pubkey'
+        required: true
+    .commands:
+      eval:
+        params:
+          code:
+            type: 'javascript'
+            required: true
+      reloadProject: 
+        params:
+          projectId:
+            type: 'string'
+            required: true
+      reloadProjects: 
+        description: 'Reloads all projects'

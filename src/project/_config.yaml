@@ -1,0 +1,10 @@
+moduleName: 'project'
+requiredModules:
+  project/engine: true
+  project/pvpServer: true
+  project/loader: true
+    
+dwellers:
+  Project: 
+    mixins:
+      project/project: true

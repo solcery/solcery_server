@@ -1,7 +1,0 @@
-moduleName: 'user'
-dwellers: 
-  User: 
-    id: 'string'
-mixins: 
-  User:
-    user: true

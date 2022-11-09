@@ -6,18 +6,25 @@
     "node": "16.x"
   },
   "scripts": {
-    "start": "node loader.js",
-    "test": "node loader.js --test"
+    "start": "node src/loader.js",
+    "test": "node src/loader.js --test"
   },
   "main": "loader.js",
   "repository": "git@github.com:solcery/solcery_server.git",
   "author": "teuzet <teuzet@solcery.xyz>",
   "license": "MIT",
   "dependencies": {
+    "@metaplex-foundation/js": "^0.17.4",
+    "@solana/spl-token": "^0.3.6",
+    "@solana/web3.js": "^1.66.2",
+    "aws-sdk": "^2.1243.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "imagemagick": "^0.1.3",
     "mongodb": "^4.10.0",
+    "request": "^2.88.2",
     "socket.io": "^4.5.3",
     "socket.io-client": "^4.5.3",
     "uuid": "^9.0.0",

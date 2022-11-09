@@ -1,0 +1,12 @@
+moduleName: 'main'
+requiredModules:
+  dweller: true
+  admin: true
+  api: true
+  project: true
+  unityBuilds: true
+  forge: true
+
+dwellers:
+  Core:
+    id: 'string'

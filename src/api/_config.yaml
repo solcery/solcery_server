@@ -1,0 +1,24 @@
+moduleName: 'api'
+requiredModules:
+  web/http: true
+  
+dwellers:
+  Core:
+    mixins:
+      api/core: true
+  Api:
+    id: 'string'
+    mixins:
+      api/api: true
+api:
+  .commands:
+    help:
+      description: 'Shows Help'
+      params: 
+        paths:
+          description: 'Shows API paths'
+          type: 'boolean'
+
+tests:
+  testHelp: true
+  # testNestedCommand: true

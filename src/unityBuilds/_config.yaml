@@ -1,0 +1,17 @@
+moduleName: 'unityBuilds'
+requiredModules:
+  api: true
+
+dwellers:
+  Api:
+    mixins:
+      unityBuilds/api: true
+      
+api:
+  system:
+    .commands:
+      getUnityBuild:
+        params: 
+          buildId:
+            type: 'string'
+            required: true

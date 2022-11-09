@@ -1,4 +1,0 @@
-moduleName: 'http'
-mixins: 
-  Core:
-    core: true

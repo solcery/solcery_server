@@ -7,8 +7,8 @@ Master.onCreate = function(data) {
 	this.finished = data.finished;
 	this.version = data.version;
 	this.gameBuild = data.gameBuild;
-	this.seed = data.seed ?? Math.floor(Math.random() * 256);
-	this.botActivationCommandId = objget(this.gameBuild, 'content', 'web', 'gameSettings', 'botActivationCommandId');
+	this.seed = data.seed ?? Math.floor(Math.random() * 256);	
+	this.botActivationCommandId = objget(this.gameBuild, 'content', 'web', 'gameSettings', 'botActivationCommand');
 }
 
 Master.start = function(data) {

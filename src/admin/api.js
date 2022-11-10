@@ -8,7 +8,7 @@ Master.api.admin.reloadProjects = async function(params, ctx) {
     for (let project of this.core.getAll(Project)) {
         project.delete();
     }
-    core.createProjects();
+    this.core.createProjects();
 }
 
 Master.api.admin.reloadProject = async function(params, ctx) {

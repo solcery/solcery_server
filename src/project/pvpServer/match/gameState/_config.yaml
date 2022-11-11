@@ -1,0 +1,7 @@
+moduleName: 'project/pvpServer/match/gameState'
+dwellers:
+  Match: 
+    mixins:
+      project/pvpServer/match/gameState/match: true
+tests:
+  testGameState: true

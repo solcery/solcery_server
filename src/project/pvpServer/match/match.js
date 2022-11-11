@@ -8,15 +8,22 @@ Master.onCreate = function(data) {
 	this.version = data.version;
 	this.gameBuild = data.gameBuild;
 	this.seed = data.seed ?? Math.floor(Math.random() * 256);	
-	this.botActivationCommandId = objget(this.gameBuild, 'content', 'web', 'gameSettings', 'botActivationCommand');
+	this.botActivationCommandId = objget(this, 'gameBuild', 'content', 'web', 'gameSettings', 'botActivationCommand');
+}
+
+Master.addAction = function(action, broadcast) {
+	this.actionLog.push(action);
+	this.execAllMixins('onAction', action);
+	if (!this.started) return;
+	this.execAllPlayers('onMatchAction', this.getSaveData([ 'actionLog' ]));
 }
 
 Master.start = function(data) {
-	this.started = this.time();
+	assert(!this.started);
 	if (this.botActivationCommandId) {
 		for (let player of this.players) {
 			if (player.bot) {
-				this.actionLog.push({
+				this.addAction({
 					type: 'gameCommand',
 					commandId: this.botActivationCommandId,
 					ctx: {
@@ -26,11 +33,13 @@ Master.start = function(data) {
 			}
 		}
 	}
-	this.actionLog.push({ 
+	this.addAction({ 
 		type: 'init',
 	});
-	this.execAllPlayers('onMatchStart', this.getSaveData());
+	this.started = this.time();
 	this.save();
+	this.execAllMixins('onStart');
+	this.execAllPlayers('onMatchStart', this.getSaveData());
 }
 
 Master.end = function(data) {
@@ -63,26 +72,25 @@ Master.save = function() {
 }
 
 Master.addPlayer = function(player, data = {}) {
-	assert(!this.started);
+	assert(!this.started, `Impossible to add player. Match ${this.id} is already started.`);
+	let index = this.players.length + 1;
 	this.players.push({
-		index: this.players.length + 1,
+		index,
 		id: player.id,
 		nfts: data.nfts,
 		bot: player.bot,
 	})
 	this.save();
-	player.execAllMixins('onJoinMatch', this);
+	player.execAllMixins('onJoinMatch', this, index);
 }
 
 Master.removePlayer = function(player, outcome) {
 	let playerData = this.players.find(agent => agent.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
 	this.actionLog.push({
-		player: playerData.index,
-		action: {
-			type: 'leaveGame',
-			outcome,
-		}
+		player: playerData.id,
+		type: 'leaveGame',
+		outcome,
 	})
 	this.save()
 	playerData.outcome = outcome; //Player who sent the outcome means they won't impact the game anymore
@@ -100,12 +108,11 @@ Master.onPlayerAction = function(player, action) {
 	let playerData = this.players.find(agent => agent.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
 	objset(action, playerData.index, 'ctx', 'player_index');
-	this.actionLog.push({
+	this.addAction({
 		player: playerData.id,
 		...action,
 	})
 	this.save();
-	this.execAllPlayers('onMatchAction', this.getSaveData([ 'actionLog' ]));
 }
 
 Master.execAllPlayers = function(callbackName, data) {

@@ -1,12 +1,13 @@
-moduleName: 'project/pvpServer/bot'
+moduleName: 'project/pvpServer/match/bot'
 requiredModules:
   project/pvpServer/player: true
   project/pvpServer/match: true
+  project/pvpServer/match/gameState: true
 
 dwellers:
   Player:
     mixins:
-      project/pvpServer/bot/player: true
+      project/pvpServer/match/bot/player: true
 
 tests:
   testBot: true

@@ -30,7 +30,7 @@ Master.onJoinMatch = function(match, playerIndex) {
 	this.strategy = strategy;
 	this.rules = strategy.rules.map(ruleId => botContent.botRules[ruleId]);
 	this.runtime = this.match.gameState.runtime;
-	// TODO: own brick runtime
+	// TODO: own brick runtime?
 	assert(this.rules);
 }
 
@@ -60,14 +60,19 @@ Master.onMatchAction = function(data) {
 	this.think();
 }
 
-Master.think = function() {
+Master.execBrick = function(brick) {
 	let ctx = this.botContext();
-	let active = this.runtime.execBrick(this.strategy.activationCondition, ctx);
+	return this.runtime.execBrick(brick, ctx);
+}
+
+Master.think = function() {
+	let active = this.execBrick(this.strategy.activationCondition);
 	if (!active) return;
 	let actions = [];
 	for (let rule of this.rules) {
-		ctx = this.botContext();
-		let weight = this.runtime.execBrick(rule.weight, ctx);
+		let condition = this.execBrick(rule.condition);
+		if (!condition) continue;
+		let weight = this.execBrick(rule.weight);
 		if (weight > 0) {
 			actions.push({
 				name: rule.name,
@@ -89,8 +94,7 @@ Master.think = function() {
 		chosenAction = current.action;
 		currentWeigth -= current.weight;
 	}
-	ctx = this.botContext();
-	this.runtime.execBrick(chosenAction, ctx);
+	this.execBrick(chosenAction);
 }
 
-module.exports = Master
+module.exports = Master;

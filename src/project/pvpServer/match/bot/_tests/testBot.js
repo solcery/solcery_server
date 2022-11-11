@@ -376,11 +376,11 @@ const gameBuild = {
 			botRules: {
 				14: {
 					name: 'end turn',
-					weight: {
-						lib: 'value',
-						func: 'if_then',
+					condition: {
+						lib: 'condition',
+						func: 'not',
 						params: {
-							if: {
+							condition: {
 								lib: 'condition',
 								func: 'eq',
 								params: {
@@ -399,21 +399,14 @@ const gameBuild = {
 										}
 									}
 								}
-							},
-							then: {
-								lib: 'value',
-								func: 'const',
-								params: {
-									value: 0
-								}
-							},
-							else: {
-								lib: 'value',
-								func: 'const',
-								params: {
-									value: 1
-								}
 							}
+						}
+					},
+					weight: {
+						lib: 'value',
+						func: 'const',
+						params: {
+							value: 1
 						}
 					},
 					action: {
@@ -433,44 +426,31 @@ const gameBuild = {
 				},
 				15: {
 					name: 'take card',
-					weight: {
-						lib: 'value',
-						func: 'if_then',
+						condition: {
+						lib: 'condition',
+						func: 'eq',
 						params: {
-							if: {
-								lib: 'condition',
-								func: 'eq',
-								params: {
-									value1: {
-										lib: 'value',
-										func: 'game_attr',
-										params: { 
-											attr_name: 'turnNumber'
-										}
-									},
-									value2: {
-										lib: 'value',
-										func: 'scope_var',
-										params: { 
-											var_name: 'take_card_turn'
-										}
-									}
+							value1: {
+								lib: 'value',
+								func: 'game_attr',
+								params: { 
+									attr_name: 'turnNumber'
 								}
 							},
-							then: {
+							value2: {
 								lib: 'value',
-								func: 'const',
-								params: {
-									value: 1
-								}
-							},
-							else: {
-								lib: 'value',
-								func: 'const',
-								params: {
-									value: 0
+								func: 'scope_var',
+								params: { 
+									var_name: 'take_card_turn'
 								}
 							}
+						}
+					},
+					weight: {
+						lib: 'value',
+						func: 'const',
+						params: {
+							value: 1
 						}
 					},
 					action: {

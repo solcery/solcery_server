@@ -8,10 +8,10 @@ Master.onCreate = function(data) {
 	this.version = data.version;
 	this.gameBuild = data.gameBuild;
 	this.seed = data.seed ?? Math.floor(Math.random() * 256);	
-	this.botActivationCommandId = objget(this, 'gameBuild', 'content', 'web', 'gameSettings', 'botActivationCommand');
 }
 
 Master.addAction = function(action, broadcast) {
+	action.id = this.actionLog.length;
 	this.actionLog.push(action);
 	this.execAllMixins('onAction', action);
 	if (!this.started) return;
@@ -20,20 +20,8 @@ Master.addAction = function(action, broadcast) {
 
 Master.start = function(data) {
 	assert(!this.started);
-	if (this.botActivationCommandId) {
-		for (let player of this.players) {
-			if (player.bot) {
-				this.addAction({
-					type: 'gameCommand',
-					commandId: this.botActivationCommandId,
-					ctx: {
-						player_index: player.index
-					}
-				})
-			}
-		}
-	}
 	this.addAction({ 
+		id: this.actionLog.length,
 		type: 'init',
 	});
 	this.started = this.time();
@@ -88,6 +76,7 @@ Master.removePlayer = function(player, outcome) {
 	let playerData = this.players.find(agent => agent.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
 	this.actionLog.push({
+		id: this.actionLog.length,
 		player: playerData.id,
 		type: 'leaveGame',
 		outcome,

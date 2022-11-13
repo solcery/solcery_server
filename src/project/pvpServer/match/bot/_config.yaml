@@ -8,6 +8,7 @@ dwellers:
   Player:
     mixins:
       project/pvpServer/match/bot/player: true
+      project/pvpServer/match/gameState/mixin: true
 
 tests:
   testBot: true

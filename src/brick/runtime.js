@@ -76,4 +76,4 @@ class BrickRuntime {
 	};
 }
 
-module.exports = { BrickRuntime };
+module.exports = BrickRuntime;

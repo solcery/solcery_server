@@ -1,4 +1,3 @@
-const GameState = require('./gameState');
 const Master = {};
 
 Master.onCreate = function(data) {
@@ -7,25 +6,11 @@ Master.onCreate = function(data) {
 		this.disableMixinCallbacks(Master);
 		return;
 	}
-	this.gameState = new GameState({
-		seed: this.seed,
-		players: this.players,
-		content,
-	})
+	this.createGameState(content, this.players, this.seed)
 }
 
 Master.onAction = function(action) {
-	let { type, commandId, ctx, playerIndex } = action;
-	switch (type) {
-		case 'init':
-			this.gameState.start(this.players);
-			break;
-		case 'gameCommand':
-			this.gameState.applyCommand(commandId, ctx)
-			break;
-		default: 
-			break;
-	}
+	this.gameStateAction(action);
 }
 
 module.exports = Master;

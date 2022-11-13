@@ -4,6 +4,7 @@ const { addMixin, removeMixin } = require('./mixin');
 require('./utils');
 require('./env');
 require("dotenv").config({ path: "./.env" });
+global.BrickRuntime = require('./brick/runtime');
 
 const config = {};
 const loadedModules = {}; // Stack of loaded modules to prevent recursive dependencies

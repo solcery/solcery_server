@@ -266,10 +266,16 @@ const gameBuild = {
 			},
 			bots: {
 				12: {
-					scopeVars: {
-						player_index: 1,
-						take_card_turn: 5,
-					},
+					scopeVars: [
+						{
+							varName: 'player_index',
+							value: 1,
+						},
+						{
+							varName: 'take_card_turn',
+							value: 5,
+						}
+					],
 					activationCondition: {
 						lib: 'condition',
 						func: 'and',
@@ -319,10 +325,16 @@ const gameBuild = {
 					rules: [ 14, 15 ]
 				},
 				13: {
-					scopeVars: {
-						player_index: 2,
-						take_card_turn: 9,
-					},
+					scopeVars: [
+						{
+							varName: 'player_index',
+							value: 2,
+						},
+						{
+							varName: 'take_card_turn',
+							value: 9,
+						}
+					],
 					activationCondition: {
 						lib: 'condition',
 						func: 'and',
@@ -470,8 +482,6 @@ const gameBuild = {
 				}
 			}
 		}
-
-
 	}
 }
 

@@ -1,5 +1,3 @@
-const { BrickRuntime } = require("./brickLib/runtime");
-
 class Entity {
 	id = undefined;
 	tplId = undefined;
@@ -31,7 +29,8 @@ class GameState {
 	attrs = {};
 
 	constructor(data) {
-		this.seed = data.seed ?? 0;
+		assert(data.seed)
+		this.seed = data.seed;
 		this.content = data.content;
 		this.players = data.players;
 		this.runtime = new BrickRuntime(this.content, data.seed);
@@ -51,7 +50,7 @@ class GameState {
 		return outcome;
 	}
 
-	start = (players) => {
+	start = () => {
 		let layout = this.content.gameSettings.layout;
 		if (layout) {
 			for (let cardPack of Object.values(this.content.cards)) {
@@ -69,7 +68,7 @@ class GameState {
 			}
 		}
 		if (this.content.collections) {
-			for (let player of players) {
+			for (let player of this.players) {
 				if (!player.nfts) continue;
 				for (let nft of player.nfts) {
 					let collection = Object.values(this.content.collections)
@@ -104,6 +103,11 @@ class GameState {
 		if (scopeVars) Object.assign(ctx.scopes[0].vars, scopeVars);
 		if (command.action) {
 			this.runtime.execBrick(command.action, ctx);
+		}
+		for (let objectId of Object.keys(this.objects)) {
+			if (this.objects[objectId].deleted) {
+				delete this.objects[objectId];
+			}
 		}
 	};
 

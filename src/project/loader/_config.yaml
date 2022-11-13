@@ -1,6 +1,8 @@
 moduleName: 'project/loader'
 requiredModules:
   mongo: true
+  api: true
+  admin: true
 
 dwellers:
   Core: 
@@ -8,6 +10,21 @@ dwellers:
       project/loader/core:
         requiredMixins:
           mongo/core: true
+  Api: 
+    mixins:
+      project/loader/api: true
+
+api:
+  admin:
+    .commands:
+      reloadProject: 
+        params:
+          projectId:
+            type: 'string'
+            required: true
+      reloadProjects: 
+        description: 'Reloads all projects'
+
 
 tests:
   testLoader: true

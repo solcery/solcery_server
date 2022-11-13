@@ -126,7 +126,7 @@ Master.api.engine.release = async function(params, ctx) {
 
       await ctx.project.gameDb.gameInfo.updateOne({}, update);
       await ctx.project.gameDb.gameBuilds.insertOne(dist);
-      console.log('RELEASED')
+      await this.core.loadProject(ctx.project.id);
       return gameBuildVersion;
 }
 

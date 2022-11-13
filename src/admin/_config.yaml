@@ -20,10 +20,3 @@ api:
           code:
             type: 'javascript'
             required: true
-      reloadProject: 
-        params:
-          projectId:
-            type: 'string'
-            required: true
-      reloadProjects: 
-        description: 'Reloads all projects'

@@ -68,7 +68,7 @@ async function test(testEnv) {
 	await player2.execAllMixins('onSocketRequestLeaveMatch', { outcome: -1 });
 	assert(!pvpServer.get(Match, match.id));
 
-	assert(match.actionLog[5].player === 2 && match.actionLog[5].action.outcome === -1);
+	assert(match.actionLog[5].player === 'pubkey2' && match.actionLog[5].outcome === -1);
 	assert(playerMessages[PUBKEY1] && playerMessages[PUBKEY1].length === 4);
 	assert(playerMessages[PUBKEY2] && playerMessages[PUBKEY2].length === 5);
 }

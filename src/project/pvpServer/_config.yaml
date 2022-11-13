@@ -10,9 +10,6 @@ dwellers:
   Project:
     mixins:
       project/pvpServer/project: true
-  Core:
-    mixins:
-      project/pvpServer/core: true
   Api:
     mixins:
       project/pvpServer/api: true

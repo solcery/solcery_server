@@ -6,31 +6,38 @@ Master.onCreate = function(data) {
   		return;
   	}
   	this.solceryDb = this.createMongo(data.solceryDb, [ 'objects' ]);
-  	this.createProjects();
+  	this.loadProjects();
 }
 
-Master.createProjects = async function() {
-  	let projects = await this.solceryDb.objects.find({ template: 'projects' }).toArray();
-  	for (let project of projects) {
-		let projectConfig = project.fields;
-		env.log('Creating project with config ', projectConfig)
+Master.loadProject = async function(projectId) {
+	let project = this.get(Project, projectId);
+	if (project) {
+		project.delete();
+	}
+	let projectConfig = await this.core.solceryDb.objects.findOne({ 
+		template: 'projects', 
+		'fields.name': projectId 
+	});
+	assert(projectConfig, `No config found for project ${projectId}`);
+	env.log('Creating project with config ', projectConfig.fields)
+	this.create(Project, { 
+		id: projectConfig.fields.name,
+		...projectConfig.fields,
+	})
+}
+
+Master.loadProjects = async function() {
+	for (let project of this.core.getAll(Project)) {
+        project.delete();
+    }
+  	let projectConfigs = await this.solceryDb.objects.find({ template: 'projects' }).toArray();
+  	for (let projectConfig of projectConfigs) {
+  		env.log('Creating project with config ', projectConfig.fields)
 		this.create(Project, { 
-			id: projectConfig.name,
-			...projectConfig,
+			id: projectConfig.fields.name,
+			...projectConfig.fields,
 		})
 	}
-}
-
-Master.onMongoReady = async function(mongo) {
-	// if (mongo.id !== 'solcery') return;
-	// let projects = await mongo.objects.find({ template: 'projects' }).toArray();
-	// for (let project of projects) {
-	// 	let projectConfig = project.fields;
-	// 	this.create(Project, { 
-	// 		id: `project.${projectConfig.name}`,
-	// 		...projectConfig,
-	// 	})
-	// }
 }
 
 module.exports = Master;

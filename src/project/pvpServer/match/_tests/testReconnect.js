@@ -71,10 +71,8 @@ async function test(testEnv) {
 	match.start();
 	assert(clientPlayer.status.code === 'ingame' && clientPlayer.status.data.matchId === match.id);
 	assert(clientPlayer.matchMessages.length === 1);
-	match.start();
-	assert(clientPlayer.matchMessages.length === 2);
 	player.execAllMixins('onSocketRequestAction', { type: 'leftClick' });
-	assert(clientPlayer.matchMessages.length === 3);
+	assert(clientPlayer.matchMessages.length === 2);
 	clientPlayer.matchMessages = [];
 
 	// player reconnects on their side

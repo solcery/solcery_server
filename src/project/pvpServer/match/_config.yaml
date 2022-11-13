@@ -2,6 +2,8 @@ moduleName: 'project/pvpServer/match'
 requiredModules:
   web/socket: true
   project/pvpServer/player: true
+  project/pvpServer/match/gameState: true
+  project/pvpServer/match/bot: true
 
 dwellers:
   Match: 

@@ -46,8 +46,6 @@ async function test(testEnv) {
 	pvpServer.delete();
 
 	core.delete();
-	
-
 	// Reload
 	core = createCore({ virtualDb });
 	pvpServer = core.create(Project, { 

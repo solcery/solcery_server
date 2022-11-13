@@ -5,7 +5,7 @@ Master.api.admin.reloadProjects = async function(params, ctx) {
 }
 
 Master.api.admin.reloadProject = async function(params, ctx) {
-    await this.core.reloadProject(params.projectId)
+    await this.core.loadProject(params.projectId)
 }
 
 module.exports = Master;

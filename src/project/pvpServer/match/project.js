@@ -8,13 +8,14 @@ Master.onCreate = function(data) {
     this.getRequiredGameBuilds();
 }
 
-Master.createMatch = function(version) {
-	assert(version, 'Attempt to create match withouth specifying game build version');
-	let gameBuild = this.getGameBuild(version);
-	assert(gameBuild, `Game build with version ${version} isn't loaded on server`);
+Master.createMatch = function(data) {
+	assert(data, 'Error creating match, no data provided!');
+	data.id = data.id ?? uuid();
+	assert(data.version, 'Attempt to create match withouth specifying game build version');
+	let gameBuild = this.getGameBuild(data.version);
+	assert(gameBuild, `Game build with version ${data.version} isn't loaded on server`);
 	return this.create(Match, {
-		id: uuid(),
-		version,
+		...data,
 		gameBuild,
 	});
 }
@@ -22,14 +23,14 @@ Master.createMatch = function(version) {
 Master.onGameBuildLoaded = async function(gameBuild) {
 	let version = gameBuild.version;
 	let matches = await this.gameDb.matches.find({ finished: null, version }).toArray();
-	for (let match of matches) {
-		this.create(Match, match);
+	for (let matchData of matches) {
+		this.createMatch(matchData);
 	}
 }
 
 Master.getRequiredGameBuilds = async function() {
 	let matches = await this.gameDb.matches.find({ finished: null }).toArray();
-	let gameBuildVersions = {}
+	let gameBuildVersions = {};
 	for (let match of matches) {
 		gameBuildVersions[match.version] = true;
 	}

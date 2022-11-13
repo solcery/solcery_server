@@ -119,10 +119,7 @@ class VirtualCollection {
             deletedCount: this.source.length - oldLength,
         }
     }
-    updateOne(query, update, config) {
-        if (config) {
-            if (config.upsert) throw ('Not supported!');
-        }
+    updateOne(query, update, config = {}) {
         let obj;
         for (let doc of this.source) {
             if (checkQuery(query, doc)) {
@@ -130,11 +127,14 @@ class VirtualCollection {
                 break;
             }
         }
-        if (!obj) return {
-            acknowledged: true,
-            matchedCount: 0,
-            modifiedCount: 0,
-        };
+        if (!obj) {
+            if (!config.upsert) return {
+                acknowledged: true,
+                matchedCount: 0,
+                modifiedCount: 0,
+            };
+            return this.insertOne(update['$set']);
+        }
         if (update['$set']) {
             for (let [ prop, value ] of Object.entries(update['$set'])) {
                 let path = prop.split('.');
@@ -185,7 +185,7 @@ class VirtualCollection {
         if (index > -1) {
             this.source[index] = replacement;
         } else {
-            this.source.push(replacement)
+            // this.source.push(replacement)
         }
     }
 

@@ -18,13 +18,6 @@ Master.onGameBuildLoaded = function(gameBuild) {
 	})
 }
 
-Master.createBot = function(data) { // TODO: move to bot module
-	return this.create(Player, { 
-		id: uuid(), 
-		bot: true
-	})
-}
-
 Master.onDelete = function() {
 	if (!this.matchmaker) return;
 	this.matchmaker.delete();

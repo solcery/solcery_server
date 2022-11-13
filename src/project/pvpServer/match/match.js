@@ -6,8 +6,8 @@ Master.onCreate = function(data) {
 	this.started = data.started;
 	this.finished = data.finished;
 	this.version = data.version;
-	this.gameBuild = data.gameBuild;
-	this.seed = data.seed ?? Math.floor(Math.random() * 256);	
+	this.gameBuild = data.gameBuild ?? this.gameBuild;
+	this.seed = data.seed ?? Math.floor(Math.random() * 256);
 }
 
 Master.addAction = function(action, broadcast) {
@@ -53,10 +53,10 @@ Master.getSaveData = function(fields) {
 	return res;
 }
 
-Master.save = function() {
-	let filter = { id: this.id };
+Master.save = function(initial) {
 	let saveData = this.getSaveData();
-	this.parent.gameDb.matches.replaceOne(filter, saveData);
+	let filter = { id: this.id };
+	this.parent.gameDb.matches.updateOne(filter, { '$set': saveData }, { upsert: true });
 }
 
 Master.addPlayer = function(player, data = {}) {

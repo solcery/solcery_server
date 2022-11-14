@@ -53,7 +53,7 @@ async function test(testEnv) {
 	await sleep(1) // Dirty hack, allowing server to load everything
 	let player1 = pvpServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
 	let player2 = pvpServer.create(Player, { id: PUBKEY2, pubkey: PUBKEY2 });
-	let match = await pvpServer.createMatch(1);
+	let match = await pvpServer.createMatch({ version: 1 });
 
 	await match.addPlayer(player1);
 	await match.addPlayer(player2);

@@ -35,10 +35,7 @@ const mixins = [
 					if (type === 'playerStatus') {
 						clientPlayer.status = data;
 					}
-					if (type === 'matchAction') {
-						clientPlayer.matchMessages.push(data)
-					}
-					if (type === 'matchStart') {
+					if (type === 'matchUpdate') {
 						clientPlayer.matchMessages.push(data)
 					}
 				}

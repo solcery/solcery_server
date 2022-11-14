@@ -14,7 +14,6 @@ async function test(testEnv) {
 		command: 'forge.getPlayerNfts',
 		pubkey: 'DrANdHtiF3rSQi2X9sAVjL6ZrLhUPfwV3vfcA8LwPryf',
 	})
-	console.log(result)
 }
 
 module.exports = { test }

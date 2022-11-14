@@ -27,10 +27,7 @@ const mixins = [
 		mixinConfig: {
 			master: {
 				_name: 'Test player message receiver',
-				onMatchAction: function(data) {
-					objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
-				},
-				onMatchStart: function(data) {
+				onMatchUpdate: function(data) {
 					objinsert(playerMessages, JSON.parse(JSON.stringify(data)), this.id)
 				}
 			}
@@ -53,24 +50,30 @@ async function test(testEnv) {
 	await sleep(1) // Dirty hack, allowing server to load everything
 	let player1 = pvpServer.create(Player, { id: PUBKEY1, pubkey: PUBKEY1 });
 	let player2 = pvpServer.create(Player, { id: PUBKEY2, pubkey: PUBKEY2 });
-	let match = await pvpServer.createMatch({ version: 1 });
+	let match = pvpServer.createMatch({ version: 1 });
 
-	await match.addPlayer(player1);
-	await match.addPlayer(player2);
-	await match.start();
+	match.addPlayer(player1);
+	match.addPlayer(player2);
+	match.start();
 
-	await player1.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
-	await player2.execAllMixins('onSocketRequestAction', { type: 'leftClick' });
-	await player2.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
+	player1.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
+	player2.execAllMixins('onSocketRequestAction', { type: 'leftClick' });
+	player2.execAllMixins('onSocketRequestAction', { type: 'rightClick' });
 
-	await player1.execAllMixins('onSocketRequestLeaveMatch', { outcome: 1 });
+	player1.execAllMixins('onSocketRequestLeaveMatch');
 	assert(pvpServer.get(Match, match.id));
-	await player2.execAllMixins('onSocketRequestLeaveMatch', { outcome: -1 });
+	player2.execAllMixins('onSocketRequestLeaveMatch');
 	assert(!pvpServer.get(Match, match.id));
+	assert(player1.status.code === 'online' && player2.status.code === 'online');
+	assert(match.actionLog[5].player === PUBKEY2);
+	assert(playerMessages[PUBKEY1] && playerMessages[PUBKEY1].length === 5);
+	assert(playerMessages[PUBKEY2] && playerMessages[PUBKEY2].length === 6);
 
-	assert(match.actionLog[5].player === 'pubkey2' && match.actionLog[5].outcome === -1);
-	assert(playerMessages[PUBKEY1] && playerMessages[PUBKEY1].length === 4);
-	assert(playerMessages[PUBKEY2] && playerMessages[PUBKEY2].length === 5);
+	match = pvpServer.createMatch({ version: 1 });
+	match.addPlayer(player1);
+	match.addPlayer(player2);
+	match.delete();
+	assert(player1.status.code === 'online' && player2.status.code === 'online');
 }
 
 module.exports = { test, mixins }

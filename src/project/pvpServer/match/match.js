@@ -8,6 +8,7 @@ Master.onCreate = function(data) {
 	this.version = data.version;
 	this.gameBuild = data.gameBuild ?? this.gameBuild;
 	this.seed = data.seed ?? Math.floor(Math.random() * 256);
+	this.result = data.result;
 }
 
 Master.addAction = function(action, broadcast) {
@@ -15,7 +16,11 @@ Master.addAction = function(action, broadcast) {
 	this.actionLog.push(action);
 	this.execAllMixins('onAction', action);
 	if (!this.started) return;
-	this.execAllPlayers('onMatchAction', this.getSaveData([ 'actionLog' ]));
+	this.execAllPlayers('onMatchUpdate', this.getSaveData([ 'actionLog' ]));
+}
+
+Master.onDelete = function() {
+	this.execAllPlayers('onLeaveMatch');
 }
 
 Master.start = function(data) {
@@ -25,9 +30,9 @@ Master.start = function(data) {
 		type: 'init',
 	});
 	this.started = this.time();
-	this.save();
+	this.save(true);
 	this.execAllMixins('onStart');
-	this.execAllPlayers('onMatchStart', this.getSaveData());
+	this.execAllPlayers('onMatchUpdate', this.getSaveData());
 }
 
 Master.end = function(data) {
@@ -37,7 +42,7 @@ Master.end = function(data) {
 }
 
 Master.getSaveData = function(fields) {
-	const defaultFields = [ 'id', 'version', 'started', 'finished', 'actionLog', 'players', 'seed' ];
+	const defaultFields = [ 'id', 'version', 'started', 'finished', 'actionLog', 'players', 'seed', 'result'];
 	let res = {};
 	if (!fields) {
 		fields = defaultFields;
@@ -53,10 +58,9 @@ Master.getSaveData = function(fields) {
 	return res;
 }
 
-Master.save = function(initial) {
-	let saveData = this.getSaveData();
+Master.save = async function(upsert = false) {
 	let filter = { id: this.id };
-	this.parent.gameDb.matches.updateOne(filter, { '$set': saveData }, { upsert: true });
+	this.parent.gameDb.matches.updateOne(filter, { '$set': this.getSaveData() }, { upsert });
 }
 
 Master.addPlayer = function(player, data = {}) {
@@ -75,22 +79,29 @@ Master.addPlayer = function(player, data = {}) {
 Master.removePlayer = function(player, outcome) {
 	let playerData = this.players.find(agent => agent.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
-	this.actionLog.push({
-		id: this.actionLog.length,
+	this.addAction({
 		player: playerData.id,
-		type: 'leaveGame',
-		outcome,
-	})
-	this.save()
-	playerData.outcome = outcome; //Player who sent the outcome means they won't impact the game anymore
-	player.execAllMixins('onLeaveMatch');
-	for (let participant of this.players) {
-		if (participant.outcome === undefined) {
-			this.execAllPlayers('onMatchAction', this.getSaveData(['actionLog']));
-			return;
-		};
+		type: 'leaveMatch',
+	});
+	let leaveGameCommandId = objget(this.gameBuild, 'content', 'web', 'gameSettings', 'leaveGameCommandId');
+	if (leaveGameCommandId) {
+		this.addAction({
+			player: playerData.id,
+			type: 'gameCommand',
+			commandId: leaveGameCommandId,
+			ctx: {
+				player_index: playerData.index,
+			}
+		})
 	}
-	this.end();
+	playerData.left = true;
+	player.execAllMixins('onLeaveMatch');
+	let activePlayers = this.players.filter(p => !p.left).length;
+	if (activePlayers > 0) {
+		this.save();
+	} else {
+		this.end();
+	}
 }
 
 Master.onPlayerAction = function(player, action) {
@@ -106,7 +117,7 @@ Master.onPlayerAction = function(player, action) {
 
 Master.execAllPlayers = function(callbackName, data) {
 	for (let playerData of this.players) {
-		if (playerData.outcome !== undefined) continue;
+		if (playerData.left) continue;
 		let player = this.parent.get(Player, playerData.id);
 		if (!player) continue;
 		player.execAllMixins(callbackName, data)

@@ -5,12 +5,13 @@ Master.onCreate = function(data) {
 	if (!this.players) return;
 	for (let playerInfo of this.players) {
 		if (!playerInfo.bot) continue;
+		if (playerInfo.left) continue;
 		let player = this.parent.get(Player, playerInfo.id);
 		if (!player) {
 			player = this.parent.createBot({ id: playerInfo.id });
 		}
 		player.execAllMixins('onJoinMatch', this, playerInfo.index);
-		player.execAllMixins('onMatchStart', this.getSaveData());
+		player.execAllMixins('onMatchUpdate', this.getSaveData());
 	}
 }
 

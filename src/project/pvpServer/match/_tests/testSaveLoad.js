@@ -53,7 +53,7 @@ async function test(testEnv) {
 		pvpServer: true,
 		db: 'testDb', 
 	});
-	await sleep(1)
+	await sleep(1);
 
  	pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
 	player1 = pvpServer.get(Player, PUBKEY);

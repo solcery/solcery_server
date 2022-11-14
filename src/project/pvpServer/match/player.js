@@ -4,8 +4,7 @@ Master.onCreate = function(data) {
     let matches = this.parent.getAll(Match);
     for (let match of matches) {
         if (match.players.find(player => player.id === this.id)) {
-            this.match = match;
-            this.setStatus('ingame', { matchId: match.id })
+            this.execAllMixins('onJoinMatch', match);
             return;
         }
     }

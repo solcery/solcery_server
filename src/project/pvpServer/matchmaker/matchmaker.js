@@ -13,7 +13,7 @@ Master.onTick = function(time) {
 }
 
 Master.createMatch = function() {
-	const match = this.parent.createMatch(this.version);
+	const match = this.parent.createMatch({ version: this.version });
 	let selectedPlayers = this.queue.splice(0, this.playerQuantity);
 	for (let queueEntry of selectedPlayers) {
 		match.addPlayer(queueEntry.player, {

@@ -30,11 +30,17 @@ Master.getGameBuild = function(version) {
 
 Master.loadGameBuild = async function(version) {
     assert(version)
+    if (typeof version === 'string') { // Somehow string is stored in game data
+        version = parseInt(version);
+    }
     if (this.gameBuilds[version]) return;
     let build = await this.gameDb.gameBuilds.findOne({ version });
     assert(build, `No game build with version ${version} found`);
+    let firstLoading = !this.gameBuilds[version];
     this.gameBuilds[version] = build;
-    this.execAllMixins('onGameBuildLoaded', build);
+    if (firstLoading) {
+        this.execAllMixins('onGameBuildLoaded', build);
+    }
 }
 
 module.exports = Master

@@ -118,7 +118,8 @@ class GameState {
 	}
 
 	createEntity(cardTypeId, place, initAction, ctx) {
-		let id = ++this.maxEntityId;
+		let id = this.maxEntityId + 1;
+		this.maxEntityId ++;
 		assert(!this.objects[id], `Game.createEntity error: Object Id '${id}' is already taken!`);
 		let entity = new Entity(id, cardTypeId, this);
 		this.objects[id] = entity;

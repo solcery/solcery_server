@@ -36,7 +36,7 @@ async function test(testEnv) {
 	await sleep(1);
 
 	pvpServer.execAllMixins('onPlayerSocketConnected', PUBKEY);
-	let match = pvpServer.createMatch(1);
+	let match = pvpServer.createMatch({ version: 1 });
 	let matchId = match.id;
 	let player1 = pvpServer.get(Player, PUBKEY);
 	match.addPlayer(player1);

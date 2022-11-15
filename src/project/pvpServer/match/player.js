@@ -3,7 +3,7 @@ const Master = {}
 Master.onCreate = function(data) {
     let matches = this.parent.getAll(Match);
     for (let match of matches) {
-        if (match.players.find(player => player.id === this.id)) {
+        if (match.players.find(player => player.id === this.id && !player.left)) {
             this.execAllMixins('onJoinMatch', match);
             return;
         }
@@ -12,7 +12,7 @@ Master.onCreate = function(data) {
 
 Master.onSocketConnected = function(wsConnection) {
     if (!this.match) return;
-    this.execAllMixins('onMatchStart', this.match.getSaveData());
+    this.execAllMixins('onMatchUpdate', this.match.getSaveData());
 }
 
 Master.onJoinMatch = function(match) {
@@ -30,17 +30,13 @@ Master.onSocketRequestAction = function(data) {
     this.match.execAllMixins('onPlayerAction', this, data);
 }
 
-Master.onSocketRequestLeaveMatch = function(data) {
+Master.onSocketRequestLeaveMatch = function() {
     if (!this.match) return;
-    this.match.removePlayer(this, data.outcome);
+    this.match.removePlayer(this);
 }
 
-Master.onMatchStart = function(data) {
-    this.socketMessage('matchStart', data)
-}
-
-Master.onMatchAction = function(data) {
-    this.socketMessage('matchAction', data)
+Master.onMatchUpdate = function(data) {
+    this.socketMessage('matchUpdate', data)
 }
 
 module.exports = Master

@@ -14,31 +14,40 @@ Master.onJoinMatch = function(match, playerIndex) {
 	assert(this.match);
 	this.gameBuild = this.match.gameBuild;
 	this.actionLog = [];
-}
-
-Master.onLeaveMatch = function(data) {
-	env.log('Bot left the match, deleting itself');
-	this.delete();
-}
-
-Master.onMatchStart = function(data) {
 	let botContent = objget(this.gameBuild, 'content', 'bot');
 	if (!botContent) {
 		this.disableMixinCallbacks(Master);
 		return;
 	}
-	let gameContent = objget(this.gameBuild, 'content', 'web');
-	let seed = data.seed;
-	let players = data.players;
-	this.createGameState(gameContent, players, seed);
-	this.bot = new Bot({
-		gameBuild: this.match.gameBuild,
-		gameState: this.gameState,
-		playerIndex: this.playerIndex, 
-		onCommand: action => this.match.execAllMixins('onPlayerAction', this, action),
-	});
+}
+
+Master.onLeaveMatch = function(data) {
+	this.delete();
+}
+
+Master.onMatchUpdate = function(data) {
+	if (data.started) { // Match start
+		let gameContent = objget(this.gameBuild, 'content', 'web');
+		let seed = data.seed;
+		let players = data.players;
+		this.createGameState(gameContent, players, seed);
+		this.bot = new Bot({
+			gameBuild: this.match.gameBuild,
+			gameState: this.gameState,
+			playerIndex: this.playerIndex, 
+			onCommand: action => this.match.execAllMixins('onPlayerAction', this, action),
+		});
+	}
+	if (!this.gameState) return;
+	if (!data.actionLog) return; 
 	this.updateActionLog(data.actionLog);
-	this.bot.think();
+	if (this.gameState.getResult()) {
+		this.delete();
+	}
+	let botAlive = this.bot.think();
+	if (!botAlive) {
+		this.match.removePlayer(this)
+	}
 }
 
 Master.updateActionLog = function(actionLog) {
@@ -48,12 +57,6 @@ Master.updateActionLog = function(actionLog) {
 		this.actionLog.push(action);
 		this.gameStateAction(action);
 	}
-}
-
-Master.onMatchAction = function(data) {
-	if (!this.gameState) return; // TODO: this is for tests. Player 2 gets it before match start
-	this.updateActionLog(data.actionLog);
-	this.bot.think();
 }
 
 module.exports = Master;

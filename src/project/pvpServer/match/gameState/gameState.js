@@ -1,36 +1,10 @@
-class Entity {
-	id = undefined;
-	tplId = undefined;
-
-	constructor(id, tplId, gameState) {
-		this.id = id;
-		this.tplId = tplId;
-		this.attrs = {};
-		this.gameState = gameState;
-		if (gameState.content.attributes) {
-			for (let attr of Object.values(gameState.content.attributes)) {
-				this.attrs[attr.code] = 0;
-			}
-		}
-	}
-
-	setAttr(attr, value) {
-		if (this.attrs[attr] === undefined) throw new Error(`trying to set unknown entity attr [${attr}]`);
-		this.attrs[attr] = value;
-	}
-
-	transform(tplId) {
-		this.tplId = tplId;
-	}
-}
-
 class GameState {
 	objects = {};
 	attrs = {};
 	maxEntityId = 0;
 
 	constructor(data) {
-		assert(data.seed)
+		assert(data.seed !== undefined)
 		this.seed = data.seed;
 		this.content = data.content;
 		this.players = data.players;
@@ -42,13 +16,28 @@ class GameState {
 		}
 	}
 
-	checkOutcome() {
-		let outcomeValue = objget(this.content, 'gameSettings', 'outcome');
-		if (!outcomeValue) return;
+	getResult() {
+		let gameOverCondition = this.content.gameSettings.gameOverCondition;
+		if (!gameOverCondition) return;
 		let ctx = this.createContext();
-		let outcome = this.runtime.execBrick(outcomeValue, ctx);
-		if (outcome === 0) return;
-		return outcome;
+		let finished = this.runtime.execBrick(gameOverCondition, ctx);
+		if (!finished) return;
+		if (!this.content.players) return {};
+		let playerScore = {};
+		for (let player of this.players) {
+			let playerInfo = Object.values(this.content.players).find(p => p.index === player.index);
+			let scoreValue = playerInfo.score;
+			if (!scoreValue) {
+				playerScore[playerInfo.index] = 0;
+				continue;
+			}
+			let ctx = this.createContext();
+			let score = this.runtime.execBrick(scoreValue, ctx);
+			playerScore[playerInfo.index] = score;
+		}
+		return {
+			playerScore,
+		};
 	}
 
 	start = () => {
@@ -141,6 +130,32 @@ class GameState {
 		return this.runtime.context(object, extra);
 	}
 
+}
+
+class Entity {
+	id = undefined;
+	tplId = undefined;
+
+	constructor(id, tplId, gameState) {
+		this.id = id;
+		this.tplId = tplId;
+		this.attrs = {};
+		this.gameState = gameState;
+		if (gameState.content.attributes) {
+			for (let attr of Object.values(gameState.content.attributes)) {
+				this.attrs[attr.code] = 0;
+			}
+		}
+	}
+
+	setAttr(attr, value) {
+		if (this.attrs[attr] === undefined) throw new Error(`trying to set unknown entity attr [${attr}]`);
+		this.attrs[attr] = value;
+	}
+
+	transform(tplId) {
+		this.tplId = tplId;
+	}
 }
 
 module.exports = GameState;

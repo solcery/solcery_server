@@ -26,6 +26,26 @@ const gameBuild = {
 				}
 			},
 			gameSettings: {
+				gameOverCondition: {
+					lib: 'condition',
+					func: 'gt',
+					params: {
+						value1: {
+							lib: 'value',
+							func: 'game_attr',
+							params: {
+								attr_name: 'turnNumber'
+							}
+						},
+						value2: {
+							lib: 'value',
+							func: 'const',
+							params: {
+								value: 12
+							}
+						}
+					},
+				},
 				initAction: {
 					lib: 'action',
 					func: 'two',
@@ -278,46 +298,20 @@ const gameBuild = {
 					],
 					activationCondition: {
 						lib: 'condition',
-						func: 'and',
+						func: 'eq',
 						params: {
-							cond1: {
-								lib: 'condition',
-								func: 'lt',
+							value1: {
+								lib: 'value',
+								func: 'game_attr',
 								params: {
-									value1: {
-										lib: 'value',
-										func: 'game_attr',
-										params: {
-											attr_name: 'turnNumber'
-										}
-									},
-									value2: {
-										lib: 'value',
-										func: 'const',
-										params: {
-											value: 10
-										}
-									}
+									attr_name: 'activePlayer'
 								}
 							},
-							cond2: {
-								lib: 'condition',
-								func: 'eq',
+							value2: {
+								lib: 'value',
+								func: 'scope_var',
 								params: {
-									value1: {
-										lib: 'value',
-										func: 'game_attr',
-										params: {
-											attr_name: 'activePlayer'
-										}
-									},
-									value2: {
-										lib: 'value',
-										func: 'scope_var',
-										params: {
-											var_name: 'player_index'
-										}
-									}
+									var_name: 'player_index'
 								}
 							}
 						}
@@ -337,50 +331,23 @@ const gameBuild = {
 					],
 					activationCondition: {
 						lib: 'condition',
-						func: 'and',
+						func: 'eq',
 						params: {
-							cond1: {
-								lib: 'condition',
-								func: 'lt',
+							value1: {
+								lib: 'value',
+								func: 'game_attr',
 								params: {
-									value1: {
-										lib: 'value',
-										func: 'game_attr',
-										params: {
-											attr_name: 'turnNumber'
-										}
-									},
-									value2: {
-										lib: 'value',
-										func: 'const',
-										params: {
-											value: 10
-										}
-									}
+									attr_name: 'activePlayer'
 								}
 							},
-							cond2: {
-								lib: 'condition',
-								func: 'eq',
+							value2: {
+								lib: 'value',
+								func: 'scope_var',
 								params: {
-									value1: {
-										lib: 'value',
-										func: 'game_attr',
-										params: {
-											attr_name: 'activePlayer'
-										}
-									},
-									value2: {
-										lib: 'value',
-										func: 'scope_var',
-										params: {
-											var_name: 'player_index'
-										}
-									}
+									var_name: 'player_index'
 								}
 							}
 						}
-						
 					},
 					rules: [ 14, 15 ]
 				}
@@ -522,8 +489,8 @@ async function test(testEnv) {
 	match.start();
 
 	assert(match.gameState.attrs.testAttr === 14);
-	assert(match.gameState.attrs.turnNumber === 10);
-	assert(match.gameState.attrs.activePlayer === 2);
+	assert(match.gameState.attrs.turnNumber === 13);
+	assert(match.gameState.attrs.activePlayer === 1);
 }
 
 module.exports = { test }

@@ -11,6 +11,10 @@ Master.onCreate = function(data) {
 
 Master.onAction = function(action) {
 	this.gameStateAction(action);
+	this.result = this.gameState.getResult();
+	if (this.result) {
+		this.end();
+	}
 }
 
 module.exports = Master;

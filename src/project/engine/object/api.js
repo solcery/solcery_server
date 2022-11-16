@@ -29,7 +29,7 @@ Master.api.engine.template.object.update = async function(params, ctx) {
 
 Master.api.engine.template.object.clone = async function(params, ctx) {
 	let newObject = { ...ctx.object }
-	let time = this.time();
+	let time = Math.floor(this.time() / 1000);
 	objset(newObject, time, 'fields', 'creationTime');
 	delete newObject._id;
 	let res = await ctx.project.contentDb.objects.insertOne(newObject);

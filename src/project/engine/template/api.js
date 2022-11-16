@@ -55,7 +55,7 @@ Master.api.engine.template.createObject = async function(params, ctx) {
 	let newObject = {
 		template: params.templateCode,
 		fields: {
-			creationTime: this.time(),
+			creationTime: Math.floor(this.time() / 1000),
 		}
 	}
 	let res = await ctx.project.contentDb.objects.insertOne(newObject);

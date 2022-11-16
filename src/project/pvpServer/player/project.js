@@ -7,6 +7,12 @@ Master.onCreate = function(data) {
     }
 }
 
+Master.onDelete = function(data) {
+	for (let player of this.getAll(Player)) {
+		player.delete();
+	}
+}
+
 Master.onPlayerSocketConnected = function(pubkey, socket) {
 	let player = this.get(Player, pubkey);
 	if (!player) {

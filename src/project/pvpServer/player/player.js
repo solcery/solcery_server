@@ -18,6 +18,11 @@ Master.onCreate = function(data) {
 	this.pubkey = data.pubkey;
 }
 
+Master.onDelete = function() {
+	if (!this.socket) return;
+	this.socket.delete();
+}
+
 Master.setStatus = function (code, data) {
 	this.status = {
 		code,

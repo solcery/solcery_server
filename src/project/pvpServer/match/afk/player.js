@@ -22,27 +22,29 @@ Master.onJoinMatch = function(match) {
 }
 
 Master.onTick = function(time) { //TODO: onProcess
-    if (!this.afk) return;
-    if (!this.afk.next) return;
-    let runtime = this.match.gameState.miscRuntime;
-    
-    let ctx = runtime.context();
-    ctx.sendCommand = (commandId, objectId) => {
-        let action = {
-            type: 'gameCommand',
-            commandId,
-            ctx: {
-                object_id: objectId,
-            }
-        }
-        this.match.execAllMixins('onPlayerAction', this, action)
-    }
+    let next = objget(this, 'afk', 'next');
+    if (!next) return;
+    if (time < next) return;
     this.afk.next = undefined; 
+    let runtime = this.match.gameState.getRuntime();
+    let ctx = this.match.gameState.createContext({
+        sendCommand: (commandId, objectId) => {
+            let action = {
+                type: 'gameCommand',
+                commandId,
+                ctx: {
+                    object_id: objectId,
+                }
+            }
+            this.match.execAllMixins('onPlayerAction', this, action)
+        }
+    });
     runtime.execBrick(this.afk.action, ctx);
 }
 
 Master.onMatchUpdate = function(data) {
     if (!this.afk) return;
+    if (!this.match) return; //TODO ???
     let myLastActionTime = this.match.started;
     if (data.actionLog) {
         let myActions = data.actionLog.filter(action => action.player === this.id);
@@ -50,8 +52,9 @@ Master.onMatchUpdate = function(data) {
             myLastActionTime = myActions.pop().time;
         }
     }
-    let runtime = this.match.gameState.miscRuntime;
-    let timeout = runtime.execBrick(this.afk.timeout);
+    let ctx = this.match.gameState.createContext();
+    let runtime = this.match.gameState.getRuntime();
+    let timeout = runtime.execBrick(this.afk.timeout, ctx);
     if (timeout <= 0) {
         this.afk.next = undefined;
         return;

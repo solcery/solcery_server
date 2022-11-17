@@ -55,7 +55,7 @@ class BrickRuntime {
 		}
 	}
 
-	context = (object, extra) => {
+	context = (extra) => {
 		var ctx = Object.assign(
 			{
 				scopes: [
@@ -65,7 +65,6 @@ class BrickRuntime {
 			},
 			extra
 		);
-		ctx.object = object;
 		return ctx;
 	};
 

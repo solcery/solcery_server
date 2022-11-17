@@ -8,7 +8,6 @@ class Bot {
 		this.gameState = data.gameState;
 		this.playerIndex = data.playerIndex;
 		this.onCommand = data.onCommand;
-		this.runtime = new BrickRuntime(data.gameBuild.content.web, 0);
 		let botContent = this.gameBuild.content.bot;
 		let playerSettings = Object.values(botContent.players).find(player => player.index === this.playerIndex);
 		assert(playerSettings);
@@ -33,9 +32,9 @@ class Bot {
 	}
 
 	createContext = function() {
-		let ctx = this.runtime.context();
-		ctx.game = this.gameState;
-		ctx.sendCommand = (commandId, objectId) => this.sendCommand(commandId, objectId);
+		let ctx = this.gameState.createContext({
+			sendCommand: (commandId, objectId) => this.sendCommand(commandId, objectId),
+		})
 		if (this.strategy.scopeVars) {
 			for (let { varName, value } of this.strategy.scopeVars) {
 				ctx.scopes[0].vars[varName] = value;
@@ -46,7 +45,7 @@ class Bot {
 
 	execBrick = function(brick) {
 		let ctx = this.createContext();
-		return this.runtime.execBrick(brick, ctx);
+		return this.gameState.getRuntime().execBrick(brick, ctx);
 	}
 
 	think() {

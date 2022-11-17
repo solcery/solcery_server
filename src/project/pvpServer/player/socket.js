@@ -5,6 +5,7 @@ Master.onChallenge = function(data, result) {
 	assert(data.pubkey, 'Error in websocket challenge! No pubkey provided!')
 	let server = this.core.get(Project, data.server);
 	assert(server, `Error in websocket challenge! No server '${data.server}'!`);
+	assert(server.free, `Error in websocket challenge! Server '${data.server}' is busy!`);
 }
 
 Master.onConfirmed = function(data) {

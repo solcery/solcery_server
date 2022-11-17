@@ -63,7 +63,7 @@ forgeNft = async function ({ nft, collection }, publicKey, dirName) {
 				width: "512!",
 				height: "512!",
 			}, function(err, stdout, stderr) {
-				if (err) console.log(imageUrl);
+				if (err) env.error(imageUrl); // TODO
 				if (err) throw err;
 
 				const s3 = new AWS.S3({

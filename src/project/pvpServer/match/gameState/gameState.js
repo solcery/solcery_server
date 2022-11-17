@@ -9,6 +9,7 @@ class GameState {
 		this.content = data.content;
 		this.players = data.players;
 		this.runtime = new BrickRuntime(this.content, data.seed);
+		this.miscRuntime = new BrickRuntime(this.content, data.seed); //TODO: proper name
 		if (this.content.gameAttributes) {
 			for (let attr of Object.values(this.content.gameAttributes)) {
 				this.attrs[attr.code] = 0;
@@ -16,11 +17,20 @@ class GameState {
 		}
 	}
 
+	getRuntime(type = 'misc') {
+		if (type === 'misc') {
+			return this.miscRuntime;
+		}
+		if (type === 'main') {
+			return this.runtime;
+		}
+	}
+
 	getResult() {
 		let gameOverCondition = this.content.gameSettings.gameOverCondition;
 		if (!gameOverCondition) return;
 		let ctx = this.createContext();
-		let finished = this.runtime.execBrick(gameOverCondition, ctx);
+		let finished = this.getRuntime().execBrick(gameOverCondition, ctx);
 		if (!finished) return;
 		if (!this.content.players) return {};
 		let playerScore = {};
@@ -32,7 +42,7 @@ class GameState {
 				continue;
 			}
 			let ctx = this.createContext();
-			let score = this.runtime.execBrick(scoreValue, ctx);
+			let score = this.getRuntime().execBrick(scoreValue, ctx);
 			playerScore[playerInfo.index] = score;
 		}
 		return {
@@ -79,7 +89,7 @@ class GameState {
 	objectEvent = (objectId, event, vars) => {
 		let object = this.objects[objectId];
 		if (!object) throw new Error('Attempt to call event unkown object!');
-		let ctx = this.createContext(object, { vars });
+		let ctx = this.createContext({ object, vars });
 		let cardType = this.content.cardTypes[object.tplId];
 		if (cardType[event]) {
 			this.runtime.execBrick(cardType[event], ctx);
@@ -89,7 +99,7 @@ class GameState {
 	applyCommand = (commandId, scopeVars) => {
 		let command = this.content.commands[commandId];
 		if (!command) throw 'No such game command';
-		let ctx = this.createContext(undefined);
+		let ctx = this.createContext();
 		if (scopeVars) Object.assign(ctx.scopes[0].vars, scopeVars);
 		if (command.action) {
 			this.runtime.execBrick(command.action, ctx);
@@ -116,18 +126,22 @@ class GameState {
 		entity.attrs.place = place;
 		let cardType = this.content.cardTypes[cardTypeId];
 		if (!cardType) throw new Error('Game.createEntity error: Unknown cardType!');
+		ctx = ctx ?? this.createContext();
+		let oldCtxObject = ctx.object;
+		ctx.object = entity;
 		if (cardType.action_on_create) {
-			this.runtime.execBrick(cardType.action_on_create, this.createContext(entity, ctx));
+			this.runtime.execBrick(cardType.action_on_create, ctx);
 		}
 		if (initAction) {
-			this.runtime.execBrick(initAction, this.createContext(entity, ctx));
+			this.runtime.execBrick(initAction, ctx);
 		}
+		ctx.object = oldCtxObject;
 		return entity;
 	}
 
-	createContext(object, extra = {}) {
+	createContext(extra = {}) { // TODO: scope support
 		extra.game = this;
-		return this.runtime.context(object, extra);
+		return this.runtime.context(extra);
 	}
 
 }

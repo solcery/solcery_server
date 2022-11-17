@@ -4,6 +4,7 @@ const Master = { api: { game: {} } };
 Master.api.game.ctx = function(params, ctx) {
     ctx.project = this.core.get(Project, params.gameId);
     assert(ctx.project, `API Error: No game with id '${params.gameId}'`);
+    assert(ctx.project.free, `API Error: Project '${params.gameId}' is busy`)
 }
 
 Master.api.game.getGameInfo = async function(params, ctx) {

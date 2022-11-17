@@ -22,21 +22,28 @@ Master.createMatch = function(data) {
 
 Master.onGameBuildLoaded = async function(gameBuild) {
 	let version = gameBuild.version;
+	this.completeTask(`load.gameBuild.${version}`)
 	let matches = await this.gameDb.matches.find({ finished: null, version }).toArray();
 	for (let matchData of matches) {
 		this.createMatch(matchData);
+		this.completeTask(`load.match.${matchData.id}`);
 	}
 }
 
 Master.getRequiredGameBuilds = async function() {
+	this.addTask('load.matches');
 	let matches = await this.gameDb.matches.find({ finished: null }).toArray();
+
 	let gameBuildVersions = {};
 	for (let match of matches) {
+		this.addTask(`load.match.${match.id}`);
 		gameBuildVersions[match.version] = true;
 	}
 	for (let version of Object.keys(gameBuildVersions)) {
+		this.addTask(`load.gameBuild.${version}`)
 		this.loadGameBuild(version);
 	}
+	this.completeTask('load.matches');
 }
 
 Master.getLatestGameBuild = async function() {

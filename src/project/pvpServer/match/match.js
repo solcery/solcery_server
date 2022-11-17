@@ -11,8 +11,23 @@ Master.onCreate = function(data) {
 	this.result = data.result;
 }
 
-Master.addAction = function(action, broadcast) {
+Master.onPostCreate = function(data) {
+	for (let playerInfo of this.players) {
+		if (playerInfo.left) continue;
+		let player = this.parent.get(Player, playerInfo.id);
+		if (!player) {
+			player = this.parent.create(Player, { 
+				id: playerInfo.id,
+				bot: playerInfo.bot, 
+			});
+			player.execAllMixins('onJoinMatch', this, playerInfo.index);
+		}
+	}
+}
+
+Master.addAction = function(action) {
 	action.id = this.actionLog.length;
+	action.time = this.time();
 	this.actionLog.push(action);
 	this.execAllMixins('onAction', action);
 	if (!this.started) return;
@@ -31,7 +46,6 @@ Master.start = function(data) {
 	});
 	this.started = this.time();
 	this.save(true);
-	this.execAllMixins('onStart');
 	this.execAllPlayers('onMatchUpdate', this.getSaveData());
 }
 
@@ -105,7 +119,7 @@ Master.removePlayer = function(player, outcome) {
 }
 
 Master.onPlayerAction = function(player, action) {
-	let playerData = this.players.find(agent => agent.id === player.id);
+	let playerData = this.players.find(playerData => playerData.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
 	objset(action, playerData.index, 'ctx', 'player_index');
 	this.addAction({

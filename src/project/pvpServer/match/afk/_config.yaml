@@ -1,0 +1,13 @@
+moduleName: 'project/pvpServer/match/afk'
+requiredModules:
+  project/pvpServer/player: true
+  project/pvpServer/match: true
+  project/pvpServer/match/gameState: true
+
+dwellers:
+  Player:
+    mixins:
+      project/pvpServer/match/afk/player: true
+
+tests:
+  testAfk: true

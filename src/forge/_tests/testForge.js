@@ -1,5 +1,5 @@
 async function test(testEnv) {
-	console.log('FIX ME!')
+	env.warn('FIX ME!')
 	return;
 
 	const core = createCore({

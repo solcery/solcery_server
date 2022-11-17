@@ -4,6 +4,7 @@ requiredModules:
   project/pvpServer/player: true
   project/pvpServer/match/gameState: true
   project/pvpServer/match/bot: true
+  project/pvpServer/match/afk: true
 
 dwellers:
   Match: 

@@ -2,6 +2,7 @@ moduleName: 'project/pvpServer'
 requiredModules:
   api: true
   mongo: true
+  tasks: true
   project/pvpServer/player: true
   project/pvpServer/match: true
   project/pvpServer/matchmaker: true
@@ -10,6 +11,7 @@ dwellers:
   Project:
     mixins:
       project/pvpServer/project: true
+      tasks/mixin: true
   Api:
     mixins:
       project/pvpServer/api: true

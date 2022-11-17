@@ -6,9 +6,9 @@ Master.onCreate = function(data) {
         try {
             this.execAllMixins('onSocketMessage', message)
         } catch (err) {
-            this.socket.emit('message', {
-                type: 'error',
-                data: err.message,
+            env.error(err)
+            this.socket.emit('exception', {
+                message: err.message,
             })
         }
         if (callback) {
@@ -38,7 +38,9 @@ Master.challenge = function (data) {
     try {
         this.execAllMixins('onChallenge', data);
     } catch (e) {
-        this.socket.emit('exception', e.message);
+        this.socket.emit('exception', {
+            message: e.message
+        });
         this.disconnect();
         return;
     }

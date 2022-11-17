@@ -9,9 +9,20 @@ Master.onCreate = function(data) {
 	this.gameBuild = data.gameBuild ?? this.gameBuild;
 	this.seed = data.seed ?? Math.floor(Math.random() * 256);
 	this.result = data.result;
+	for (let playerInfo of this.players) {
+		if (playerInfo.left) continue;
+		let player = this.parent.get(Player, playerInfo.id);
+		if (!player) {
+			player = this.parent.create(Player, { 
+				id: playerInfo.id,
+				bot: playerInfo.bot, 
+			});
+			player.execAllMixins('onJoinMatch', this, playerInfo.index);
+		}
+	}
 }
 
-Master.addAction = function(action, broadcast) {
+Master.addAction = function(action) {
 	action.id = this.actionLog.length;
 	this.actionLog.push(action);
 	this.execAllMixins('onAction', action);

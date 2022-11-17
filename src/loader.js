@@ -148,7 +148,6 @@ process.chdir('./src');
 let mainConfig = parseConfig('./config.yaml');
 loadModule(mainConfig); // Loading modules from config
 env.config = config;
-// console.log(require('util').inspect(config, { colors: true, depth: 5 }));
 initClasses();
 env.log('All modules loaded');
 

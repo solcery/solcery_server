@@ -6,6 +6,7 @@ Master.onCreate = function(data) {
         try {
             this.execAllMixins('onSocketMessage', message)
         } catch (err) {
+            env.error(err)
             this.socket.emit('exception', {
                 message: err.message,
             })

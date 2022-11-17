@@ -12,9 +12,6 @@ dwellers:
   Project:
     mixins:
       project/pvpServer/match/bot/project: true
-  Match:
-    mixins:
-      project/pvpServer/match/bot/match: true
 
 tests:
   testBot: true

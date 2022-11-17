@@ -9,6 +9,9 @@ Master.onCreate = function(data) {
 	this.gameBuild = data.gameBuild ?? this.gameBuild;
 	this.seed = data.seed ?? Math.floor(Math.random() * 256);
 	this.result = data.result;
+}
+
+Master.onPostCreate = function(data) {
 	for (let playerInfo of this.players) {
 		if (playerInfo.left) continue;
 		let player = this.parent.get(Player, playerInfo.id);
@@ -24,6 +27,7 @@ Master.onCreate = function(data) {
 
 Master.addAction = function(action) {
 	action.id = this.actionLog.length;
+	action.time = this.time();
 	this.actionLog.push(action);
 	this.execAllMixins('onAction', action);
 	if (!this.started) return;
@@ -42,7 +46,6 @@ Master.start = function(data) {
 	});
 	this.started = this.time();
 	this.save(true);
-	this.execAllMixins('onStart');
 	this.execAllPlayers('onMatchUpdate', this.getSaveData());
 }
 
@@ -116,7 +119,7 @@ Master.removePlayer = function(player, outcome) {
 }
 
 Master.onPlayerAction = function(player, action) {
-	let playerData = this.players.find(agent => agent.id === player.id);
+	let playerData = this.players.find(playerData => playerData.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
 	objset(action, playerData.index, 'ctx', 'player_index');
 	this.addAction({

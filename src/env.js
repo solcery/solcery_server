@@ -8,6 +8,10 @@ env.log = function(...args) {
 	console.log(...args);
 }
 
+env.warn = function(...args) {
+	console.warn(...args);
+}
+
 env.error = function(...args) {
 	console.error(...args);
 }

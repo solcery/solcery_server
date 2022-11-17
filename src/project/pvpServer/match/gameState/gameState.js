@@ -9,6 +9,7 @@ class GameState {
 		this.content = data.content;
 		this.players = data.players;
 		this.runtime = new BrickRuntime(this.content, data.seed);
+		this.miscRuntime = new BrickRuntime(this.content, data.seed); //TODO: proper name
 		if (this.content.gameAttributes) {
 			for (let attr of Object.values(this.content.gameAttributes)) {
 				this.attrs[attr.code] = 0;
@@ -20,7 +21,7 @@ class GameState {
 		let gameOverCondition = this.content.gameSettings.gameOverCondition;
 		if (!gameOverCondition) return;
 		let ctx = this.createContext();
-		let finished = this.runtime.execBrick(gameOverCondition, ctx);
+		let finished = this.miscRuntime.execBrick(gameOverCondition, ctx);
 		if (!finished) return;
 		if (!this.content.players) return {};
 		let playerScore = {};
@@ -32,7 +33,7 @@ class GameState {
 				continue;
 			}
 			let ctx = this.createContext();
-			let score = this.runtime.execBrick(scoreValue, ctx);
+			let score = this.miscRuntime.execBrick(scoreValue, ctx);
 			playerScore[playerInfo.index] = score;
 		}
 		return {

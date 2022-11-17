@@ -9,16 +9,27 @@ Master.onCreate = function(data) {
 	this.bot = data.bot;
 }
 
-Master.onJoinMatch = function(match, playerIndex) {
-	this.playerIndex = playerIndex; // find himself
-	assert(this.match);
-	this.gameBuild = this.match.gameBuild;
-	this.actionLog = [];
-	let botContent = objget(this.gameBuild, 'content', 'bot');
+Master.onJoinMatch = function(match) {
+	for (let player of match.players) {
+		if (player.id === this.id) {
+			var playerIndex = player.index;
+			break;
+		}
+	}
+	assert(playerIndex);
+	let gameBuild = this.match.gameBuild;
+	let botContent = objget(gameBuild, 'content', 'bot');
 	if (!botContent) {
 		this.disableMixinCallbacks(Master);
 		return;
 	}
+	let gameState = this.match.gameState;
+	this.bot = new Bot({
+		gameBuild,
+		gameState,
+		playerIndex, 
+		onCommand: action => this.match.execAllMixins('onPlayerAction', this, action),
+	});
 }
 
 Master.onLeaveMatch = function(data) {
@@ -26,36 +37,13 @@ Master.onLeaveMatch = function(data) {
 }
 
 Master.onMatchUpdate = function(data) {
-	if (data.started) { // Match start
-		let gameContent = objget(this.gameBuild, 'content', 'web');
-		let seed = data.seed;
-		let players = data.players;
-		this.createGameState(gameContent, players, seed);
-		this.bot = new Bot({
-			gameBuild: this.match.gameBuild,
-			gameState: this.gameState,
-			playerIndex: this.playerIndex, 
-			onCommand: action => this.match.execAllMixins('onPlayerAction', this, action),
-		});
-	}
-	if (!this.gameState) return;
-	if (!data.actionLog) return; 
-	this.updateActionLog(data.actionLog);
-	if (this.gameState.getResult()) {
+	if (this.match.gameState.getResult()) {
 		this.delete();
+		return;
 	}
-	let botAlive = this.bot.think();
-	if (!botAlive) {
+	let panic = !this.bot.think();
+	if (panic) {
 		this.match.removePlayer(this)
-	}
-}
-
-Master.updateActionLog = function(actionLog) {
-	if (this.actionLog.length >= actionLog.length) return;
-	let toAdd = actionLog.slice(this.actionLog.length);
-	for (let action of toAdd) {
-		this.actionLog.push(action);
-		this.gameStateAction(action);
 	}
 }
 

@@ -21,6 +21,10 @@ Master.onJoinMatch = function(match) {
     }
 }
 
+Master.onLeaveMatch = function() {
+    this.afk = undefined;
+}
+
 Master.onTick = function(time) { //TODO: onProcess
     let next = objget(this, 'afk', 'next');
     if (!next) return;

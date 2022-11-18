@@ -21,7 +21,7 @@ Master.onJoinMatch = function(match) {
 }
 
 Master.onLeaveMatch = function(match) {
-    delete this.match;
+    this.match = undefined;
     this.setStatus('online')
 }
 

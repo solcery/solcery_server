@@ -36,6 +36,7 @@ Master.onSocketRequestLeaveMatch = function() {
 }
 
 Master.onMatchUpdate = function(data) {
+    data.time = this.time();
     this.socketMessage('matchUpdate', data)
 }
 

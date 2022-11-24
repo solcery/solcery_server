@@ -306,6 +306,7 @@ const basicActions = [
 			{ code: 'volume', name: 'Volume', type: 'SBrick<value>' },
 		],
 		exec: (runtime, params, ctx) => {
+			if (!ctx.game.playSound) return;
 			let volume = runtime.execBrick(params.volume, ctx);
 			ctx.game.playSound(params.sound_id, volume);
 		},

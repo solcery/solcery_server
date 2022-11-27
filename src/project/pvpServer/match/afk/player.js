@@ -17,7 +17,7 @@ Master.onJoinMatch = function(match) {
     };
     this.afk = {
         action: afkAction,
-        timeout: afkTimeout
+        timeout: afkTimeout,
     }
 }
 
@@ -48,22 +48,13 @@ Master.onTick = function(time) { //TODO: onProcess
 
 Master.onMatchUpdate = function(data) {
     if (!this.afk) return;
-    if (!this.match) return; //TODO ???
-    let myLastActionTime = this.match.started;
-    if (data.actionLog) {
-        let myActions = data.actionLog.filter(action => action.player === this.id);
-        if (myActions.length > 0) {
-            myLastActionTime = myActions.pop().time;
-        }
-    }
+    if (!this.match) return; //TODO ??
     let ctx = this.match.gameState.createContext();
     let runtime = this.match.gameState.getRuntime();
     let timeout = runtime.execBrick(this.afk.timeout, ctx);
-    if (timeout <= 0) {
-        this.afk.next = undefined;
-        return;
-    };
-    this.afk.next = myLastActionTime + timeout;
+    if (timeout > 0) {
+        this.afk.next = this.match.started + timeout;
+    }
 }
 
 module.exports = Master;

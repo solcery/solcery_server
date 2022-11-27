@@ -10,7 +10,8 @@ Master.createGameState = function(content, players, seed) {
 }
 
 Master.gameStateAction = function(action) {
-	let { type, commandId, ctx, playerIndex } = action;
+	let { type, commandId, ctx, playerIndex, time } = action;
+	this.gameState.time = time;
 	switch (type) {
 		case 'init':
 			this.gameState.start(this.players);
@@ -21,6 +22,7 @@ Master.gameStateAction = function(action) {
 		default: 
 			break;
 	}
+	this.execAllMixins('onGameStateAction', action)
 }
 
 module.exports = Master;

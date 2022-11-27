@@ -386,6 +386,17 @@ const basicValues = [
 			return scope.vars[varName];
 		},
 	},
+	{
+		type: 2,
+		subtype: 11, // TODO
+		lib: 'value',
+		func: 'time',
+		name: 'Time',
+		params: [],
+		exec: (runtime, params, ctx) => {
+			return objget(ctx, 'game', 'time') ?? 0;
+		},
+	}
 ];
 
 module.exports = { basicValues };

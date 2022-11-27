@@ -5,6 +5,7 @@ Master.onCreate = function(data) {
   		this.disableMixinCallbacks(Master);
   		return;
   	}
+  	this.projectConfigs = data.projectConfigs; // TODO: remove
   	this.solceryDb = this.createMongo(data.solceryDb, [ 'objects' ]);
   	this.loadProjects();
 }
@@ -30,7 +31,7 @@ Master.loadProjects = async function() {
 	for (let project of this.core.getAll(Project)) {
         project.delete();
     }
-  	let projectConfigs = await this.solceryDb.objects.find({ template: 'projects' }).toArray();
+    let projectConfigs = this.projectConfigs ?? await this.solceryDb.objects.find({ template: 'projects' }).toArray();
   	for (let projectConfig of projectConfigs) {
   		env.log('Creating project with config ', projectConfig.fields)
 		this.create(Project, { 

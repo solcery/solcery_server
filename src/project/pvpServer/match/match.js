@@ -27,10 +27,10 @@ Master.onPostCreate = function(data) {
 
 Master.addAction = function(action) {
 	action.id = this.actionLog.length;
-	action.time = this.time();
+	action.time = this.time() - this.started;
 	this.actionLog.push(action);
 	this.execAllMixins('onAction', action);
-	if (!this.started) return;
+	if (action.type === 'init') return; // TODO
 	this.execAllPlayers('onMatchUpdate', this.getSaveData([ 'actionLog' ]));
 }
 
@@ -40,17 +40,19 @@ Master.onDelete = function() {
 
 Master.start = function(data) {
 	assert(!this.started);
+	this.started = this.time();
 	this.addAction({ 
 		id: this.actionLog.length,
 		type: 'init',
+		time: 0,
 	});
-	this.started = this.time();
 	this.save(true);
 	this.execAllPlayers('onMatchUpdate', this.getSaveData());
 }
 
 Master.end = function(data) {
 	this.finished = this.time();
+	this.execAllPlayers('onLeaveMatch');
 	this.save();
 	this.delete();
 }
@@ -90,13 +92,9 @@ Master.addPlayer = function(player, data = {}) {
 	player.execAllMixins('onJoinMatch', this, index);
 }
 
-Master.removePlayer = function(player, outcome) {
+Master.removePlayer = function(player) {
 	let playerData = this.players.find(agent => agent.id === player.id);
 	assert(playerData, `Player '${player.id}' does not participate in this game!`);
-	this.addAction({
-		player: playerData.id,
-		type: 'leaveMatch',
-	});
 	let leaveGameCommandId = objget(this.gameBuild, 'content', 'web', 'gameSettings', 'leaveGameCommandId');
 	if (leaveGameCommandId) {
 		this.addAction({
@@ -108,6 +106,10 @@ Master.removePlayer = function(player, outcome) {
 			}
 		})
 	}
+	this.addAction({
+		player: playerData.id,
+		type: 'leaveMatch',
+	});
 	playerData.left = true;
 	player.execAllMixins('onLeaveMatch');
 	let activePlayers = this.players.filter(p => !p.left).length;

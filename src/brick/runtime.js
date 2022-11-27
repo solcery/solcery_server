@@ -39,7 +39,7 @@ class BrickRuntime {
 				objset(this.bricks, brick, lib, func);
 			}
 		}
-		this.random = new Random(seed)
+		this.random = new Random(seed);
 	}
 
 	newScope (args = {}) {

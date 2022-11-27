@@ -301,9 +301,14 @@ const basicActions = [
 		lib: 'action',
 		func: 'play_sound',
 		name: 'Play sound',
-		params: [{ code: 'sound_id', name: 'Sound', type: 'SLink<sounds>' }],
+		params: [
+			{ code: 'sound_id', name: 'Sound', type: 'SLink<sounds>' },
+			{ code: 'volume', name: 'Volume', type: 'SBrick<value>' },
+		],
 		exec: (runtime, params, ctx) => {
-			// ctx.game.playSound(params.sound_id);
+			if (!ctx.game.playSound) return;
+			let volume = runtime.execBrick(params.volume, ctx);
+			ctx.game.playSound(params.sound_id, volume);
 		},
 	},
 	{

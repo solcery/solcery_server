@@ -12,7 +12,14 @@ const gameBuild = {
 				1: {
 					action: {
 						lib: 'action',
-						func: 'void',
+						func: 'set_game_attr',
+						params: {
+							attr_name: 'lastActionTime',
+							value: {
+								lib: 'value',
+								func: 'time'
+							}
+						}
 					}
 				},
 				2: {
@@ -27,9 +34,22 @@ const gameBuild = {
 					index: 1,
 					afkTimeout: {
 						lib: 'value',
-						func: 'const',
+						func: 'add',
 						params: {
-							value: 1000
+							value1: {
+								lib: 'value',
+								func: 'game_attr',
+								params: {
+									attr_name: 'lastActionTime'
+								}
+							},
+							value2: {
+								lib: 'value',
+								func: 'const',
+								params: {
+									value: 1000,
+								}
+							}
 						}
 					},
 					afkAction: {
@@ -50,11 +70,15 @@ const gameBuild = {
 				4: {
 					index: 2,
 				}
-			}
+			},
+			gameAttributes: [
+				{
+					code: 'lastActionTime'
+				}
+			]
 		}
 	}
 }
-
 
 const virtualDb = {
 	dbs: {
@@ -71,8 +95,6 @@ const virtualDb = {
 		}
 	}
 }
-
-
 
 async function test(testEnv) {
 	const core = createCore({ virtualDb });

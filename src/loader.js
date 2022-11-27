@@ -151,6 +151,20 @@ env.config = config;
 initClasses();
 env.log('All modules loaded');
 
+// let projectConfigs = [
+// 	{
+// 		fields: {
+// 			db: 'polygon',
+// 			game: {
+// 				gameId: 'polygon'
+// 			},
+// 			pvpServer: true,
+// 			engine: true,
+// 			name: 'polygon'
+// 		}
+// 	}
+// ]
+
 if (env.test) {
 	let tests = [];
 	for (let loadedModule of Object.values(loadedModules)) {
@@ -165,6 +179,7 @@ if (env.test) {
 		httpServer: true,
 		loader: true,
 		solceryDb: 'solcery',
+		// projectConfigs,
 	});
 	setInterval(() => core.tick(env.time()), 1000); // TODO: add try-catch
 }

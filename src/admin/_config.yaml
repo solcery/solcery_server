@@ -20,3 +20,6 @@ api:
           code:
             type: 'javascript'
             required: true
+
+tests:
+  testQuestUtil: true

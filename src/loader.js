@@ -151,19 +151,19 @@ env.config = config;
 initClasses();
 env.log('All modules loaded');
 
-// let projectConfigs = [
-// 	{
-// 		fields: {
-// 			db: 'polygon',
-// 			game: {
-// 				gameId: 'polygon'
-// 			},
-// 			pvpServer: true,
-// 			engine: true,
-// 			name: 'polygon'
-// 		}
-// 	}
-// ]
+let projectConfigs = [
+	{
+		fields: {
+			db: 'paint_n_powder',
+			game: {
+				gameId: 'paint_n_powder'
+			},
+			pvpServer: true,
+			engine: true,
+			name: 'paint_n_powder'
+		}
+	}
+]
 
 if (env.test) {
 	let tests = [];
@@ -182,4 +182,105 @@ if (env.test) {
 		// projectConfigs,
 	});
 	setInterval(() => core.tick(env.time()), 1000); // TODO: add try-catch
+	setTimeout(() => matchLog(core), 1000);
+}
+
+
+const matchLog = async(core) => {
+
+	const GameState = require('./project/pvpServer/match/gameState/gameState.js');
+	console.log(GameState)
+	env.log('test util running');
+	let pnp = core.get(Project, 'paint_n_powder');
+	let query = { 
+		started: {
+			$gt: env.time() - 86400000 * 14
+		},
+		finished: {
+			$gt: 0
+		}
+	}
+	let result = {};
+
+	let matches = await pnp.gameDb.matches.find(query).toArray();
+	for (let matchData of matches) {
+		let matchResult = {};
+		let { id, index } = matchData.players.find(p => !p.bot);
+		matchResult.playerPubkey = id;
+
+		let playerScore = matchData.result.playerScore[`${index}`];
+		matchResult.result = playerScore ? 'VICTORY' : 'DEFEAT';
+		
+
+
+		let gameBuild = await pnp.gameDb.gameBuilds.findOne({ version: matchData.version })
+
+		let gameState = new GameState({
+			seed: matchData.seed,
+			content: gameBuild.content.web,
+			players: matchData.players,
+		})
+
+		let actionLog = matchData.actionLog;
+
+		const gameLog = []
+		let step = 0;
+		for (let action of actionLog) {
+			let { type, commandId, ctx, playerIndex, time } = action;
+			gameState.time = time;
+			switch (type) {
+				case 'init':
+					gameState.start(this.players);
+					break;
+				case 'gameCommand':
+					gameState.applyCommand(commandId, ctx)
+					break;
+				default: 
+					break;
+			}
+			step++;
+			const shopPlaces = [ 37, 38, 39, 40, 41];
+			let playerHp = gameState.attrs.your_hp;
+			let botHp = gameState.attrs.enemy_hp;
+			let cardsInShop = Object.values(gameState.objects).filter(obj => shopPlaces.includes(obj.attrs.place)).length;
+			let cardsInShopDeck = Object.values(gameState.objects).filter(obj => obj.attrs.place === 15).length;
+			gameLog.push({
+				step,
+				playerHp, 
+				botHp,
+				cardsInShopDeck,
+				cardsInShop
+			});
+		}
+		let fullHp = gameLog[gameLog.length - 1].playerHp === 20;
+		let emptyShop = gameLog[gameLog.length - 1].cardsInShop === 0 && gameLog[gameLog.length - 1].cardsInShopDeck === 0;
+		let playerHp = gameLog[gameLog.length - 1].playerHp;
+		let cardsInShopDeck = gameLog[gameLog.length - 1].cardsInShopDeck;
+		let cardsInShop = gameLog[gameLog.length - 1].cardsInShop;
+		let sumDamage = 0;
+		for (let i = 1; i < gameLog.length; i++) {
+			let prev = gameLog[i-1];
+			let current = gameLog[i];
+			if (current.botHp < prev.botHp) {
+				sumDamage += prev.botHp - current.botHp;
+			}
+		}
+		matchResult = {
+			...matchResult,
+			fullHp,
+			playerHp,
+			emptyShop,
+			sumDamage,
+			cardsInShopDeck,
+			cardsInShop,
+		}
+
+		result[matchData.id] = matchResult;
+	}
+	let resStr = ''
+	for (let mr of Object.values(result)) {
+		resStr += `${mr.playerPubkey}\t${mr.result}\t${mr.cardsInShop}+${mr.cardsInShopDeck}\n`;
+	}
+	console.log(resStr)
+	// console.log(matches[0])
 }

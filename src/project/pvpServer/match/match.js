@@ -75,8 +75,8 @@ Master.getSaveData = function(fields) {
 }
 
 Master.save = async function(upsert = false) {
-	let filter = { id: this.id };
-	this.parent.gameDb.matches.updateOne(filter, { '$set': this.getSaveData() }, { upsert });
+	// let filter = { id: this.id };
+	// this.parent.gameDb.matches.updateOne(filter, { '$set': this.getSaveData() }, { upsert });
 }
 
 Master.addPlayer = function(player, data = {}) {

@@ -8,7 +8,9 @@ Master.onJoinMatch = function(match) {
         }
     }
     assert(playerIndex);
-    let playerSettings = objget(this.match, 'gameBuild', 'content', 'web', 'players');
+    let content = objget(this.match, 'gameBuild', 'content', 'web');
+    if (!content) return;
+    let playerSettings = content.players;
     if (!playerSettings) return;
     let { afkAction, afkTimeout } = Object.values(playerSettings).find(player => player.index === playerIndex); 
     if (!afkAction || !afkTimeout) {
@@ -19,6 +21,10 @@ Master.onJoinMatch = function(match) {
         action: afkAction,
         timeout: afkTimeout,
     }
+    this.afkBrickRuntime = this.match.gameState.auxBrickRuntime();
+    this.afkBrickRuntime.addBindings('client',  {
+        sendCommand: (commandId, ctx) => this.sendGameCommand(commandId, ctx)
+    });
 }
 
 Master.onLeaveMatch = function() {
@@ -29,29 +35,14 @@ Master.onTick = function(time) { //TODO: onProcess
     let next = objget(this, 'afk', 'next');
     if (!next) return;
     if (time < next) return;
-    this.afk.next = undefined; 
-    let runtime = this.match.gameState.getRuntime();
-    let ctx = this.match.gameState.createContext({
-        sendCommand: (commandId, objectId) => {
-            let action = {
-                type: 'gameCommand',
-                commandId,
-                ctx: {
-                    object_id: objectId,
-                }
-            }
-            this.match.execAllMixins('onPlayerAction', this, action)
-        }
-    });
-    runtime.execBrick(this.afk.action, ctx);
+    this.afk.next = undefined;
+    this.afkBrickRuntime.execBrick(this.afk.action);
 }
 
 Master.onMatchUpdate = function(data) {
     if (!this.afk) return;
     if (!this.match) return; //TODO ??
-    let ctx = this.match.gameState.createContext();
-    let runtime = this.match.gameState.getRuntime();
-    let timeout = runtime.execBrick(this.afk.timeout, ctx);
+    let timeout = this.afkBrickRuntime.execBrick(this.afk.timeout);
     if (timeout > 0) {
         this.afk.next = this.match.started + timeout;
     }

@@ -5,7 +5,7 @@ class GameState {
 
 	constructor(data) {
 		assert(data.seed !== undefined)
-		this.seed = data.seed;
+		this.random = new Random(data.seed);
 		this.content = data.content;
 		this.players = data.players;
 		this.runtime = new BrickRuntime(this.content, data.seed);

@@ -23,12 +23,18 @@ Master.onJoinMatch = function(match) {
 		this.disableMixinCallbacks(Master);
 		return;
 	}
+	let playerSettings = Object.values(botContent.players).find(player => player.index === playerIndex);
+	if (!playerSettings) return;
 	let gameState = this.match.gameState;
+	let botIds = playerSettings.bots;
+	let botId = botIds[Math.floor(Math.random() * botIds.length)]; // Choosing random bot
+	let strategy = botContent.bots[botId];
+	let rules = strategy.rules.map(ruleId => botContent.botRules[ruleId]);
 	this.bot = new Bot({
-		gameBuild,
+		strategy,
+		rules,
 		gameState,
-		playerIndex, 
-		onCommand: action => this.match.execAllMixins('onPlayerAction', this, action),
+		onCommand: (commandId, ctx) => this.sendGameCommand(commandId, ctx),
 	});
 }
 

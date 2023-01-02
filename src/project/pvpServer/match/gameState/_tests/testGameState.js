@@ -182,11 +182,11 @@ async function test(testEnv) {
 			object_id: 8,
 		}
 	})
-	let obj5 = match.gameState.objects['5'];
+	let obj5 = match.gameState.entities['5'];
 	assert(obj5.id === 5);
 	assert(obj5.attrs.place === 4);
 	assert(obj5.attrs.testObjectAttr === 3);
-	let obj8 = match.gameState.objects['8'];
+	let obj8 = match.gameState.entities['8'];
 	assert(obj8.id === 8);
 	assert(obj8.attrs.place === 4);
 	assert(obj8.attrs.testObjectAttr === 1);

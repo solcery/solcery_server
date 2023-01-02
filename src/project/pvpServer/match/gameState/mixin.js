@@ -1,10 +1,9 @@
-const GameState = require('./gameState');
+const GameState = require('solcery_game_state');
 const Master = {};
 
 Master.createGameState = function(content, players, seed) {
 	this.gameState = new GameState({
 		content,
-		players,
 		seed,
 	})
 }
@@ -14,7 +13,7 @@ Master.gameStateAction = function(action) {
 	this.gameState.time = time;
 	switch (type) {
 		case 'init':
-			this.gameState.start(this.players);
+			this.gameState.start();
 			break;
 		case 'gameCommand':
 			this.gameState.applyCommand(commandId, ctx)

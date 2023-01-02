@@ -4,7 +4,6 @@ const { addMixin, removeMixin } = require('./mixin');
 require('./utils');
 require('./env');
 require("dotenv").config({ path: "./.env" });
-global.BrickRuntime = require('./brick/runtime');
 
 const config = {};
 const loadedModules = {}; // Stack of loaded modules to prevent recursive dependencies
@@ -151,19 +150,39 @@ env.config = config;
 initClasses();
 env.log('All modules loaded');
 
-// let projectConfigs = [
-// 	{
-// 		fields: {
-// 			db: 'polygon',
-// 			game: {
-// 				gameId: 'polygon'
-// 			},
-// 			pvpServer: true,
-// 			engine: true,
-// 			name: 'polygon'
-// 		}
-// 	}
-// ]
+let projectConfigs = [
+	{
+		fields: {
+			db: 'polygon',
+			game: {
+				gameId: 'polygon'
+			},
+			pvpServer: true,
+			engine: true,
+			name: 'polygon'
+		}
+	},
+	{
+		fields: {
+			db: 'lightmor',
+			game: {
+				gameId: 'lightmor'
+			},
+			engine: true,
+			name: 'lightmor'
+		}
+	},
+	{
+		fields: {
+			db: 'paint_n_powder',
+			game: {
+				gameId: 'paint_n_powder'
+			},
+			engine: true,
+			name: 'paint_n_powder'
+		}
+	}
+]
 
 if (env.test) {
 	let tests = [];
@@ -179,7 +198,7 @@ if (env.test) {
 		httpServer: true,
 		loader: true,
 		solceryDb: 'solcery',
-		// projectConfigs,
+		projectConfigs,
 	});
 	setInterval(() => core.tick(env.time()), 1000); // TODO: add try-catch
 }

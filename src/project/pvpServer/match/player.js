@@ -27,7 +27,7 @@ Master.onLeaveMatch = function(match) {
 
 Master.onSocketRequestAction = function(data) {
     if (!this.match) return;
-    this.match.execAllMixins('onPlayerAction', this, data);
+    this.match.execAllMixins('onPlayerAction', this, data); // TODO sendGameCommand
 }
 
 Master.onSocketRequestLeaveMatch = function() {
@@ -38,6 +38,16 @@ Master.onSocketRequestLeaveMatch = function() {
 Master.onMatchUpdate = function(data) {
     data.time = this.time();
     this.socketMessage('matchUpdate', data)
+}
+
+Master.sendGameCommand = function(commandId, ctx) {
+    if (!this.match) return;
+    let action = {
+        type: 'gameCommand',
+        commandId,
+        ctx,
+    }
+    this.match.execAllMixins('onPlayerAction', this, action)
 }
 
 module.exports = Master

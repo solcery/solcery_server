@@ -3259,6 +3259,14 @@ socks@^2.7.0:
     ip "^2.0.0"
     smart-buffer "^4.2.0"
 
+"solcery_brick_runtime@file:../solcery_brick_runtime":
+  version "1.0.8"
+
+"solcery_game_state@file:../solcery_game_state":
+  version "1.0.5"
+  dependencies:
+    solcery_brick_runtime "file:../../.cache/yarn/v6/npm-solcery-game-state-1.0.5-6e6ffd2d-9192-49b5-b412-0c8a41b28dcf-1669681346515/node_modules/solcery_brick_runtime"
+
 sparse-bitfield@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/sparse-bitfield/-/sparse-bitfield-3.0.3.tgz#ff4ae6e68656056ba4b3e792ab3334d38273ca11"
